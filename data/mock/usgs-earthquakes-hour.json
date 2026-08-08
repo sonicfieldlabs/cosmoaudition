@@ -1,0 +1,28 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "title": "USGS All Earthquakes, Past Hour"
+  },
+  "features": [
+    {
+      "id": "fixture-usgs-event-1",
+      "properties": {
+        "mag": 1.22,
+        "place": "3 km NW of The Geysers, CA",
+        "time": 1782492898790,
+        "type": "earthquake",
+        "title": "M 1.2 - 3 km NW of The Geysers, CA"
+      }
+    },
+    {
+      "id": "fixture-usgs-event-2",
+      "properties": {
+        "mag": 2.1,
+        "place": "sample preflight event",
+        "time": 1782492000000,
+        "type": "earthquake",
+        "title": "M 2.1 - sample preflight event"
+      }
+    }
+  ]
+}

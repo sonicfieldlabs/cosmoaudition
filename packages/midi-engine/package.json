@@ -1,0 +1,17 @@
+{
+  "name": "@cosmoaudition/midi-engine",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run src",
+    "typecheck": "tsc -b tsconfig.json --pretty false"
+  },
+  "dependencies": {
+    "@cosmoaudition/core": "workspace:*"
+  }
+}

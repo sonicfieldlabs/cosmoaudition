@@ -1,0 +1,23 @@
+{
+  "name": "@cosmoaudition/api",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.mjs",
+    "typecheck": "tsc -b tsconfig.json --pretty false"
+  },
+  "dependencies": {
+    "@cosmoaudition/core": "workspace:*",
+    "@cosmoaudition/masa": "workspace:*",
+    "@hono/node-server": "2.0.10",
+    "hono": "^4.13.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.11",
+    "vite": "^7.3.6"
+  }
+}

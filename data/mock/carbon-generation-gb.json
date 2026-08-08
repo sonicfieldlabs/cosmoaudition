@@ -1,0 +1,15 @@
+{
+  "data": {
+    "generationmix": [
+      { "fuel": "biomass", "perc": 5.4 },
+      { "fuel": "coal", "perc": 0 },
+      { "fuel": "imports", "perc": 4.4 },
+      { "fuel": "gas", "perc": 37.8 },
+      { "fuel": "nuclear", "perc": 8.3 },
+      { "fuel": "other", "perc": 0 },
+      { "fuel": "hydro", "perc": 0 },
+      { "fuel": "solar", "perc": 21.8 },
+      { "fuel": "wind", "perc": 22.3 }
+    ]
+  }
+}

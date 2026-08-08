@@ -1,0 +1,23 @@
+{
+  "name": "@cosmoaudition/masa",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run src/__tests__",
+    "typecheck": "tsc -b tsconfig.json --pretty false"
+  },
+  "dependencies": {
+    "@cosmoaudition/core": "workspace:*",
+    "@sonicfield/masa": "file:../../vendor/masa/sonicfield-masa-0.1.0.tgz",
+    "@sonicfield/masa-validator": "file:../../vendor/masa/sonicfield-masa-validator-0.1.0.tgz"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.7"
+  }
+}

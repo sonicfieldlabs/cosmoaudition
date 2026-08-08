@@ -1,0 +1,20 @@
+{
+  "items": [
+    {
+      "project": "all-projects",
+      "access": "all-access",
+      "agent": "user",
+      "granularity": "hourly",
+      "timestamp": "2026072815",
+      "views": 420000000
+    },
+    {
+      "project": "all-projects",
+      "access": "all-access",
+      "agent": "user",
+      "granularity": "hourly",
+      "timestamp": "2026072816",
+      "views": 441000000
+    }
+  ]
+}

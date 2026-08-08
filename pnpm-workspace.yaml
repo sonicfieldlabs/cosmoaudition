@@ -1,0 +1,20 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+overrides:
+  # Vite resolves PostCSS during local builds. Releases through 8.5.22 can
+  # read an attacker-selected source map when the input path is unset
+  # (GHSA-fxqj-rqcc-2cmp), so keep the workspace on the patched line.
+  "postcss": "8.5.26"
+  # ajv (through the vendored MASA validator) resolves fast-uri, and versions
+  # before 3.1.5 are vulnerable to host confusion via backslash
+  # (GHSA-7p8r-x3mc-p8w7). Pinned to the patched release inside ajv's declared
+  # ^3.0.1 range rather than crossing a major boundary.
+  "fast-uri": "3.1.5"
+  # postcss (a build-time dependency of vite) resolves nanoid; builds before
+  # 3.3.17 can loop indefinitely on hostile input (GHSA-28wg-ghj8-5hjv,
+  # GHSA-2v37-7h3g-55p8). Patched inside the declared ^3.3.x range.
+  "nanoid": "3.3.17"
+  "@sonicfield/masa@0.1.0": "file:vendor/masa/sonicfield-masa-0.1.0.tgz"
+  "@sonicfield/masa-validator@0.1.0": "file:vendor/masa/sonicfield-masa-validator-0.1.0.tgz"
+  "@sonicfield/masa-bundle@0.1.0": "file:vendor/masa/sonicfield-masa-bundle-0.1.0.tgz"

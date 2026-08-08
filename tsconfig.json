@@ -1,0 +1,12 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/core" },
+    { "path": "./packages/masa" },
+    { "path": "./packages/midi-engine" },
+    { "path": "./packages/audio-engine" },
+    { "path": "./packages/ui-system" },
+    { "path": "./apps/api" },
+    { "path": "./apps/web" }
+  ]
+}

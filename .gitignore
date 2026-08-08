@@ -1,0 +1,33 @@
+node_modules/
+dist/
+build/
+.vite/
+coverage/
+test-results/
+playwright-report/
+.playwright-cli/
+.pnpm-store/
+output/
+
+# Local build and demo archives. These are regenerable artifacts, not sources,
+# and the set runs to tens of megabytes; they stay on the machine that made
+# them.
+release/
+
+# Private local working material, including the original working brief. It
+# carries absolute home-directory paths and references to a separate private
+# wiki, so it is retained locally rather than published.
+private/
+
+.DS_Store
+*.log
+*.tsbuildinfo
+
+data/cache/*
+!data/cache/.gitkeep
+data/snapshots/*
+!data/snapshots/.gitkeep
+
+.env
+.env.*
+!.env.example

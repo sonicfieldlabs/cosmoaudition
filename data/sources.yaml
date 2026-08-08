@@ -1,0 +1,588 @@
+version: 1
+updated_at: "2026-07-29"
+preflight_timezone: "America/Bogota"
+project: "Cosmoaudition System"
+policy:
+  no_api_keys_required_for_mvp: true
+  no_automatic_geolocation: true
+  no_client_fingerprinting_persistence: true
+  network_route_default: "api-proxy"
+  null_value_rule: "Missing or invalid values must remain null; adapters must not invent replacement measurements."
+
+sources:
+  - id: carbon_intensity_gb
+    label: "Carbon Intensity GB"
+    status: ready
+    layers: [earth, cloud]
+    endpoint: "https://api.carbonintensity.org.uk/intensity"
+    route: api-proxy
+    ttl_seconds: 1800
+    unit: "gCO2/kWh"
+    parser: "JSON data[0].intensity.actual, data[0].intensity.forecast, data[0].intensity.index"
+    primary_signals:
+      - carbon_intensity_actual
+      - carbon_intensity_forecast
+      - carbon_intensity_index
+    preflight:
+      checked_at: "2026-06-26"
+      http_status: 200
+      latency_seconds: 0.807
+      bytes: 191
+    confidence_rules:
+      high: "actual exists and timestamp is inside ttl"
+      medium: "forecast exists but actual is null"
+      stale: "cached value older than ttl"
+      error: "network, validation, or timestamp failure"
+    fallback: "Use last-known-good cache as stale; otherwise emit null-valued signal and quiet staleNoise."
+    limitation: "Great Britain grid data only; must not be presented as global carbon intensity."
+    license_note: "Public API; record provider attribution in UI/docs."
+
+  - id: carbon_generation_gb
+    label: "Carbon Intensity GB generation mix"
+    status: ready
+    layers: [earth]
+    endpoint: "https://api.carbonintensity.org.uk/generation"
+    route: api-proxy
+    ttl_seconds: 1800
+    unit: "percent"
+    parser: "JSON data.generationmix[] fuel/perc"
+    primary_signals:
+      - generation_mix_biomass
+      - generation_mix_coal
+      - generation_mix_gas
+      - generation_mix_nuclear
+      - generation_mix_solar
+      - generation_mix_wind
+      - generation_mix_hydro
+      - generation_mix_imports
+    preflight:
+      checked_at: "2026-06-26"
+      http_status: 200
+      latency_seconds: 0.691
+      bytes: 331
+    confidence_rules:
+      high: "all expected fuel rows parse and sum is plausible"
+      medium: "partial mix parses"
+      stale: "cached value older than ttl"
+      error: "network, validation, or malformed mix"
+    fallback: "Use last-known-good cache as stale; otherwise emit null-valued mix signals."
+    limitation: "Great Britain electricity mix only; useful as a material-energy sonification source, not a planetary proxy."
+    license_note: "Public API; record provider attribution in UI/docs."
+
+  - id: open_meteo_local
+    label: "Open-Meteo current weather by manual coordinates"
+    status: ready
+    layers: [earth, user]
+    endpoint_pattern: "https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,wind_speed_10m,precipitation&timezone=auto"
+    preflight_endpoint: "https://api.open-meteo.com/v1/forecast?latitude=4.7110&longitude=-74.0721&current=temperature_2m,wind_speed_10m,precipitation&timezone=auto"
+    route: api-proxy
+    ttl_seconds: 600
+    unit: "mixed"
+    parser: "JSON current.temperature_2m, current.wind_speed_10m, current.precipitation, current_units"
+    primary_signals:
+      - local_temperature_2m
+      - local_wind_speed_10m
+      - local_precipitation
+    preflight:
+      checked_at: "2026-06-26"
+      http_status: 200
+      latency_seconds: 0.866
+      bytes: 433
+      sample_coordinates: "Bogota, Colombia: 4.7110,-74.0721"
+    confidence_rules:
+      high: "current values and units parse for manually supplied coordinates"
+      medium: "partial weather values parse"
+      stale: "cached value older than ttl"
+      error: "network, validation, or coordinate validation failure"
+    fallback: "Use last-known-good cache for the same rounded manual coordinates as stale; otherwise null-valued local weather signals."
+    privacy_note: "No automatic geolocation. Manual coordinates or city selection only; do not persist precise coordinates without explicit user action."
+    license_note: "Public API; record provider attribution in UI/docs."
+
+  - id: usgs_earthquakes
+    label: "USGS earthquakes, past hour"
+    status: ready
+    layers: [earth]
+    endpoint: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson"
+    route: api-proxy
+    ttl_seconds: 300
+    unit: "magnitude/count"
+    parser: "GeoJSON metadata.title, features[].properties.mag/time/place/type"
+    primary_signals:
+      - earthquake_count_1h
+      - earthquake_max_magnitude_1h
+      - earthquake_recent_magnitude
+    preflight:
+      checked_at: "2026-06-26"
+      http_status: 200
+      latency_seconds: 0.429
+      bytes: 7532
+      sample_feature_count: 10
+    confidence_rules:
+      high: "GeoJSON parses and metadata title matches past-hour feed"
+      medium: "GeoJSON parses but no events are present"
+      stale: "cached value older than ttl"
+      error: "network or malformed GeoJSON"
+    fallback: "No events is valid data; network failure uses last-known-good as stale or null event signals."
+    ethical_note: "Earthquake events should trigger restrained resonances, not spectacle."
+    license_note: "USGS public feed; record provider attribution in UI/docs."
+
+  - id: mempool_stats
+    label: "mempool.space mempool"
+    status: ready
+    layers: [cloud]
+    endpoint: "https://mempool.space/api/mempool"
+    route: api-proxy
+    ttl_seconds: 60
+    unit: "transactions/vbytes/sats"
+    parser: "JSON count, vsize, total_fee, fee_histogram[]"
+    primary_signals:
+      - bitcoin_mempool_count
+      - bitcoin_mempool_vsize
+      - bitcoin_mempool_total_fee
+    preflight:
+      checked_at: "2026-06-26"
+      http_status: 200
+      latency_seconds: 0.457
+      bytes: 4199
+    confidence_rules:
+      high: "numeric count, vsize, total_fee parse inside ttl"
+      medium: "core numbers parse but fee histogram is missing"
+      stale: "cached value older than ttl"
+      error: "network or validation failure"
+    fallback: "Use last-known-good cache as stale; otherwise emit null-valued crypto congestion signals."
+    limitation: "Bitcoin mempool only; not a general cloud traffic metric."
+    license_note: "Public API; record provider attribution in UI/docs."
+
+  - id: mempool_hashrate
+    label: "mempool.space mining hashrate 3d"
+    status: ready
+    layers: [cloud]
+    endpoint: "https://mempool.space/api/v1/mining/hashrate/3d"
+    route: api-proxy
+    ttl_seconds: 1800
+    unit: "hashes/second"
+    parser: "JSON currentHashrate, currentDifficulty, hashrates[]"
+    primary_signals:
+      - bitcoin_current_hashrate
+      - bitcoin_current_difficulty
+    preflight:
+      checked_at: "2026-06-26"
+      http_status: 200
+      latency_seconds: 0.398
+      bytes: 292
+    confidence_rules:
+      high: "currentHashrate and currentDifficulty parse inside ttl"
+      medium: "current values parse but history is missing"
+      stale: "cached value older than ttl"
+      error: "network or validation failure"
+    fallback: "Use last-known-good cache as stale; otherwise null crypto load signals."
+    limitation: "Bitcoin mining proxy for computation/energy pressure; must not stand in for all cloud infrastructure."
+    license_note: "Public API; record provider attribution in UI/docs."
+
+  - id: coingecko_btc
+    label: "CoinGecko Bitcoin simple price"
+    status: deferred
+    layers: [cloud]
+    endpoint: "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true"
+    route: api-proxy
+    ttl_seconds: 120
+    unit: "USD/percent"
+    parser: "JSON bitcoin.usd, bitcoin.usd_24h_change"
+    primary_signals:
+      - bitcoin_usd
+      - bitcoin_usd_24h_change
+    preflight:
+      checked_at: "2026-06-26"
+      http_status: 200
+      latency_seconds: 0.480
+      bytes: 61
+    confidence_rules:
+      high: "price and 24h change parse inside ttl"
+      medium: "price parses but change is absent"
+      stale: "cached value older than ttl"
+      error: "network, rate-limit, or validation failure"
+    fallback: "Use stale cache; otherwise omit price drift from mapping."
+    limitation: "Market price is not material throughput; use only for pitch drift/volatility coloration."
+    license_note: "Public API with rate-limit risk; record provider attribution in UI/docs."
+
+  - id: yahoo_oil_cl
+    label: "Yahoo Finance WTI crude oil futures CL=F"
+    status: deferred
+    layers: [earth]
+    endpoint: "https://query2.finance.yahoo.com/v8/finance/chart/CL=F?range=1d&interval=1m"
+    route: api-proxy
+    ttl_seconds: 300
+    unit: "USD/barrel"
+    parser: "JSON chart.result[0].meta.regularMarketPrice, regularMarketTime, indicators.quote[0].close/open/high/low/volume"
+    primary_signals:
+      - crude_oil_wti_usd
+      - crude_oil_wti_intraday_change
+    preflight:
+      checked_at: "2026-06-26"
+      plain_query1_http_status: 429
+      user_agent_query1_http_status: 200
+      query2_http_status: 200
+      latency_seconds: 1.137
+      bytes: 66011
+    confidence_rules:
+      high: "chart response parses and market timestamp is fresh"
+      medium: "regularMarketPrice parses but intraday arrays are partial"
+      stale: "cached value older than ttl or market closed"
+      error: "network, rate-limit, or chart error"
+    fallback: "Deferred for MVP audio activation. If later activated, use last-known-good cache as stale; if unavailable, keep oil price value null."
+    limitation: "Unofficial finance endpoint with rate-limit behavior; must never be fetched directly by the browser."
+    license_note: "Yahoo endpoint access/terms need review before public deployment."
+
+  - id: owid_oil_production
+    label: "OWID oil production by country"
+    status: deferred
+    layers: [earth]
+    endpoint: "https://ourworldindata.org/grapher/oil-production-by-country.csv"
+    route: api-proxy
+    ttl_seconds: 604800
+    unit: "barrels/day"
+    parser: "CSV Entity, Code, Year, Oil; select latest year per entity and global aggregate if present"
+    primary_signals:
+      - oil_production_latest
+      - oil_production_world_latest
+    preflight:
+      checked_at: "2026-06-26"
+      http_status: 200
+      latency_seconds: 1.367
+      bytes: 477129
+    confidence_rules:
+      high: "CSV parses and latest non-null year is found"
+      medium: "CSV parses with gaps"
+      stale: "cached dataset older than ttl"
+      error: "network or CSV schema failure"
+    fallback: "Use bundled snapshot if live fetch fails; stale is acceptable for historical production."
+    limitation: "Historical annual dataset; not real-time extraction."
+    license_note: "OWID Grapher dataset; record dataset attribution and license metadata in docs."
+
+  - id: worldbank_population
+    label: "World Bank population"
+    status: deferred
+    layers: [earth, user]
+    endpoint_pattern: "https://api.worldbank.org/v2/country/{country}/indicator/SP.POP.TOTL?format=json&per_page=10"
+    preflight_endpoint: "https://api.worldbank.org/v2/country/WLD/indicator/SP.POP.TOTL?format=json&per_page=3"
+    route: api-proxy
+    ttl_seconds: 2592000
+    unit: "people"
+    parser: "JSON [1][]; choose latest non-null value, because newest year may be null"
+    primary_signals:
+      - population_latest
+    preflight:
+      checked_at: "2026-06-26"
+      http_status: 200
+      latency_seconds: 1.172
+      bytes: 673
+      latest_year_value: null
+      latest_non_null_year: "2024"
+    confidence_rules:
+      high: "latest non-null value is present"
+      medium: "older non-null value is present"
+      stale: "cached response older than ttl"
+      error: "network or schema failure"
+    fallback: "Use bundled snapshot for per-capita normalization; otherwise skip per-capita derived metrics."
+    limitation: "Annual demographic context only; not an activity signal."
+    license_note: "World Bank public API; record attribution in docs."
+
+  - id: opensky_states
+    label: "OpenSky Network all states"
+    status: deferred
+    layers: [city]
+    endpoint: "https://opensky-network.org/api/states/all"
+    route: api-proxy
+    ttl_seconds: 60
+    unit: "aircraft states"
+    parser: "JSON time, states[] positional arrays; count active states and optional regional bounds"
+    primary_signals:
+      - aircraft_state_count
+      - aircraft_regional_count
+    preflight:
+      checked_at: "2026-06-26"
+      http_status: 200
+      latency_seconds: 2.696
+      bytes: 1731220
+      sample_state_count: 13165
+    confidence_rules:
+      high: "time and states array parse inside ttl"
+      medium: "states parse but regional fields are sparse"
+      stale: "cached value older than ttl"
+      error: "network, rate-limit, or schema failure"
+    fallback: "Deferred for MVP audio activation. If later activated, use last-known-good aggregate as stale; otherwise silence flightArps."
+    limitation: "Large unauthenticated global response with rate-limit risk; browser must not fetch directly."
+    license_note: "OpenSky terms need review before public deployment."
+
+  - id: gbfs_systems
+    label: "GBFS systems registry"
+    status: deferred
+    layers: [city]
+    endpoint: "https://github.com/MobilityData/gbfs/raw/master/systems.csv"
+    route: api-proxy
+    ttl_seconds: 604800
+    unit: "systems"
+    parser: "CSV registry; use Auto-Discovery URL and Supported Versions"
+    primary_signals:
+      - gbfs_system_count
+      - gbfs_abya_yala_system_count
+    preflight:
+      checked_at: "2026-06-26"
+      http_status: 200
+      latency_seconds: 1.063
+      bytes: 216004
+      observed_regional_systems: ["Bogota", "Buenos Aires", "Santiago", "Mexico City", "Guadalajara", "Sao Paulo", "Rio de Janeiro"]
+    confidence_rules:
+      high: "CSV parses and selected system discovery URL is present"
+      medium: "registry parses but selected city feed is unavailable"
+      stale: "cached registry older than ttl"
+      error: "network or CSV schema failure"
+    fallback: "Use bundled registry snapshot; otherwise disable GBFS city module."
+    limitation: "Registry is only a directory; individual feeds have different GBFS versions and shapes."
+    license_note: "MobilityData GBFS registry; record attribution in docs."
+
+  - id: gbfs_bogota_station_status
+    label: "GBFS Bogota station status"
+    status: ready
+    layers: [city]
+    endpoint: "https://bogota.publicbikesystem.net/customer/gbfs/v3.0/station_status"
+    discovery_endpoint: "https://bogota.publicbikesystem.net/customer/gbfs/v3.0/gbfs.json"
+    route: api-proxy
+    ttl_seconds: 30
+    unit: "bikes/docks/stations"
+    parser: "GBFS v3 JSON data.stations[] status flags, num_vehicles_available, num_docks_available, last_reported"
+    primary_signals:
+      - bogota_bike_station_count
+      - bogota_bike_stations_available
+      - bogota_bike_vehicles_available
+      - bogota_bike_docks_available
+      - bogota_bike_availability_ratio
+      - bogota_bike_stale_station_count
+    preflight:
+      checked_at: "2026-06-26"
+      discovery_http_status: 200
+      station_status_http_status: 200
+      latency_seconds: 0.994
+      bytes: 101557
+      ttl_observed_seconds: 21
+      station_count: 203
+    confidence_rules:
+      high: "station_status parses and last_updated is inside ttl"
+      medium: "station counts parse but per-vehicle type details are partial"
+      stale: "cached value older than feed ttl"
+      error: "network or GBFS schema failure"
+    fallback: "Use stale aggregate cache; otherwise emit null-valued city mobility signals and silence bike mobility mapping."
+    limitation: "Bogota bike system only; valuable for Local/Abya Yala mode, not a global city proxy."
+    license_note: "GBFS feed attribution required; deployment terms need review."
+
+  - id: noaa_swpc_solar_wind_speed
+    label: "NOAA SWPC real-time solar-wind speed"
+    status: ready
+    sphere: cosmos
+    temporal_character: stream
+    layers: [earth]
+    endpoint: "https://services.swpc.noaa.gov/products/summary/solar-wind-speed.json"
+    route: api-proxy
+    ttl_seconds: 60
+    unit: "km/s"
+    parser: "JSON proton_speed and time_tag"
+    primary_signals: [solar_wind_speed]
+    confidence_rules:
+      high: "finite proton_speed and valid timestamp inside ttl"
+      stale: "matching cached product older than ttl"
+      error: "missing or malformed proton_speed remains null"
+    fallback: "Use matching last-known-good cache as stale; otherwise keep the value null."
+    limitation: "Near-real-time L1 spacecraft product; outages and spacecraft-source changes must stay visible."
+    license_note: "NOAA SWPC public operational product; attribution required."
+
+  - id: noaa_swpc_magnetic_field
+    label: "NOAA SWPC real-time solar-wind magnetic field"
+    status: ready
+    sphere: cosmos
+    temporal_character: stream
+    layers: [earth]
+    endpoint: "https://services.swpc.noaa.gov/products/summary/solar-wind-mag-field.json"
+    route: api-proxy
+    ttl_seconds: 60
+    unit: "nT"
+    parser: "JSON bt, bz_gsm, and time_tag"
+    primary_signals:
+      - solar_wind_magnetic_field_bt
+      - solar_wind_magnetic_field_bz_gsm
+    confidence_rules:
+      high: "at least one finite field value and valid timestamp inside ttl"
+      stale: "matching cached product older than ttl"
+      error: "both field values missing or malformed"
+    fallback: "Use matching last-known-good cache as stale; otherwise keep Bt and Bz null."
+    limitation: "Near-real-time L1 summary; preserve signed Bz instead of reducing it to magnitude."
+    license_note: "NOAA SWPC public operational product; attribution required."
+
+  - id: noaa_swpc_planetary_k_index
+    label: "NOAA SWPC estimated planetary K index"
+    status: ready
+    sphere: cosmos
+    temporal_character: stream
+    layers: [earth]
+    endpoint: "https://services.swpc.noaa.gov/json/planetary_k_index_1m.json"
+    route: api-proxy
+    ttl_seconds: 300
+    unit: "Kp"
+    parser: "Latest JSON row kp_index or estimated_kp and time_tag"
+    primary_signals: [planetary_k_index]
+    confidence_rules:
+      high: "finite latest estimate inside ttl"
+      stale: "matching cached product older than ttl"
+      error: "no valid estimate remains null"
+    fallback: "Use matching last-known-good cache as stale; otherwise keep the estimate null."
+    limitation: "Planetary activity estimate, not a local magnetometer reading."
+    license_note: "NOAA SWPC public operational product; attribution required."
+
+  - id: nasa_jpl_close_approaches
+    label: "NASA JPL small-body close approaches"
+    status: ready
+    sphere: cosmos
+    temporal_character: forecast
+    layers: [earth]
+    endpoint: "https://ssd-api.jpl.nasa.gov/cad.api?date-min=now&date-max=%2B7&dist-max=0.2&fullname=true&diameter=true"
+    route: api-proxy
+    ttl_seconds: 21600
+    unit: "count/AU/km/s/hours"
+    parser: "JSON fields/data table; closest parseable dist row in the configured window"
+    request_policy:
+      max_response_bytes: 2097152
+      concurrency_key: nasa-jpl-ssd
+    primary_signals:
+      - close_approach_count_7d
+      - closest_approach_distance_au
+      - closest_approach_velocity_km_s
+      - closest_approach_time_hours
+    confidence_rules:
+      high: "fields and data table parse for the matching query"
+      stale: "matching seven-day query cache older than ttl"
+      error: "missing fields or malformed values remain null"
+    fallback: "Use matching query cache as stale; otherwise keep approach details null."
+    limitation: "Ephemeris forecast, not a live detection; use time-to-approach as a schedule with uncertainty."
+    license_note: "NASA/JPL public API; attribution and API fair-use rules apply."
+
+  - id: nasa_jpl_fireballs
+    label: "NASA/JPL reported fireball events"
+    status: ready
+    sphere: cosmos
+    temporal_character: event
+    layers: [earth, address]
+    endpoint_pattern: "https://ssd-api.jpl.nasa.gov/fireball.api?date-min={past-30-days}&sort=-date&vel-comp=true"
+    route: api-proxy
+    ttl_seconds: 21600
+    unit: "count/10^10 J/kt/km/km/s"
+    parser: "Version 1.2 fields/data table; latest event; optional velocity magnitude derived from vx/vy/vz"
+    primary_signals:
+      - fireball_count_30d
+      - fireball_latest_impact_energy_kt
+      - fireball_latest_radiated_energy
+      - fireball_latest_altitude_km
+      - fireball_latest_velocity_km_s
+    request_policy:
+      max_response_bytes: 1048576
+      concurrency_key: nasa-jpl-ssd
+    confidence_rules:
+      high: "signature is 1.2 and required date/energy/impact-e fields parse"
+      stale: "matching rolling-window cache older than ttl"
+      error: "version drift or malformed required fields remain null"
+    fallback: "Use matching query cache as stale; never inject the fixture into live mode."
+    limitation: "Reported atmospheric fireball events, not raw sensor audio, a complete census, or a live impact warning; optional fields remain nullable."
+    license_note: "NASA/JPL public API; attribution and one-request-at-a-time fair-use rules apply."
+
+  - id: inaturalist_recent_observations
+    label: "iNaturalist recent global observation activity"
+    status: ready
+    sphere: biosphere
+    temporal_character: aggregate
+    layers: [earth]
+    endpoint_pattern: "https://api.inaturalist.org/v1/observations?created_d1={start}&created_d2={end}&per_page=1&order=desc&order_by=created_at"
+    route: api-proxy
+    ttl_seconds: 300
+    unit: "observations/hour"
+    parser: "JSON total_results and newest created_at; emit aggregate only"
+    primary_signals:
+      - inaturalist_observations_created_1h
+      - inaturalist_observation_rate_per_minute
+    privacy_note: "Reduce to count, time window, and newest creation time before cache persistence; never cache or emit usernames, observation rows, taxa, media, or coordinates."
+    confidence_rules:
+      high: "non-negative total_results parses for the requested window"
+      stale: "matching global one-hour aggregate older than ttl"
+      error: "missing or malformed total_results remains null"
+    fallback: "Use matching aggregate cache as stale; otherwise keep activity values null."
+    limitation: "Platform submission activity is not organism abundance, biodiversity, or ecological population."
+    license_note: "iNaturalist attribution and recommended API request-rate practices apply."
+
+  - id: wikimedia_pageviews_hourly
+    label: "Wikimedia all-project hourly pageviews"
+    status: ready
+    sphere: human
+    temporal_character: aggregate
+    layers: [city]
+    endpoint_pattern: "https://wikimedia.org/api/rest_v1/metrics/pageviews/aggregate/all-projects/all-access/user/hourly/{start}/{end}"
+    route: api-proxy
+    ttl_seconds: 900
+    unit: "views/hour"
+    parser: "JSON items[]; latest complete hour plus change from prior complete hour"
+    primary_signals:
+      - wikimedia_pageviews_latest_hour
+      - wikimedia_pageviews_hourly_change
+    confidence_rules:
+      high: "at least one valid complete hourly row parses"
+      stale: "matching aggregate cache older than ttl"
+      error: "missing or malformed rows remain null"
+    fallback: "Use matching aggregate cache as stale; otherwise keep pageview values null."
+    limitation: "Delayed platform attention aggregate, not culture, population, or individual behavior."
+    license_note: "Wikimedia REST API attribution and identifying User-Agent requirements apply."
+
+local_browser_signals:
+  - id: browser_local_time
+    status: ready
+    layers: [interface, user]
+    route: browser-only
+    ttl_seconds: 1
+    unit: "time"
+    parser: "Date/time derived locally in browser"
+    privacy_note: "Do not send to server."
+  - id: browser_fetch_latency
+    status: ready
+    layers: [interface, user]
+    route: browser-only
+    ttl_seconds: 30
+    unit: "milliseconds"
+    parser: "Measured round-trip to internal API snapshot endpoint"
+    privacy_note: "Aggregate locally; do not persist."
+  - id: browser_window_size
+    status: ready
+    layers: [interface, user]
+    route: browser-only
+    ttl_seconds: 5
+    unit: "pixels"
+    parser: "window.innerWidth and window.innerHeight"
+    privacy_note: "Use only for local mapping/UI adaptation; do not send to server."
+  - id: browser_audio_context
+    status: ready
+    layers: [interface, user]
+    route: browser-only
+    ttl_seconds: 60
+    unit: "Hz/state"
+    parser: "AudioContext.sampleRate and state after explicit user gesture"
+    privacy_note: "Display if used; do not persist."
+  - id: local_archive
+    status: ready
+    layers: [interface]
+    route: browser-only
+    ttl_seconds: 31536000
+    unit: "snapshot"
+    parser: "Browser localStorage archive entry selected by explicit user action"
+    privacy_note: "Archive payload stays browser-local and is not sent to third parties."
+  - id: local_modulation_bank
+    status: ready
+    layers: [interface, address, user]
+    route: browser-only
+    ttl_seconds: 1
+    unit: "normalized/bipolar"
+    parser: "Deterministic clock, pulse, LFO, envelope, and seeded sample-and-hold from explicit phase origin"
+    privacy_note: "Generated locally; never substitute these values for missing provider observations."
