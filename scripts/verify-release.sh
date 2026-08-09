@@ -134,8 +134,8 @@ if grep -R -n 'import\.meta\.env\.' apps/web/src \
 fi
 pass "web build reads only the validated local API origin"
 
-if grep -R -n -E 'navigator\.geolocation|getCurrentPosition|watchPosition|document\.cookie|gtag\(|posthog|plausible|mixpanel|amplitude' \
-  apps/web/src apps/api/src packages tests >"$TEMP_DIR/release-policy-scan.txt"; then
+if git grep -n -E 'navigator\.geolocation|getCurrentPosition|watchPosition|document\.cookie|gtag\(|posthog|plausible|mixpanel|amplitude' \
+  -- apps/web/src apps/api/src packages tests >"$TEMP_DIR/release-policy-scan.txt"; then
   cat "$TEMP_DIR/release-policy-scan.txt" >&2
   fail "blocked browser tracking/geolocation pattern found"
 fi
