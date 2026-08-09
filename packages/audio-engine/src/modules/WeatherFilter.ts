@@ -35,7 +35,6 @@ export function calculateWeatherFilterParams(
   signals: readonly ObservedSignal[]
 ): WeatherFilterParams {
   const temperature = getSignal(signals, "local_temperature_2m");
-  const wind = getSignal(signals, "local_wind_speed_10m");
   const precipitation = getSignal(signals, "local_precipitation");
   const temperatureLevel = getSignalNormalized(signals, "local_temperature_2m");
   const windLevel = getSignalNormalized(signals, "local_wind_speed_10m");

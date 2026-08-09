@@ -88,6 +88,7 @@ export function parseLocalCorsOrigins(rawOrigins: string | undefined): string[] 
     return [...defaultLocalCorsOrigins];
   }
 
+  const normalizedOrigins: string[] = [];
   for (const origin of origins) {
     let parsed: URL;
     try {
@@ -96,12 +97,26 @@ export function parseLocalCorsOrigins(rawOrigins: string | undefined): string[] 
       throw new Error(`Invalid COSMOAUDITION_CORS_ORIGIN value: ${origin}`);
     }
 
+    if (
+      (parsed.protocol !== "http:" && parsed.protocol !== "https:") ||
+      parsed.username !== "" ||
+      parsed.password !== "" ||
+      parsed.pathname !== "/" ||
+      parsed.search !== "" ||
+      parsed.hash !== ""
+    ) {
+      throw new Error(
+        `Invalid COSMOAUDITION_CORS_ORIGIN value: ${origin}. Use an HTTP(S) origin without credentials, path, query, or fragment.`
+      );
+    }
+
     if (!isLoopbackHost(parsed.hostname)) {
       throw new Error(
         `Local-only mode refuses CORS origin ${origin}. Use localhost, 127.0.0.1, or [::1].`
       );
     }
+    normalizedOrigins.push(parsed.origin);
   }
 
-  return Array.from(new Set(origins));
+  return Array.from(new Set(normalizedOrigins));
 }

@@ -33,7 +33,7 @@ This creates `release/cosmoaudition-system-local-<UTC timestamp>.tgz`. The archi
 - `COSMOAUDITION_CACHE_DIR`, default `data/cache`.
 - `COSMOAUDITION_MOCK_DIR`, default `data/mock`.
 - `COSMOAUDITION_CORS_ORIGIN`, comma-separated loopback origins only.
-- `VITE_API_BASE_URL`, browser URL for the local API.
+- `VITE_API_BASE_URL`, a credential-free loopback HTTP origin supplied through the process environment; web `.env` files are never loaded.
 
 
 ## Public-deployment boundary

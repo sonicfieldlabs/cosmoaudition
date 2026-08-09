@@ -1,5 +1,13 @@
+import { BlockList, isIP } from "node:net";
+
 const DEFAULT_MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 const providerTails = new Map<string, Promise<unknown>>();
+
+async function cancelResponseBody(response: Response): Promise<void> {
+  if (response.body) {
+    await response.body.cancel().catch(() => undefined);
+  }
+}
 
 async function runSerialized<T>(
   key: string | undefined,
@@ -19,10 +27,12 @@ async function runSerialized<T>(
 async function boundedJson(response: Response, maxBytes: number): Promise<unknown> {
   const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
   if (contentType && !contentType.includes("json")) {
+    await cancelResponseBody(response);
     throw new Error(`Unexpected response content type: ${contentType.split(";")[0]}.`);
   }
   const declaredLength = Number(response.headers.get("content-length"));
   if (Number.isFinite(declaredLength) && declaredLength > maxBytes) {
+    await cancelResponseBody(response);
     throw new Error(`Provider response exceeds the ${maxBytes}-byte limit.`);
   }
   if (!response.body) {
@@ -67,12 +77,77 @@ async function boundedJson(response: Response, maxBytes: number): Promise<unknow
 }
 
 const MAX_PROVIDER_REDIRECTS = 3;
+const RESERVED_PROVIDER_SUFFIXES = [
+  "localhost",
+  "local",
+  "internal",
+  "home.arpa",
+  "test",
+  "invalid",
+  "example",
+  "example.com",
+  "example.net",
+  "example.org",
+  "onion",
+  "alt"
+] as const;
+
+const blockedProviderAddresses = new BlockList();
+
+for (const [network, prefix] of [
+  ["0.0.0.0", 8],
+  ["10.0.0.0", 8],
+  ["100.64.0.0", 10],
+  ["127.0.0.0", 8],
+  ["169.254.0.0", 16],
+  ["172.16.0.0", 12],
+  ["192.0.0.0", 24],
+  ["192.0.2.0", 24],
+  ["192.88.99.0", 24],
+  ["192.168.0.0", 16],
+  ["198.18.0.0", 15],
+  ["198.51.100.0", 24],
+  ["203.0.113.0", 24],
+  ["224.0.0.0", 4],
+  ["240.0.0.0", 4]
+] as const) {
+  blockedProviderAddresses.addSubnet(network, prefix, "ipv4");
+}
+
+for (const [network, prefix] of [
+  ["::", 128],
+  ["::", 96],
+  ["::1", 128],
+  ["::ffff:0:0", 96],
+  ["64:ff9b::", 96],
+  ["64:ff9b:1::", 48],
+  ["100::", 64],
+  ["100:0:0:1::", 64],
+  ["2001::", 32],
+  ["2001:2::", 48],
+  ["2001:10::", 28],
+  ["2001:20::", 28],
+  ["2001:db8::", 32],
+  ["2002::", 16],
+  ["3fff::", 20],
+  ["5f00::", 16],
+  ["fc00::", 7],
+  ["fe80::", 10],
+  ["fec0::", 10],
+  ["ff00::", 8]
+] as const) {
+  blockedProviderAddresses.addSubnet(network, prefix, "ipv6");
+}
 
 /**
- * Provider requests must stay on public HTTPS hosts. A redirect is the one way
- * a provider (or a hijacked DNS answer) could otherwise point the gateway at
- * loopback, link-local metadata, or another private service whose response
- * would then be cached and returned to the browser.
+ * Provider requests must stay on HTTPS URLs whose host representation is not a
+ * reserved name or non-public literal address. Redirects are checked one hop
+ * at a time before they are followed.
+ *
+ * This is a URL-policy boundary, not a general-purpose SSRF proxy: DNS remains
+ * inside Node's HTTPS transport and is authenticated by TLS rather than pinned
+ * here. All initial provider URLs are code-declared. A public deployment or a
+ * future user-supplied URL surface needs a connection-level resolver policy.
  */
 function assertPublicProviderUrl(url: string): URL {
   let parsed: URL;
@@ -81,53 +156,41 @@ function assertPublicProviderUrl(url: string): URL {
   } catch {
     throw new Error("Provider URL is not a valid absolute URL.");
   }
-  if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
-    throw new Error(`Provider URL scheme ${parsed.protocol} is refused.`);
+  if (parsed.protocol !== "https:") {
+    throw new Error(`Provider URL scheme ${parsed.protocol} is refused; use public HTTPS.`);
+  }
+  if (parsed.username !== "" || parsed.password !== "") {
+    throw new Error("Provider URLs may not contain credentials.");
   }
   if (isPrivateProviderHost(parsed.hostname)) {
-    throw new Error("Provider URL resolves to a loopback or private-network host.");
+    throw new Error("Provider URL names a loopback, non-public, or private-network host.");
   }
   return parsed;
 }
 
 function isPrivateProviderHost(hostname: string): boolean {
-  const normalized = hostname.toLowerCase().replace(/^\[|\]$/g, "");
-  if (
-    normalized === "localhost" ||
-    normalized.endsWith(".localhost") ||
-    normalized.endsWith(".local") ||
-    normalized.endsWith(".internal")
-  ) {
+  const normalized = hostname
+    .toLowerCase()
+    .replace(/^\[|\]$/g, "")
+    .replace(/\.+$/, "");
+  if (normalized.length === 0) {
     return true;
   }
   if (
-    normalized === "::1" ||
-    normalized === "::" ||
-    normalized.startsWith("fe80:") ||
-    normalized.startsWith("fc") ||
-    normalized.startsWith("fd")
+    RESERVED_PROVIDER_SUFFIXES.some(
+      (suffix) => normalized === suffix || normalized.endsWith(`.${suffix}`)
+    )
   ) {
     return true;
   }
-  const octets = normalized.startsWith("::ffff:")
-    ? normalized.slice("::ffff:".length).split(".").map(Number)
-    : normalized.split(".").map(Number);
-  if (
-    octets.length !== 4 ||
-    octets.some((octet) => !Number.isInteger(octet) || octet < 0 || octet > 255)
-  ) {
-    return false;
+  const version = isIP(normalized);
+  if (version === 4) {
+    return blockedProviderAddresses.check(normalized, "ipv4");
   }
-  const [first = -1, second = -1] = octets;
-  return (
-    first === 0 ||
-    first === 10 ||
-    first === 127 ||
-    (first === 100 && second >= 64 && second <= 127) ||
-    (first === 169 && second === 254) ||
-    (first === 172 && second >= 16 && second <= 31) ||
-    (first === 192 && second === 168)
-  );
+  if (version === 6) {
+    return blockedProviderAddresses.check(normalized, "ipv6");
+  }
+  return false;
 }
 
 export async function fetchJson(
@@ -139,6 +202,13 @@ export async function fetchJson(
     concurrencyKey?: string;
   }
 ): Promise<unknown> {
+  if (
+    !Number.isInteger(options.timeoutMs) ||
+    options.timeoutMs < 1 ||
+    options.timeoutMs > 120_000
+  ) {
+    throw new RangeError("Provider timeout must be an integer inside 1..120000 ms.");
+  }
   const maxBytes = options.maxBytes ?? DEFAULT_MAX_RESPONSE_BYTES;
   if (!Number.isInteger(maxBytes) || maxBytes < 1 || maxBytes > 16 * 1024 * 1024) {
     throw new RangeError("Provider response limit must be an integer inside 1..16777216 bytes.");
@@ -162,6 +232,7 @@ export async function fetchJson(
       let currentUrl = url;
       let response = await fetch(currentUrl, init);
       for (let hop = 0; response.status >= 300 && response.status < 400; hop += 1) {
+        await cancelResponseBody(response);
         if (hop >= MAX_PROVIDER_REDIRECTS) {
           throw new Error("Provider redirected too many times.");
         }
@@ -175,6 +246,7 @@ export async function fetchJson(
       }
 
       if (!response.ok) {
+        await cancelResponseBody(response);
         throw new Error(`HTTP ${response.status}`);
       }
 

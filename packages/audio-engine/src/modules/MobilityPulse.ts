@@ -35,7 +35,6 @@ export function calculateMobilityPulseParams(
 ): MobilityPulseParams {
   const availability = getSignal(signals, "bogota_bike_availability_ratio");
   const stations = getSignal(signals, "bogota_bike_stations_available");
-  const staleStations = getSignal(signals, "bogota_bike_stale_station_count");
   const availabilityLevel = getSignalNormalized(
     signals,
     "bogota_bike_availability_ratio"

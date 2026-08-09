@@ -33,7 +33,7 @@ describe("deterministic Standard MIDI File export", () => {
     const first = createMidiFile(options);
     const second = createMidiFile(options);
 
-    expect([...first.slice(0, 14)]).toEqual([
+    expect(Array.from(first.slice(0, 14))).toEqual([
       0x4d,
       0x54,
       0x68,

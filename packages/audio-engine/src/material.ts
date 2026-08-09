@@ -101,11 +101,25 @@ const CONTROL_NAMES: readonly MaterialControlName[] = [
   "delayFeedback",
   "gain"
 ];
-const MAX_MATERIAL_BYTES = 64 * 1024 * 1024;
+export const MAX_MATERIAL_BYTES = 64 * 1024 * 1024;
 const MAX_MATERIAL_DURATION_SECONDS = 60 * 60;
 const MAX_MATERIAL_CHANNELS = 8;
 const MAX_DECODED_SAMPLE_VALUES = 96_000_000;
 const MAX_CONTROL_SMOOTHING_MS = 30_000;
+
+export function validateMaterialByteLength(byteLength: number): void {
+  if (!Number.isSafeInteger(byteLength) || byteLength < 0) {
+    throw new RangeError("Imported material has an invalid encoded byte length.");
+  }
+  if (byteLength === 0) {
+    throw new RangeError("Imported material is empty.");
+  }
+  if (byteLength > MAX_MATERIAL_BYTES) {
+    throw new RangeError(
+      "Imported material exceeds the 64 MiB encoded-data safety limit."
+    );
+  }
+}
 
 function isMaterialControlName(value: string): value is MaterialControlName {
   return (CONTROL_NAMES as readonly string[]).includes(value);
@@ -294,12 +308,7 @@ export class ImportedMaterialPlayer {
   }
 
   async load(arrayBuffer: ArrayBuffer, name?: string): Promise<MaterialStatus> {
-    if (arrayBuffer.byteLength === 0) {
-      throw new RangeError("Imported material is empty.");
-    }
-    if (arrayBuffer.byteLength > MAX_MATERIAL_BYTES) {
-      throw new RangeError("Imported material exceeds the 64 MiB encoded-data safety limit.");
-    }
+    validateMaterialByteLength(arrayBuffer.byteLength);
 
     const generation = ++this.loadGeneration;
     const decoded = await this.context.decodeAudioData(arrayBuffer.slice(0));

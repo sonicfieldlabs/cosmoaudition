@@ -20,12 +20,29 @@ describe("local-only runtime policy", () => {
     expect(parseLocalCorsOrigins("http://127.0.0.1:4274")).toEqual([
       "http://127.0.0.1:4274"
     ]);
+    expect(
+      parseLocalCorsOrigins("HTTP://LOCALHOST:5175,http://localhost:5175")
+    ).toEqual(["http://localhost:5175"]);
   });
 
   it("rejects public CORS origins", () => {
     expect(() => parseLocalCorsOrigins("https://public.example")).toThrow(
       /Local-only mode refuses CORS origin/
     );
+  });
+
+  it("rejects values that are URLs but not browser origins", () => {
+    for (const value of [
+      "ftp://localhost:5175",
+      "http://user:password@localhost:5175",
+      "http://localhost:5175/path",
+      "http://localhost:5175?query=1",
+      "http://localhost:5175#fragment"
+    ]) {
+      expect(() => parseLocalCorsOrigins(value)).toThrow(
+        /Invalid COSMOAUDITION_CORS_ORIGIN/
+      );
+    }
   });
 
   it("rejects non-loopback host binds", () => {

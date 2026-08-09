@@ -95,7 +95,7 @@ Or build and run the paired local preview with automatic loopback ports:
 pnpm local:preview
 ```
 
-The server refuses non-loopback bind hosts, non-loopback CORS origins, and requests whose `Host` header is not a loopback authority, so a rebound public domain cannot reach the gateway as a same-origin caller. Provider requests resolve redirects one hop at a time and refuse any hop that leaves public HTTPS for a loopback, link-local, or private address. This repository does not contain a public deployment script.
+The server refuses non-loopback bind hosts, non-loopback CORS origins, and requests whose `Host` header is not a loopback authority, so a rebound public domain cannot reach the gateway as a same-origin caller. Provider requests resolve redirects one hop at a time, require HTTPS, and refuse reserved hostnames and literal non-public addresses. DNS resolution and certificate authentication remain Node's platform HTTPS boundary: this code-declared provider client is not a general-purpose SSRF proxy, and a future user-supplied URL surface would need connection-level address enforcement. This repository does not contain a public deployment script.
 
 ## Verification
 
@@ -125,7 +125,7 @@ All variables are optional:
 | `COSMOAUDITION_OSC_TARGET` | loopback `host:port` to emit modulation frames over OSC; unset disables it |
 | `COSMOAUDITION_OSC_MODE` | `live` (default) or `fixture` acquisition for OSC emission |
 | `COSMOAUDITION_OSC_INTERVAL_MS` | OSC cadence, 1000–600000, default 60000 |
-| `VITE_API_BASE_URL` | browser URL for the local API |
+| `VITE_API_BASE_URL` | credential-free loopback HTTP origin for the local API; read from the process environment, never a web `.env` file |
 | `HOST` / `PORT` | local API bind host and port; non-loopback hosts are refused |
 
 ## Privacy and provenance
@@ -136,7 +136,7 @@ All variables are optional:
 - No automatic geolocation, analytics, cookies, accounts, or public upload are used.
 - A control or modulation receipt means the parameter was scheduled; it does not claim audition.
 - A live synthesis state is not represented as an audio artifact unless it is recorded.
-- MASA 0.1.0 is vendored immutably from the public release (`sonicfieldlabs/MASA`, tag `v0.1.0`, MIT); this repository does not depend at runtime on a mutable sibling checkout. See [`vendor/masa/README.md`](vendor/masa/README.md) for the checksum boundary and update procedure.
+- MASA TypeScript tooling 0.1.1 is vendored immutably from the public release (`sonicfieldlabs/MASA`, tag `v0.1.1`, MIT) while records continue to implement the normative MASA 0.1.0 protocol; this repository does not depend at runtime on a mutable sibling checkout. See [`vendor/masa/README.md`](vendor/masa/README.md) for the checksum boundary and update procedure.
 
 ## Licensing
 
@@ -154,7 +154,7 @@ their own and are **not** relicensed by it:
   provider they came from. This is why attribution and licence notes travel with every
   emitted signal rather than being stripped at the gateway.
 - **The vendored MASA release under `vendor/masa/`** is MIT from its own release
-  (`sonicfieldlabs/MASA`, tag `v0.1.0`) and retains that repository's copyright notice.
+  (`sonicfieldlabs/MASA`, tooling tag `v0.1.1`) and retains that repository's copyright notice.
 
 Reusing the code and operating the system publicly are separate questions. Sources whose
 note says terms need review before public deployment mean exactly that, and

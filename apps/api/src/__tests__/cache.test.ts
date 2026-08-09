@@ -100,7 +100,7 @@ describe.sequential("filesystem cache envelopes", () => {
         latitude: 4.711,
         longitude: -74.0721
       },
-      url: "https://provider.invalid/carbon",
+      url: "https://api.carbonintensity.org.uk/intensity",
       fixturePath: "carbon-intensity.json"
     };
 

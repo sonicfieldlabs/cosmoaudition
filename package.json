@@ -1,6 +1,6 @@
 {
   "name": "cosmoaudition-system",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -21,14 +21,14 @@
     "profile:local": "node scripts/profile-local-build.mjs",
     "preview:api": "pnpm --filter @cosmoaudition/api start",
     "preview:web": "pnpm --filter @cosmoaudition/web preview",
-    "release:check": "pnpm typecheck && pnpm test && pnpm e2e && pnpm package:local && pnpm verify:release",
+    "release:check": "pnpm typecheck && pnpm test && pnpm build && pnpm e2e && pnpm package:local -- --skip-build && pnpm verify:release && pnpm audit --audit-level=high",
     "typecheck": "tsc -b tsconfig.json --pretty false",
     "test": "vitest run",
     "verify:release": "scripts/verify-release.sh"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
-    "@types/node": "^24.13.3",
+    "@types/node": "^22.20.1",
     "typescript": "^5.9.3",
     "vitest": "^3.2.7"
   }
