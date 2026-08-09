@@ -2,6 +2,7 @@ import {
   type ChangeEvent,
   type CSSProperties,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState
@@ -11,7 +12,8 @@ import {
   DEFAULT_MASTER_VOLUME,
   type AudioEngineStatus,
   type MaterialControl,
-  type MaterialControlRoute
+  type MaterialControlRoute,
+  validateMaterialByteLength
 } from "@cosmoaudition/audio-engine";
 import {
   buildStackIndices,
@@ -25,6 +27,7 @@ import {
   sourceDefinitions,
   type ControlDecision,
   type ManualLocality,
+  type ModulatorDefinition,
   type ObservedSignal,
   type SignalTrigger,
   type SonicMapping,
@@ -83,6 +86,23 @@ interface SourceGroup {
   signals: ObservedSignal[];
   health: SourceHealth[];
   readyCount: number;
+}
+
+interface LatestRuntimeState {
+  outputs: OutputState;
+  routes: Readonly<Record<string, RouteSetting>>;
+  midiOutputs: readonly MidiOutputLike[];
+  selectedMidiOutputId: string;
+  generatorEnabled: boolean;
+  generatorRate: number;
+  generatorSeed: number;
+  modulationDefinitions: readonly ModulatorDefinition[];
+  audioSampleRate: number | null;
+  masterVolume: number;
+  materialControls: MaterialControls;
+  materialModulationDepth: number;
+  materialModulationMode: MaterialModulationMode;
+  selectedSignalId: string | null;
 }
 
 const ARCHIVE_KEY = "cosmoaudition.archive.v1";
@@ -153,6 +173,7 @@ const materialControlRoutes: readonly MaterialControlRoute[] = [
 function idleAudioStatus(): AudioEngineStatus {
   return {
     state: "idle",
+    outputArmed: true,
     sampleRate: null,
     currentTime: 0,
     masterVolume: DEFAULT_MASTER_VOLUME,
@@ -249,10 +270,6 @@ function formatAge(timestamp: string | null | undefined): string {
   const hours = Math.floor(minutes / 60);
   if (hours < 48) return `${hours}h ago`;
   return `${Math.floor(hours / 24)}d ago`;
-}
-
-function sourceLabel(sourceId: string): string {
-  return sourceDefinitions.find((source) => source.id === sourceId)?.label ?? sourceId;
 }
 
 function downloadBlob(filename: string, type: string, body: BlobPart): void {
@@ -417,6 +434,10 @@ export function CosmoauditionApp() {
   const engineRef = useRef<AudioEngine | null>(null);
   const snapshotRef = useRef<ApiSnapshot | null>(null);
   const snapshotRequestRef = useRef(0);
+  const snapshotAbortRef = useRef<AbortController | null>(null);
+  const audioStartRequestRef = useRef(0);
+  const audioStartPendingRef = useRef<number | null>(null);
+  const materialLoadRequestRef = useRef(0);
   const triggerHistoryRef = useRef<Set<string>>(new Set());
   const recentTriggersRef = useRef<SignalTrigger[]>([]);
   const generatorOriginRef = useRef(new Date().toISOString());
@@ -443,6 +464,7 @@ export function CosmoauditionApp() {
   const [masterVolume, setMasterVolume] = useState(DEFAULT_MASTER_VOLUME);
   const [autoObserve, setAutoObserve] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAudioStarting, setIsAudioStarting] = useState(false);
   const [message, setMessage] = useState(
     "Ready for an explicit fixture observation. Audio is stopped."
   );
@@ -496,6 +518,59 @@ export function CosmoauditionApp() {
       ),
     [generatorRate, generatorSeed]
   );
+  const runtimeRef = useRef<LatestRuntimeState>({
+    outputs,
+    routes,
+    midiOutputs,
+    selectedMidiOutputId,
+    generatorEnabled,
+    generatorRate,
+    generatorSeed,
+    modulationDefinitions,
+    audioSampleRate: audioStatus.sampleRate,
+    masterVolume,
+    materialControls,
+    materialModulationDepth,
+    materialModulationMode,
+    selectedSignalId
+  });
+
+  // Async acquisitions, permission prompts, audio startup, and material
+  // decoding must commit against the latest explicitly selected runtime state,
+  // not the render that happened to launch the request.
+  useLayoutEffect(() => {
+    runtimeRef.current = {
+      outputs,
+      routes,
+      midiOutputs,
+      selectedMidiOutputId,
+      generatorEnabled,
+      generatorRate,
+      generatorSeed,
+      modulationDefinitions,
+      audioSampleRate: audioStatus.sampleRate,
+      masterVolume,
+      materialControls,
+      materialModulationDepth,
+      materialModulationMode,
+      selectedSignalId
+    };
+  }, [
+    audioStatus.sampleRate,
+    generatorEnabled,
+    generatorRate,
+    generatorSeed,
+    masterVolume,
+    materialControls,
+    materialModulationDepth,
+    materialModulationMode,
+    midiOutputs,
+    modulationDefinitions,
+    outputs,
+    routes,
+    selectedMidiOutputId,
+    selectedSignalId
+  ]);
 
   const sourceGroups = useMemo<SourceGroup[]>(() => {
     const signals = snapshot?.signals ?? [];
@@ -542,6 +617,13 @@ export function CosmoauditionApp() {
 
   useEffect(() => {
     return () => {
+      audioStartRequestRef.current += 1;
+      audioStartPendingRef.current = null;
+      materialLoadRequestRef.current += 1;
+      snapshotRequestRef.current += 1;
+      const controller = snapshotAbortRef.current;
+      snapshotAbortRef.current = null;
+      controller?.abort();
       engineRef.current?.stop();
     };
   }, []);
@@ -557,7 +639,7 @@ export function CosmoauditionApp() {
   useEffect(() => {
     if (!autoObserve || snapshotMode !== "live") return;
     const timer = window.setInterval(() => {
-      void loadSnapshotRef.current("live", false);
+      void takeObservation("live", false).catch(() => undefined);
     }, 60_000);
     return () => window.clearInterval(timer);
   }, [autoObserve, snapshotMode]);
@@ -647,27 +729,32 @@ export function CosmoauditionApp() {
   function currentEngine(): AudioEngine {
     const engine = engineRef.current ?? new AudioEngine();
     engineRef.current = engine;
+    engine.setOutputArmed(runtimeRef.current.outputs.audio);
+    engine.setMasterVolume(runtimeRef.current.masterVolume);
     return engine;
   }
 
   function applySignalsToEngine(
     engine: AudioEngine,
     signals: readonly ObservedSignal[],
-    activeRoutes: Readonly<Record<string, RouteSetting>> = routes
+    activeRoutes: Readonly<Record<string, RouteSetting>> = runtimeRef.current.routes
   ): AudioEngineStatus {
+    const runtime = runtimeRef.current;
     const status = engine.updateSignals(
       signals,
       mappingExecutionOptions(activeRoutes)
     );
-    if (materialModulationMode === "catalog") {
+    if (runtime.materialModulationMode === "catalog") {
       engine.routeMaterialControls(engine.getControlDecisions(), materialControlRoutes);
     } else {
-      const activeSignal = signals.find((signal) => signal.id === selectedSignalId);
+      const activeSignal = signals.find(
+        (signal) => signal.id === runtime.selectedSignalId
+      );
       engine.setMaterialControl(
         modulatedMaterialControls(
-          materialControls,
+          runtime.materialControls,
           activeSignal?.normalized,
-          materialModulationDepth
+          runtime.materialModulationDepth
         )
       );
     }
@@ -691,7 +778,9 @@ export function CosmoauditionApp() {
     // overwrite a newer snapshot or a replayed archive entry, and a hung
     // gateway must not leave the instrument loading forever.
     const requestId = ++snapshotRequestRef.current;
+    snapshotAbortRef.current?.abort();
     const controller = new AbortController();
+    snapshotAbortRef.current = controller;
     const timeout = window.setTimeout(() => controller.abort(), SNAPSHOT_TIMEOUT_MS);
 
     try {
@@ -701,14 +790,20 @@ export function CosmoauditionApp() {
       if (!response.ok) throw new Error(`Observation request failed: HTTP ${response.status}`);
       const body = (await response.json()) as ApiSnapshot;
       if (requestId !== snapshotRequestRef.current) {
-        // A newer acquisition already landed; return what it produced rather
-        // than overwriting it with this superseded body.
-        return snapshotRef.current ?? body;
+        // A newer acquisition or archive replay owns the commit. Never hand a
+        // caller the superseded body as though it had become current state.
+        const current = snapshotRef.current;
+        if (current) return current;
+        throw new DOMException("Observation request was superseded.", "AbortError");
       }
+      const runtime = runtimeRef.current;
       const latency = performance.now() - startedAt;
-      const browserSignals = createBrowserSessionSignals(latency, audioStatus.sampleRate);
-      const generatorSignals = generatorEnabled
-        ? createModulatorSignals(modulationDefinitions, new Date())
+      const browserSignals = createBrowserSessionSignals(
+        latency,
+        runtime.audioSampleRate
+      );
+      const generatorSignals = runtime.generatorEnabled
+        ? createModulatorSignals(runtime.modulationDefinitions, new Date())
         : [];
       const next: ApiSnapshot = {
         ...body,
@@ -730,7 +825,7 @@ export function CosmoauditionApp() {
       const projection = projectSignalTriggers(next.signals, triggerHistoryRef.current);
       triggerHistoryRef.current = projection.seenEventKeys;
       if (
-        shouldEmitAudibleTriggers(outputs.audio, outputs.triggers) &&
+        shouldEmitAudibleTriggers(runtime.outputs.audio, runtime.outputs.triggers) &&
         engineRef.current
       ) {
         engineRef.current.emitTriggers(projection.triggers);
@@ -740,14 +835,16 @@ export function CosmoauditionApp() {
         projection.triggers
       );
       setRecentTriggers(recentTriggersRef.current);
-      setSelectedSignalId((current) =>
-        next.signals.some((signal) => signal.id === current)
-          ? current
-          : (next.signals.find((signal) => signal.value !== null)?.id ?? null)
-      );
-      if (engineRef.current) applySignalsToEngine(engineRef.current, next.signals);
-      if (outputs.midi && selectedMidiOutputId) {
-        sendSnapshotToMidi(next, false);
+      const nextSelectedSignalId = next.signals.some(
+        (signal) => signal.id === runtime.selectedSignalId
+      )
+        ? runtime.selectedSignalId
+        : (next.signals.find((signal) => signal.value !== null)?.id ?? null);
+      runtimeRef.current.selectedSignalId = nextSelectedSignalId;
+      setSelectedSignalId(nextSelectedSignalId);
+      if (engineRef.current) {
+        setAudioStatus(applySignalsToEngine(engineRef.current, next.signals));
+        setEngineControlState(engineRef.current.getControlState());
       }
       if (announce) {
         const observationBasis =
@@ -759,6 +856,9 @@ export function CosmoauditionApp() {
           `${mode === "fixture" ? "Fixture" : "Live"} observation accepted: ${body.signals.length} ${acquisitionKind} signals from ${observationBasis}; ${browserSignals.length} browser-session signals added locally; ${generatorSignals.length} deterministic generator signals added locally.`
         );
       }
+      if (runtimeRef.current.outputs.midi) {
+        sendSnapshotToMidi(next, false);
+      }
       return next;
     } catch (error) {
       const copy =
@@ -767,46 +867,138 @@ export function CosmoauditionApp() {
           : error instanceof Error
             ? error.message
             : String(error);
-      setMessage(`${copy}. No value was substituted for the failed observation.`);
+      if (requestId === snapshotRequestRef.current) {
+        setMessage(`${copy}. No value was substituted for the failed observation.`);
+      }
       throw error;
     } finally {
       window.clearTimeout(timeout);
       // Only the newest acquisition clears the loading state, so an overtaken
       // request cannot re-enable the control while a newer one is still open.
       if (requestId === snapshotRequestRef.current) {
+        if (snapshotAbortRef.current === controller) {
+          snapshotAbortRef.current = null;
+        }
         setIsLoading(false);
       }
     }
   }
 
+  function takeObservation(
+    mode: Exclude<SnapshotMode, "archive"> = snapshotMode,
+    announce = true
+  ): Promise<ApiSnapshot> {
+    // An explicit observation changes state but must never complete a Listen
+    // gesture that is still waiting on an older observation.
+    audioStartRequestRef.current += 1;
+    if (audioStartPendingRef.current !== null) {
+      audioStartPendingRef.current = null;
+      setIsAudioStarting(false);
+      const engine = engineRef.current;
+      if (engine && engine.getStatus().state !== "running") {
+        setAudioStatus(engine.stop());
+      }
+    }
+    return loadSnapshotRef.current(mode, announce);
+  }
+
   async function startAudio(): Promise<void> {
+    if (audioStartPendingRef.current !== null) return;
+    const audioRequestId = ++audioStartRequestRef.current;
+    audioStartPendingRef.current = audioRequestId;
+    setIsAudioStarting(true);
     try {
-      const current = snapshot ?? (await loadSnapshot(snapshotMode));
-      const engine = currentEngine();
-      const started = await engine.start();
-      engine.setMasterVolume(masterVolume);
-      setAudioStatus(applySignalsToEngine(engine, current.signals));
-      setMessage(
-        `Listening engine running at ${started.sampleRate ?? "unknown"} Hz. Data mappings are authored controls, not source voices.`
-      );
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : String(error));
+      if (!runtimeRef.current.outputs.audio) {
+        setMessage("Arm the Internal audio output in Route before listening.");
+        return;
+      }
+
+      let current = snapshotRef.current;
+      if (!current) {
+        try {
+          current = await loadSnapshot(snapshotMode, false);
+        } catch {
+          // loadSnapshot owns the acquisition-specific error account. In
+          // particular, a superseded request must stay silent here.
+          return;
+        }
+      }
+      if (
+        audioRequestId !== audioStartRequestRef.current ||
+        !runtimeRef.current.outputs.audio
+      ) {
+        return;
+      }
+
+      try {
+        const engine = currentEngine();
+        const started = await engine.start();
+        if (
+          audioRequestId !== audioStartRequestRef.current ||
+          !runtimeRef.current.outputs.audio ||
+          started.state !== "running"
+        ) {
+          // Each cancellation path stops its pending context immediately.
+          // This stale continuation must never stop a newer Listen that has
+          // already installed another context on the same engine object.
+          return;
+        }
+        engine.setOutputArmed(true);
+        engine.setMasterVolume(runtimeRef.current.masterVolume);
+        setAudioStatus(applySignalsToEngine(engine, current.signals));
+        setEngineControlState(engine.getControlState());
+        setMessage(
+          `Listening engine running at ${started.sampleRate ?? "unknown"} Hz. Data mappings are authored controls, not source voices.`
+        );
+      } catch (error) {
+        if (audioRequestId === audioStartRequestRef.current) {
+          setMessage(error instanceof Error ? error.message : String(error));
+        }
+      }
+    } finally {
+      if (audioStartPendingRef.current === audioRequestId) {
+        audioStartPendingRef.current = null;
+        setIsAudioStarting(false);
+      }
     }
   }
 
   function stopAudio(): void {
-    setAudioStatus(engineRef.current?.stop() ?? { ...idleAudioStatus(), state: "stopped" });
+    audioStartRequestRef.current += 1;
+    audioStartPendingRef.current = null;
+    setIsAudioStarting(false);
+    materialLoadRequestRef.current += 1;
+    setAudioStatus(
+      engineRef.current?.stop() ?? {
+        ...idleAudioStatus(),
+        outputArmed: runtimeRef.current.outputs.audio,
+        state: "stopped"
+      }
+    );
+    setMaterialName(null);
     setMaterialPlaying(false);
     setMessage("Audio stopped. Observation and lineage remain available.");
   }
 
   function panicAudio(): void {
-    setAudioStatus(engineRef.current?.panic() ?? { ...idleAudioStatus(), state: "panicked" });
+    audioStartRequestRef.current += 1;
+    audioStartPendingRef.current = null;
+    setIsAudioStarting(false);
+    materialLoadRequestRef.current += 1;
+    setAudioStatus(
+      engineRef.current?.panic() ?? {
+        ...idleAudioStatus(),
+        outputArmed: runtimeRef.current.outputs.audio,
+        state: "panicked"
+      }
+    );
+    setMaterialName(null);
     setMaterialPlaying(false);
     setMessage("Panic stop engaged. All local audio paths were closed.");
   }
 
   function updateMaster(value: number): void {
+    runtimeRef.current.masterVolume = value;
     setMasterVolume(value);
     setAudioStatus(
       engineRef.current?.setMasterVolume(value) ?? { ...audioStatus, masterVolume: value }
@@ -814,13 +1006,22 @@ export function CosmoauditionApp() {
   }
 
   function updateRoute(mapping: SonicMapping, patch: Partial<RouteSetting>): void {
+    const currentRoutes = runtimeRef.current.routes;
     const next = {
-      ...routes,
-      [mapping.id]: { ...(routes[mapping.id] ?? { enabled: true, amount: 1 }), ...patch }
+      ...currentRoutes,
+      [mapping.id]: {
+        ...(currentRoutes[mapping.id] ?? { enabled: true, amount: 1 }),
+        ...patch
+      }
     };
+    runtimeRef.current.routes = next;
     setRoutes(next);
-    if (snapshot && engineRef.current) {
-      setAudioStatus(applySignalsToEngine(engineRef.current, snapshot.signals, next));
+    const currentSnapshot = snapshotRef.current;
+    if (currentSnapshot && engineRef.current) {
+      setAudioStatus(
+        applySignalsToEngine(engineRef.current, currentSnapshot.signals, next)
+      );
+      setEngineControlState(engineRef.current.getControlState());
     }
     setMessage(
       patch.enabled === false
@@ -832,33 +1033,91 @@ export function CosmoauditionApp() {
   async function loadMaterial(event: ChangeEvent<HTMLInputElement>): Promise<void> {
     const file = event.target.files?.[0];
     if (!file) return;
+    const materialRequestId = ++materialLoadRequestRef.current;
+    if (!runtimeRef.current.outputs.audio) {
+      setMessage("Arm the Internal audio output in Route before loading material.");
+      event.target.value = "";
+      return;
+    }
     try {
-      const engine = currentEngine();
-      if (audioStatus.state !== "running") {
-        const started = await engine.start();
-        setAudioStatus(started);
+      validateMaterialByteLength(file.size);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : String(error));
+      event.target.value = "";
+      return;
+    }
+    try {
+      const engine = engineRef.current;
+      if (engine?.getStatus().state === "panicked") {
+        setMessage(
+          "Panic is active. Press Listen to re-arm audio before loading material."
+        );
+        return;
       }
-      await engine.loadMaterial(await file.arrayBuffer(), file.name);
+      if (!engine || engine.getStatus().state !== "running") {
+        setMessage("Press Listen before loading material.");
+        return;
+      }
+      // Reading and decoding may be asynchronous, but choosing a file is not
+      // an audio-start gesture. Only an already-running engine may accept it.
+      const bytes = await file.arrayBuffer();
+      if (
+        materialRequestId !== materialLoadRequestRef.current ||
+        engineRef.current !== engine ||
+        !runtimeRef.current.outputs.audio
+      ) {
+        return;
+      }
+      setAudioStatus(engine.getStatus());
+      await engine.loadMaterial(bytes, file.name);
+      if (
+        materialRequestId !== materialLoadRequestRef.current ||
+        engineRef.current !== engine ||
+        !runtimeRef.current.outputs.audio
+      ) {
+        return;
+      }
       setMaterialName(file.name);
-      if (materialModulationMode === "catalog") {
+      const runtime = runtimeRef.current;
+      if (runtime.materialModulationMode === "catalog") {
         engine.routeMaterialControls(engine.getControlDecisions(), materialControlRoutes);
       } else {
-        engine.setMaterialControl(effectiveMaterialControls);
+        const signal = snapshotRef.current?.signals.find(
+          (candidate) => candidate.id === runtime.selectedSignalId
+        );
+        engine.setMaterialControl(
+          modulatedMaterialControls(
+            runtime.materialControls,
+            signal?.normalized,
+            runtime.materialModulationDepth
+          )
+        );
       }
       setMessage(`${file.name} loaded as a private local parent representation.`);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : String(error));
+      if (materialRequestId === materialLoadRequestRef.current) {
+        setMessage(error instanceof Error ? error.message : String(error));
+      }
     } finally {
       event.target.value = "";
     }
   }
 
   function playMaterial(): void {
+    if (!runtimeRef.current.outputs.audio) {
+      setMessage("Arm the Internal audio output in Route before material playback.");
+      return;
+    }
     const engine = engineRef.current;
     if (!engine || !materialName) return;
-    engine.startMaterial();
-    setMaterialPlaying(true);
-    setMessage(`Playing ${materialName} through the local material processor.`);
+    try {
+      engine.startMaterial();
+      setMaterialPlaying(true);
+      setMessage(`Playing ${materialName} through the local material processor.`);
+    } catch (error) {
+      setMaterialPlaying(false);
+      setMessage(error instanceof Error ? error.message : String(error));
+    }
   }
 
   function stopMaterial(): void {
@@ -868,20 +1127,148 @@ export function CosmoauditionApp() {
   }
 
   function updateMaterial(patch: Partial<MaterialControls>): void {
-    const next = { ...materialControls, ...patch };
+    const next = { ...runtimeRef.current.materialControls, ...patch };
+    runtimeRef.current.materialControls = next;
     setMaterialControls(next);
-    if (materialModulationMode === "selected") {
+    if (runtimeRef.current.materialModulationMode === "selected") {
+      const signal = snapshotRef.current?.signals.find(
+        (candidate) => candidate.id === runtimeRef.current.selectedSignalId
+      );
       engineRef.current?.setMaterialControl(
         modulatedMaterialControls(
           next,
-          selectedSignal?.normalized,
-          materialModulationDepth
+          signal?.normalized,
+          runtimeRef.current.materialModulationDepth
         )
       );
     } else if (engineRef.current) {
       engineRef.current.setMaterialControl(next);
       engineRef.current.routeLatestControlsToMaterial(materialControlRoutes);
     }
+  }
+
+  function selectSignal(signal: ObservedSignal): void {
+    runtimeRef.current.selectedSignalId = signal.id;
+    setSelectedSignalId(signal.id);
+    if (
+      engineRef.current &&
+      runtimeRef.current.materialModulationMode === "selected"
+    ) {
+      engineRef.current.setMaterialControl(
+        modulatedMaterialControls(
+          runtimeRef.current.materialControls,
+          signal.normalized,
+          runtimeRef.current.materialModulationDepth
+        )
+      );
+    }
+  }
+
+  function updateMaterialModulationDepth(value: number): void {
+    runtimeRef.current.materialModulationDepth = value;
+    setMaterialModulationDepth(value);
+    const signal = snapshotRef.current?.signals.find(
+      (candidate) => candidate.id === runtimeRef.current.selectedSignalId
+    );
+    if (
+      engineRef.current &&
+      runtimeRef.current.materialModulationMode === "selected"
+    ) {
+      engineRef.current.setMaterialControl(
+        modulatedMaterialControls(
+          runtimeRef.current.materialControls,
+          signal?.normalized,
+          value
+        )
+      );
+    }
+  }
+
+  function updateMaterialModulationMode(mode: MaterialModulationMode): void {
+    runtimeRef.current.materialModulationMode = mode;
+    setMaterialModulationMode(mode);
+    const engine = engineRef.current;
+    if (!engine) return;
+    if (mode === "catalog") {
+      engine.routeMaterialControls(engine.getControlDecisions(), materialControlRoutes);
+      return;
+    }
+    const signal = snapshotRef.current?.signals.find(
+      (candidate) => candidate.id === runtimeRef.current.selectedSignalId
+    );
+    engine.setMaterialControl(
+      modulatedMaterialControls(
+        runtimeRef.current.materialControls,
+        signal?.normalized,
+        runtimeRef.current.materialModulationDepth
+      )
+    );
+  }
+
+  function updateGeneratorEnabled(enabled: boolean): void {
+    runtimeRef.current.generatorEnabled = enabled;
+    setGeneratorEnabled(enabled);
+  }
+
+  function updateGeneratorRate(rate: number): void {
+    runtimeRef.current.generatorRate = rate;
+    runtimeRef.current.modulationDefinitions = createDefaultModulatorBank(
+      generatorOriginRef.current,
+      runtimeRef.current.generatorSeed,
+      rate
+    );
+    setGeneratorRate(rate);
+  }
+
+  function updateGeneratorSeed(seed: number): void {
+    runtimeRef.current.generatorSeed = seed;
+    runtimeRef.current.modulationDefinitions = createDefaultModulatorBank(
+      generatorOriginRef.current,
+      seed,
+      runtimeRef.current.generatorRate
+    );
+    setGeneratorSeed(seed);
+  }
+
+  function selectMidiOutput(id: string): void {
+    runtimeRef.current.selectedMidiOutputId = id;
+    setSelectedMidiOutputId(id);
+  }
+
+  function toggleOutput(key: keyof OutputState): void {
+    const currentOutputs = runtimeRef.current.outputs;
+    const armed = !currentOutputs[key];
+    const next = { ...currentOutputs, [key]: armed };
+    runtimeRef.current.outputs = next;
+    setOutputs(next);
+
+    if (key !== "audio") return;
+    audioStartRequestRef.current += 1;
+    audioStartPendingRef.current = null;
+    setIsAudioStarting(false);
+    materialLoadRequestRef.current += 1;
+    const engine = engineRef.current;
+    let status: AudioEngineStatus;
+    if (engine) {
+      engine.setOutputArmed(armed);
+      status = armed ? engine.getStatus() : engine.stop();
+    } else {
+      status = {
+        ...idleAudioStatus(),
+        outputArmed: armed,
+        state: "stopped"
+      };
+    }
+    if (!armed) {
+      setMaterialName(null);
+      setMaterialPlaying(false);
+    }
+    setAudioStatus(status);
+    setMessage(
+      armed
+        ? "Internal audio armed; output remains stopped until explicit Listen."
+        : "Internal audio disarmed; all local audio paths were stopped."
+    );
   }
 
   function saveSession(): void {
@@ -906,12 +1293,34 @@ export function CosmoauditionApp() {
     // Replaying reports how the record is being read; the mode it was acquired
     // in travels alongside so a replayed fixture is never later attributed to
     // a live provider.
-    setSnapshot({
+    snapshotRequestRef.current += 1;
+    audioStartRequestRef.current += 1;
+    if (audioStartPendingRef.current !== null) {
+      audioStartPendingRef.current = null;
+      setIsAudioStarting(false);
+      const engine = engineRef.current;
+      if (engine && engine.getStatus().state !== "running") {
+        setAudioStatus(engine.stop());
+      }
+    }
+    snapshotAbortRef.current?.abort();
+    snapshotAbortRef.current = null;
+    setIsLoading(false);
+    const replayed: ApiSnapshot = {
       ...entry.snapshot,
       mode: "archive",
       originMode: entry.snapshot.originMode ?? entry.snapshot.mode
-    });
-    setSelectedSignalId(entry.snapshot.signals.find((signal) => signal.value !== null)?.id ?? null);
+    };
+    snapshotRef.current = replayed;
+    setSnapshot(replayed);
+    const replaySelectedSignalId =
+      entry.snapshot.signals.find((signal) => signal.value !== null)?.id ?? null;
+    runtimeRef.current.selectedSignalId = replaySelectedSignalId;
+    setSelectedSignalId(replaySelectedSignalId);
+    if (engineRef.current) {
+      setAudioStatus(applySignalsToEngine(engineRef.current, replayed.signals));
+      setEngineControlState(engineRef.current.getControlState());
+    }
     setWorkspace("observe");
     setMessage(`Archived observation loaded from ${new Date(entry.capturedAt).toLocaleString()}.`);
   }
@@ -977,8 +1386,11 @@ export function CosmoauditionApp() {
     setMessage("Observation JSON downloaded with source state and timestamps.");
   }
 
-  function midiEventsForSnapshot(current: ApiSnapshot) {
-    const decisions = decisionsForSignals(current.signals, routes);
+  function midiEventsForSnapshot(
+    current: ApiSnapshot,
+    activeRoutes: Readonly<Record<string, RouteSetting>> = runtimeRef.current.routes
+  ) {
+    const decisions = decisionsForSignals(current.signals, activeRoutes);
     return decisions.flatMap((decision, index) => {
       const mapping = mappingCatalog.find((candidate) => candidate.id === decision.mappingId);
       const signal = current.signals.find((candidate) => candidate.id === decision.signalId);
@@ -1024,8 +1436,11 @@ export function CosmoauditionApp() {
     try {
       const access = await requestBrowserMidiAccess();
       const available = listMidiOutputs(access);
+      const selected = runtimeRef.current.selectedMidiOutputId || available[0]?.id || "";
+      runtimeRef.current.midiOutputs = available;
+      runtimeRef.current.selectedMidiOutputId = selected;
       setMidiOutputs(available);
-      setSelectedMidiOutputId((current) => current || available[0]?.id || "");
+      setSelectedMidiOutputId(selected);
       setMessage(
         available.length > 0
           ? `${available.length} MIDI output${available.length === 1 ? "" : "s"} authorized. Transmission remains separately armed.`
@@ -1036,15 +1451,37 @@ export function CosmoauditionApp() {
     }
   }
 
-  function sendSnapshotToMidi(current = snapshot, announce = true): void {
+  function sendSnapshotToMidi(
+    current = snapshotRef.current,
+    announce = true
+  ): void {
     if (!current) return;
-    const output = midiOutputs.find((candidate) => candidate.id === selectedMidiOutputId);
+    const runtime = runtimeRef.current;
+    if (!runtime.outputs.midi) {
+      if (announce) setMessage("Arm MIDI output before transmission.");
+      return;
+    }
+    const output = runtime.midiOutputs.find(
+      (candidate) => candidate.id === runtime.selectedMidiOutputId
+    );
     if (!output) {
       if (announce) setMessage("Authorize and select a MIDI output before transmission.");
       return;
     }
-    const events = midiEventsForSnapshot(current);
-    events.forEach((event) => sendMidiControlChange(output, event));
+    let events: ReturnType<typeof midiEventsForSnapshot> = [];
+    let sent = 0;
+    try {
+      events = midiEventsForSnapshot(current, runtime.routes);
+      for (const event of events) {
+        sendMidiControlChange(output, event);
+        sent += 1;
+      }
+    } catch (error) {
+      setMessage(
+        `MIDI transmission stopped after ${sent} of ${events.length} control changes: ${error instanceof Error ? error.message : String(error)}. Device state is unknown; the observation remains accepted.`
+      );
+      return;
+    }
     if (announce) {
       setMessage(`${events.length} MIDI control changes transmitted to ${output.name ?? output.id}; reception and audition are unverified.`);
     }
@@ -1152,7 +1589,7 @@ export function CosmoauditionApp() {
             type="button"
             className="command primary"
             disabled={isLoading}
-            onClick={() => void loadSnapshot(snapshotMode)}
+            onClick={() => void takeObservation(snapshotMode).catch(() => undefined)}
           >
             <span aria-hidden="true">◎</span>
             {isLoading ? "Observing…" : "Take observation"}
@@ -1169,8 +1606,13 @@ export function CosmoauditionApp() {
         </div>
 
         <div className="command-group audio-command">
-          <button type="button" className="command listen" onClick={() => void startAudio()}>
-            <span aria-hidden="true">▶</span> Listen
+          <button
+            type="button"
+            className="command listen"
+            disabled={isLoading || isAudioStarting || !outputs.audio}
+            onClick={() => void startAudio()}
+          >
+            <span aria-hidden="true">▶</span> {isAudioStarting ? "Starting…" : "Listen"}
           </button>
           <button type="button" className="command" onClick={stopAudio}>
             <span aria-hidden="true">■</span> Stop
@@ -1204,7 +1646,7 @@ export function CosmoauditionApp() {
             selectedStratum={selectedStratum}
             selectedSignal={selectedSignal}
             onSelectStratum={setSelectedStratum}
-            onSelectSignal={(signal) => setSelectedSignalId(signal.id)}
+            onSelectSignal={selectSignal}
           />
         )}
 
@@ -1216,9 +1658,9 @@ export function CosmoauditionApp() {
             generatorEnabled={generatorEnabled}
             generatorRate={generatorRate}
             generatorSeed={generatorSeed}
-            onGeneratorEnabled={setGeneratorEnabled}
-            onGeneratorRate={setGeneratorRate}
-            onGeneratorSeed={setGeneratorSeed}
+            onGeneratorEnabled={updateGeneratorEnabled}
+            onGeneratorRate={updateGeneratorRate}
+            onGeneratorSeed={updateGeneratorSeed}
             onUpdateRoute={updateRoute}
           />
         )}
@@ -1226,6 +1668,8 @@ export function CosmoauditionApp() {
         {workspace === "transform" && (
           <TransformWorkspace
             selectedSignal={selectedSignal}
+            audioArmed={outputs.audio}
+            audioRunning={audioStatus.state === "running"}
             materialName={materialName}
             playing={materialPlaying}
             controls={materialControls}
@@ -1236,8 +1680,8 @@ export function CosmoauditionApp() {
             onPlay={playMaterial}
             onStop={stopMaterial}
             onChange={updateMaterial}
-            onModulationDepth={setMaterialModulationDepth}
-            onModulationMode={setMaterialModulationMode}
+            onModulationDepth={updateMaterialModulationDepth}
+            onModulationMode={updateMaterialModulationMode}
           />
         )}
 
@@ -1245,7 +1689,7 @@ export function CosmoauditionApp() {
           <RouteWorkspace
             snapshot={snapshot}
             outputs={outputs}
-            onToggle={(key) => setOutputs({ ...outputs, [key]: !outputs[key] })}
+            onToggle={toggleOutput}
             onExportControl={exportControlFrame}
             onExportSnapshot={exportSnapshot}
             onExportMidi={exportMidi}
@@ -1254,7 +1698,7 @@ export function CosmoauditionApp() {
             triggerCount={recentTriggers.length}
             midiOutputs={midiOutputs}
             selectedMidiOutputId={selectedMidiOutputId}
-            onSelectMidiOutput={setSelectedMidiOutputId}
+            onSelectMidiOutput={selectMidiOutput}
             onConnectMidi={() => void connectMidi()}
             onSendMidi={() => sendSnapshotToMidi()}
           />
@@ -1645,6 +2089,8 @@ function PatchWorkspace(props: {
 
 function TransformWorkspace(props: {
   selectedSignal: ObservedSignal | null;
+  audioArmed: boolean;
+  audioRunning: boolean;
   materialName: string | null;
   playing: boolean;
   controls: MaterialControls;
@@ -1678,12 +2124,17 @@ function TransformWorkspace(props: {
             <strong>{props.materialName ?? "No material loaded"}</strong>
             <small>WAV, AIFF, MP3, FLAC, or browser-decodable audio</small>
             <label className="file-command">
-              <input type="file" accept="audio/*" onChange={props.onLoad} />
+              <input
+                type="file"
+                accept="audio/*"
+                disabled={!props.audioArmed || !props.audioRunning}
+                onChange={props.onLoad}
+              />
               Choose local sound
             </label>
           </div>
           <div className="material-transport">
-            <button type="button" disabled={!props.materialName || props.playing} onClick={props.onPlay}>▶ Play loop</button>
+            <button type="button" disabled={!props.audioArmed || !props.audioRunning || !props.materialName || props.playing} onClick={props.onPlay}>▶ Play loop</button>
             <button type="button" disabled={!props.playing} onClick={props.onStop}>■ Stop material</button>
           </div>
           <p className="privacy-line">Private by default · bytes stay in this browser session</p>

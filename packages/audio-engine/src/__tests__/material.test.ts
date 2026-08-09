@@ -8,7 +8,9 @@ import { describe, expect, it } from "vitest";
 import {
   DEFAULT_MATERIAL_CONTROL,
   DEFAULT_MATERIAL_CONTROL_ROUTES,
+  MAX_MATERIAL_BYTES,
   materialControlPatchFromDecisions,
+  validateMaterialByteLength,
   validateMaterialControlPatch
 } from "../material";
 
@@ -35,6 +37,15 @@ function decision(
 }
 
 describe("imported material controls", () => {
+  it("refuses empty, invalid, and oversized encoded material before decoding", () => {
+    expect(() => validateMaterialByteLength(0)).toThrow(/empty/);
+    expect(() => validateMaterialByteLength(-1)).toThrow(/invalid encoded byte length/);
+    expect(() => validateMaterialByteLength(MAX_MATERIAL_BYTES + 1)).toThrow(
+      /64 MiB/
+    );
+    expect(() => validateMaterialByteLength(MAX_MATERIAL_BYTES)).not.toThrow();
+  });
+
   it("applies finite controls inside conservative bounds", () => {
     const update = validateMaterialControlPatch(DEFAULT_MATERIAL_CONTROL, {
       cutoffHz: 4200,

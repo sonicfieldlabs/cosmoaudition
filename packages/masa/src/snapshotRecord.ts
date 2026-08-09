@@ -27,7 +27,7 @@ const SCHEMA_URI =
   "https://masa.sonicfield.org/schemas/0.1.0/matter-record.schema.json";
 const CONTEXT_URI =
   "https://masa.sonicfield.org/contexts/0.1.0/masa.jsonld";
-const ADAPTER_VERSION = "0.1.0";
+const ADAPTER_VERSION = "0.1.1";
 
 export interface SnapshotLike {
   generatedAt: string;
@@ -125,9 +125,11 @@ export function evaluateMappingDecision(
   mapping: SonicMapping,
   previousOutput?: number
 ): MappingDecision {
-  return executeMapping(mapping, signal, {
-    ...(previousOutput === undefined ? {} : { previousOutput })
-  });
+  return executeMapping(
+    mapping,
+    signal,
+    previousOutput === undefined ? {} : { previousOutput }
+  );
 }
 
 export async function buildSnapshotMatterRecord(

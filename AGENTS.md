@@ -19,11 +19,11 @@ Only what the system needs to run, be verified, and be understood:
 
 Deliberately excluded: private working material, build output, `node_modules/`, the package store, Playwright artifacts, the runtime cache under `data/cache/`, and local build archives under `release/`.
 
-Nothing in this repository may contain credentials, provider keys, absolute home-directory paths, private endpoints, or personal data. The gateway reaches providers over public HTTPS only; there are no internal or private routes to protect, and no `.env` file is expected.
+Nothing in this repository may contain credentials, provider keys, absolute home-directory paths, private endpoints, or personal data. The gateway reaches code-declared providers over HTTPS only; reserved hostnames and literal non-public addresses are refused, while hostname DNS resolution and certificate authentication remain the platform HTTPS transport's boundary. There are no internal or private routes to protect, and no `.env` file is expected.
 
 ## Invariants
 
-- The runtime is loopback-only. It refuses non-loopback bind hosts, CORS origins, and request authorities, and provider redirects may not leave public HTTPS.
+- The runtime is loopback-only. It refuses non-loopback bind hosts, CORS origins, and request authorities. Provider redirects may not downgrade from HTTPS or name a reserved host or literal non-public address; this is not a general-purpose URL proxy or a connection-level DNS-pinning boundary.
 - Missing, stale, refused, and held values never become numbers. A control value never travels without its decision status.
 - A control or modulation receipt records that a parameter was scheduled, never that anything was heard.
 - Fixture mode is evidence of software behavior, not of current external observation. It cannot catch provider drift, so check `GET /api/sources?mode=live` before a release.
@@ -34,5 +34,7 @@ Nothing in this repository may contain credentials, provider keys, absolute home
 Run before calling any change complete:
 
 ```bash
-pnpm typecheck && pnpm test && pnpm build && pnpm e2e && pnpm verify:release && pnpm audit --audit-level=high
+pnpm release:check
 ```
+
+That authoritative gate runs typechecking, tests, production builds, browser E2E, fresh local packaging and archive inspection, and the high-severity dependency audit.

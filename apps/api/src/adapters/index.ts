@@ -88,7 +88,7 @@ export async function collectSnapshot(options: SnapshotOptions) {
   );
 
   const signals = results.flatMap((result) => result.signals);
-  signals.push(createStaleSourceSignal(results, now, adapters.length));
+  signals.push(createStaleSourceSignal(results, now));
 
   return {
     generatedAt: now.toISOString(),
@@ -166,8 +166,7 @@ function createFailureCacheMetadata(
 
 function createStaleSourceSignal(
   results: readonly AdapterResult[],
-  now: Date,
-  sourceCount: number
+  now: Date
 ): ObservedSignal {
   const count = results.filter(
     (result) =>

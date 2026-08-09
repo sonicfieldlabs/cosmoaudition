@@ -53,6 +53,7 @@ export type AudioEngineState = "idle" | "running" | "stopped" | "panicked";
 
 export interface AudioEngineStatus {
   state: AudioEngineState;
+  outputArmed: boolean;
   sampleRate: number | null;
   currentTime: number;
   masterVolume: number;
@@ -91,6 +92,7 @@ export class AudioEngine {
   private controlState = new Map<string, number>();
   private controlDecisions: ControlDecision[] = [];
   private state: AudioEngineState = "idle";
+  private outputArmed = true;
   private masterVolume = DEFAULT_MASTER_VOLUME;
   private density = 0.5;
   private startPromise: Promise<AudioEngineStatus> | null = null;
@@ -108,11 +110,14 @@ export class AudioEngine {
     if (this.startPromise) {
       return this.startPromise;
     }
-    this.startPromise = this.startExclusive();
+    const startPromise = this.startExclusive();
+    this.startPromise = startPromise;
     try {
-      return await this.startPromise;
+      return await startPromise;
     } finally {
-      this.startPromise = null;
+      if (this.startPromise === startPromise) {
+        this.startPromise = null;
+      }
     }
   }
 
@@ -120,7 +125,7 @@ export class AudioEngine {
     const AudioContextConstructor = getAudioContextConstructor();
     const context = new AudioContextConstructor();
     const master = createMasterBus(context);
-    master.setVolume(this.masterVolume);
+    master.setVolume(this.outputArmed ? this.masterVolume : 0);
 
     this.context = context;
     this.master = master;
@@ -255,7 +260,14 @@ export class AudioEngine {
 
   setMasterVolume(value: number): AudioEngineStatus {
     this.masterVolume = clamp01(value);
-    this.master?.setVolume(this.masterVolume);
+    this.master?.setVolume(this.outputArmed ? this.masterVolume : 0);
+    return this.getStatus();
+  }
+
+  /** Arm or silence the graph while preserving the configured master volume. */
+  setOutputArmed(armed: boolean): AudioEngineStatus {
+    this.outputArmed = armed;
+    this.master?.setVolume(armed ? this.masterVolume : 0);
     return this.getStatus();
   }
 
@@ -279,10 +291,7 @@ export class AudioEngine {
       );
     }
     if (!this.context || this.state !== "running" || !this.material) {
-      await this.start();
-    }
-    if (!this.material) {
-      throw new Error("Material audio path could not be initialized.");
+      throw new Error("Press Listen before loading material.");
     }
     return name === undefined
       ? this.material.load(arrayBuffer)
@@ -290,6 +299,9 @@ export class AudioEngine {
   }
 
   startMaterial(): MaterialStatus {
+    if (!this.outputArmed) {
+      throw new Error("Arm the Internal audio output before material playback.");
+    }
     if (!this.material || this.state !== "running") {
       throw new Error("Start the audio engine before material playback.");
     }
@@ -329,7 +341,12 @@ export class AudioEngine {
 
   /** Route deduplicated event projections through enabled event mappings only. */
   emitTriggers(triggers: readonly SignalTrigger[]): number {
-    if (!this.context || this.state !== "running" || triggers.length === 0) {
+    if (
+      !this.outputArmed ||
+      !this.context ||
+      this.state !== "running" ||
+      triggers.length === 0
+    ) {
       return 0;
     }
     const routedSignalIds = new Set(
@@ -375,6 +392,10 @@ export class AudioEngine {
   }
 
   stop(): AudioEngineStatus {
+    // The old startup continues only long enough to close its own context.
+    // Clearing the shared handle lets a new explicit Listen create a fresh
+    // context without allowing the old promise's finally block to erase it.
+    this.startPromise = null;
     if (!this.context) {
       this.state = "stopped";
       return this.getStatus();
@@ -412,6 +433,7 @@ export class AudioEngine {
   getStatus(): AudioEngineStatus {
     return {
       state: this.state,
+      outputArmed: this.outputArmed,
       sampleRate: this.context?.sampleRate ?? null,
       currentTime: this.context?.currentTime ?? 0,
       masterVolume: this.masterVolume,
@@ -428,7 +450,8 @@ export class AudioEngine {
     const levels = {} as Record<StackLayer, number>;
     for (const layer of stackLayers) {
       const bus = this.buses.get(layer);
-      levels[layer] = this.state === "running" && bus ? bus.level() : 0;
+      levels[layer] =
+        this.outputArmed && this.state === "running" && bus ? bus.level() : 0;
     }
     return levels;
   }

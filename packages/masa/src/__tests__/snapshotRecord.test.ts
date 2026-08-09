@@ -106,6 +106,10 @@ describe("COSMOAUDITION MASA snapshot adapter", () => {
       mode: "fixture",
       recordCardinality: "one-record-per-snapshot"
     });
+    expect(record.extensions["cosmo:adapter"]).toMatchObject({
+      package: "@cosmoaudition/masa",
+      version: "0.1.1"
+    });
     expect(record.sources).toHaveLength(4);
     expect(record.sources.every((source) => source.sourceKind === "local-fixture")).toBe(
       true
@@ -143,8 +147,9 @@ describe("COSMOAUDITION MASA snapshot adapter", () => {
       scheduledOnly: true,
       completionSemantics: "scheduled-not-heard"
     });
-    expect(embeddedEvents(record).map((event) => event.effectClass)).toEqual(
-      [...embeddedEvents(record).map((event) => event.effectClass)].sort((left, right) => eventRank(left) - eventRank(right))
+    const effectClasses = embeddedEvents(record).map((event) => event.effectClass);
+    expect(effectClasses).toEqual(
+      effectClasses.slice().sort((left, right) => eventRank(left) - eventRank(right))
     );
     expect(
       record.relations.some(
@@ -354,7 +359,7 @@ describe("COSMOAUDITION MASA snapshot adapter", () => {
     });
 
     expect(ghost).toBeDefined();
-    expect((ghost?.health as { status: string }).status).not.toBe("healthy");
+    expect((ghost!.health as { status: string }).status).not.toBe("healthy");
   });
 
   it("does not mislabel an equivalent explicit offset as a fallback timestamp", async () => {
