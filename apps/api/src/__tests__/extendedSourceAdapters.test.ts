@@ -7,6 +7,7 @@ import { aggregateFireballs } from "../adapters/fireball";
 import { aggregateCloseApproaches } from "../adapters/jpl";
 import { mempoolStatsAdapter } from "../adapters/mempool";
 import { inaturalistRecentObservationsAdapter } from "../adapters/inaturalist";
+import { eonetOpenEventsAdapter } from "../adapters/eonet";
 import { swpcSolarWindSpeedAdapter } from "../adapters/swpc";
 import { usgsEarthquakesAdapter } from "../adapters/usgs";
 import { aggregatePageviews, wikimediaPageviewsAdapter } from "../adapters/wikimedia";
@@ -46,6 +47,11 @@ describe.sequential("extended source adapter fixtures", () => {
     expect(signals.get("inaturalist_observation_rate_per_minute")?.value).toBe(122);
     expect(signals.get("wikimedia_pageviews_latest_hour")?.value).toBe(441_000_000);
     expect(signals.get("wikimedia_pageviews_hourly_change")?.value).toBeCloseTo(5, 8);
+    expect(signals.get("air_quality_pm2_5")?.value).toBe(8.6);
+    expect(signals.get("marine_wave_height")?.value).toBeNull();
+    expect(signals.get("marine_wave_height")?.sphere).toBe("hydrosphere");
+    expect(signals.get("eonet_open_event_count_bounded")?.value).toBe(24);
+    expect(signals.get("eonet_open_wildfire_count_bounded")?.value).toBe(12);
 
     expect(signals.get("solar_wind_speed")?.sphere).toBe("cosmos");
     expect(signals.get("inaturalist_observations_created_1h")?.sphere).toBe(
@@ -141,6 +147,103 @@ describe.sequential("extended source adapter fixtures", () => {
       expect(persisted).not.toContain("private.jpg");
       expect(persisted).not.toContain("4.711,-74.0721");
       expect(persisted).not.toContain("private_location");
+    } finally {
+      await rm(cacheDir, { recursive: true, force: true });
+    }
+  });
+
+  it("reduces NASA EONET event rows and geometries before cache persistence", async () => {
+    const cacheDir = await mkdtemp(join(tmpdir(), "cosmoaudition-eonet-cache-"));
+    process.env.COSMOAUDITION_CACHE_DIR = cacheDir;
+    globalThis.fetch = (async () =>
+      new Response(
+        JSON.stringify({
+          events: [
+            {
+              id: "EONET_1",
+              title: "Provider event title",
+              sources: [{ id: "source", url: "https://provider.invalid/event" }],
+              categories: [{ id: "wildfires", title: "Wildfires" }],
+              geometry: [
+                {
+                  date: "2026-08-11T10:00:00Z",
+                  type: "Point",
+                  coordinates: [-74.0721, 4.711]
+                }
+              ]
+            },
+            {
+              id: "EONET_2",
+              title: "Second event",
+              categories: [{ id: "severeStorms", title: "Severe Storms" }],
+              geometry: [{ date: "2026-08-11T11:00:00Z", coordinates: [1, 2] }]
+            }
+          ]
+        }),
+        { status: 200, headers: { "content-type": "application/json" } }
+      )) as typeof fetch;
+
+    try {
+      const result = await eonetOpenEventsAdapter.read({
+        mode: "live",
+        now: new Date("2026-08-11T12:00:00.000Z"),
+        latitude: 4.711,
+        longitude: -74.0721
+      });
+      const cacheFiles = (await readdir(cacheDir)).filter((name) =>
+        name.startsWith("nasa_eonet_open_events--")
+      );
+      expect(cacheFiles).toHaveLength(1);
+      const envelope = JSON.parse(
+        await readFile(join(cacheDir, cacheFiles[0]!), "utf8")
+      ) as { payload: Record<string, unknown> };
+      const persisted = JSON.stringify(envelope.payload);
+
+      expect(result.signals.find((signal) => signal.id === "eonet_open_event_count_bounded")?.value).toBe(2);
+      expect(result.signals.find((signal) => signal.id === "eonet_open_wildfire_count_bounded")?.value).toBe(1);
+      expect(result.signals.find((signal) => signal.id === "eonet_open_severe_storm_count_bounded")?.value).toBe(1);
+      expect(result.signals.find((signal) => signal.id === "eonet_latest_geometry_age_hours")?.value).toBe(1);
+      expect(Object.keys(envelope.payload).sort()).toEqual([
+        "apertureDays",
+        "eventCount",
+        "kind",
+        "latestGeometryAt",
+        "rowLimit",
+        "severeStormCount",
+        "wildfireCount"
+      ]);
+      expect(persisted).not.toContain("Provider event title");
+      expect(persisted).not.toContain("provider.invalid");
+      expect(persisted).not.toContain("-74.0721");
+    } finally {
+      await rm(cacheDir, { recursive: true, force: true });
+    }
+  });
+
+  it("enforces the EONET 200-row aperture even if the provider exceeds it", async () => {
+    const cacheDir = await mkdtemp(join(tmpdir(), "cosmoaudition-eonet-limit-"));
+    process.env.COSMOAUDITION_CACHE_DIR = cacheDir;
+    globalThis.fetch = (async () =>
+      new Response(
+        JSON.stringify({
+          events: Array.from({ length: 205 }, (_, index) => ({
+            id: `EONET_${index}`,
+            categories: [{ id: "wildfires" }],
+            geometry: [{ date: "2026-08-11T11:00:00Z", coordinates: [index, index] }]
+          }))
+        }),
+        { status: 200, headers: { "content-type": "application/json" } }
+      )) as typeof fetch;
+
+    try {
+      const result = await eonetOpenEventsAdapter.read({
+        mode: "live",
+        now: new Date("2026-08-11T12:00:00.000Z"),
+        latitude: 4.711,
+        longitude: -74.0721
+      });
+      expect(result.signals.find((signal) => signal.id === "eonet_open_event_count_bounded")?.value).toBe(200);
+      expect(result.signals.find((signal) => signal.id === "eonet_open_wildfire_count_bounded")?.value).toBe(200);
     } finally {
       await rm(cacheDir, { recursive: true, force: true });
     }

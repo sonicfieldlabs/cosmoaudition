@@ -1,8 +1,10 @@
 import {
   createSourceHealth,
   getSourceDefinition,
+  getSignalDefinition,
   nullableLinearNormalize,
   nullableLogNormalize,
+  normalizeSignalValue,
   parseAbsoluteTime,
   type Confidence,
   type EpistemicStatus,
@@ -46,7 +48,7 @@ export function createSignal(options: {
   layer: StackLayer;
   unit: string;
   value: number | null;
-  normalized: number | null;
+  normalized?: number | null;
   timestamp: string;
   source: SourceDefinition;
   sourceUrl?: string | undefined;
@@ -59,35 +61,81 @@ export function createSignal(options: {
   error?: string | undefined;
   notes?: string | undefined;
 }): ObservedSignal {
+  const definition = getSignalDefinition(options.id, options.source.id);
+  if (definition === undefined) {
+    throw new Error(`Signal is not declared in the catalog: ${options.id}`);
+  }
+  if (
+    definition.sourceId !== options.source.id ||
+    definition.layer !== options.layer ||
+    definition.unit !== options.unit
+  ) {
+    throw new Error(
+      `Signal ${options.id} does not match its catalog source, layer, or unit.`
+    );
+  }
+  if (
+    (options.sphere !== undefined && options.sphere !== definition.sphere) ||
+    (options.epistemicStatus !== undefined &&
+      options.epistemicStatus !== definition.epistemicStatus) ||
+    (options.temporalCharacter !== undefined &&
+      options.temporalCharacter !== definition.temporalCharacter) ||
+    (options.signalKind !== undefined &&
+      options.signalKind !== definition.signalKind)
+  ) {
+    throw new Error(`Signal ${options.id} conflicts with its catalog metadata.`);
+  }
+  const normalized = normalizeSignalValue(
+    options.value,
+    definition.normalization
+  );
+  if (
+    options.normalized !== undefined &&
+    (options.normalized === null || normalized === null
+      ? options.normalized !== normalized
+      : Math.abs(options.normalized - normalized) > 1e-12)
+  ) {
+    throw new Error(`Signal ${options.id} conflicts with catalog normalization.`);
+  }
+
   return {
     id: options.id,
-    label: options.label,
-    layer: options.layer,
-    unit: options.unit,
+    label: definition.label,
+    layer: definition.layer,
+    unit: definition.unit,
     value: options.value,
-    normalized: options.normalized,
+    normalized,
     timestamp: options.timestamp,
     sourceId: options.source.id,
     ...(options.sourceUrl === undefined ? {} : { sourceUrl: options.sourceUrl }),
-    ...((options.sphere ?? options.source.sphere) === undefined
-      ? {}
-      : { sphere: options.sphere ?? options.source.sphere }),
-    ...(options.epistemicStatus === undefined
-      ? {}
-      : { epistemicStatus: options.epistemicStatus }),
-    ...((options.temporalCharacter ?? options.source.temporalCharacter) === undefined
-      ? {}
-      : {
-          temporalCharacter:
-            options.temporalCharacter ?? options.source.temporalCharacter
-        }),
-    ...(options.signalKind === undefined ? {} : { signalKind: options.signalKind }),
+    sphere: definition.sphere,
+    epistemicStatus: definition.epistemicStatus,
+    temporalCharacter: definition.temporalCharacter,
+    signalKind: definition.signalKind,
+    normalization: definition.normalization,
     ...(options.eventKey === undefined ? {} : { eventKey: options.eventKey }),
     confidence: options.confidence,
     staleAfterSeconds: options.source.ttlSeconds,
     ...(options.error === undefined ? {} : { error: options.error }),
     ...(options.notes === undefined ? {} : { notes: options.notes })
   };
+}
+
+/** Resolve a provider-local wall-clock timestamp using its declared UTC offset. */
+export function localWallClockToInstant(
+  localTime: unknown,
+  offsetSeconds: unknown,
+  fallback: string
+): string {
+  if (typeof localTime !== "string" || localTime.trim().length === 0) {
+    return fallback;
+  }
+  if (typeof offsetSeconds !== "number" || !Number.isFinite(offsetSeconds)) {
+    return fallback;
+  }
+  const asUtc = Date.parse(`${localTime.trim()}Z`);
+  if (!Number.isFinite(asUtc)) return fallback;
+  return new Date(asUtc - offsetSeconds * 1000).toISOString();
 }
 
 export function normalizeLinear(

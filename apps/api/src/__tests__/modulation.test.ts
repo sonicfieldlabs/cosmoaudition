@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { MODULATION_CONTRACT } from "@cosmoaudition/core";
+import {
+  MODULATION_CONTRACT,
+  SIGNAL_CATALOG_CONTRACT,
+  SIGNAL_CATALOG_VERSION
+} from "@cosmoaudition/core";
 import { app } from "../app";
 import { encodeOscMessage, oscInteger } from "../emit/osc";
 import { oscAddressSegment } from "../emit/frameEmitter";
@@ -18,6 +22,30 @@ describe("modulation framework surface", () => {
     expect(body.mappings.every((mapping) => mapping.epistemicNote.length > 0)).toBe(true);
   });
 
+  it("serves a versioned, filterable signal catalog", async () => {
+    const response = await app.request(
+      "/api/signals?sources=open_meteo_air_quality,open_meteo_marine"
+    );
+    const body = (await response.json()) as {
+      contract: string;
+      version: string;
+      signals: Array<{ sourceId: string; normalization: { basis: string } }>;
+    };
+
+    expect(response.status).toBe(200);
+    expect(body.contract).toBe(SIGNAL_CATALOG_CONTRACT);
+    expect(body.version).toBe(SIGNAL_CATALOG_VERSION);
+    expect(body.signals.length).toBe(10);
+    expect(
+      body.signals.every(
+        (signal) =>
+          ["open_meteo_air_quality", "open_meteo_marine"].includes(
+            signal.sourceId
+          ) && signal.normalization.basis.length > 0
+      )
+    ).toBe(true);
+  });
+
   it("serves one fixture frame whose values all carry a control status", async () => {
     const response = await app.request("/api/frame?mode=fixture");
     expect(response.status).toBe(200);
@@ -27,9 +55,15 @@ describe("modulation framework surface", () => {
       absences: Array<{ target: string; reason: string }>;
       values: Record<string, number>;
       attribution: Array<{ licenseNote: string }>;
+      signalCatalog: { contract: string; version: string; href: string };
     };
 
     expect(frame.contract).toBe(MODULATION_CONTRACT);
+    expect(frame.signalCatalog).toEqual({
+      contract: SIGNAL_CATALOG_CONTRACT,
+      version: SIGNAL_CATALOG_VERSION,
+      href: "/api/signals"
+    });
     for (const [target, value] of Object.entries(frame.values)) {
       const control = frame.controls.find((item) => item.target === target);
       expect(control?.outputValue).toBe(value);

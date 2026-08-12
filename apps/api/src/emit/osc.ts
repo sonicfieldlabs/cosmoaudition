@@ -6,7 +6,7 @@
  * string arguments, each null-padded to a four-byte boundary — is small enough
  * to audit in one screen, which matters more in this repository than brevity.
  *
- * Outbound only in v0.1. Accepting OSC *into* the instrument would let a
+ * Outbound only in v0.2. Accepting OSC *into* the instrument would let a
  * process on the machine set control amounts, which is an authority question
  * the local-only posture has not answered.
  */

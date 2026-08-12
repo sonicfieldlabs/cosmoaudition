@@ -9,8 +9,8 @@ overrides:
   postcss: 8.5.26
   fast-uri: 3.1.5
   nanoid: 3.3.17
-  '@sonicfield/masa@0.1.1': file:vendor/masa/sonicfield-masa-0.1.1.tgz
-  '@sonicfield/masa-validator@0.1.1': file:vendor/masa/sonicfield-masa-validator-0.1.1.tgz
+  '@sonicfield/masa@0.2.0': file:vendor/masa/sonicfield-masa-0.2.0.tgz
+  '@sonicfield/masa-validator@0.2.0': file:vendor/masa/sonicfield-masa-validator-0.2.0.tgz
 
 importers:
 
@@ -99,11 +99,11 @@ importers:
         specifier: workspace:*
         version: link:../core
       '@sonicfield/masa':
-        specifier: file:../../vendor/masa/sonicfield-masa-0.1.1.tgz
-        version: file:vendor/masa/sonicfield-masa-0.1.1.tgz
+        specifier: file:../../vendor/masa/sonicfield-masa-0.2.0.tgz
+        version: file:vendor/masa/sonicfield-masa-0.2.0.tgz
       '@sonicfield/masa-validator':
-        specifier: file:../../vendor/masa/sonicfield-masa-validator-0.1.1.tgz
-        version: file:vendor/masa/sonicfield-masa-validator-0.1.1.tgz
+        specifier: file:../../vendor/masa/sonicfield-masa-validator-0.2.0.tgz
+        version: file:vendor/masa/sonicfield-masa-validator-0.2.0.tgz
     devDependencies:
       vitest:
         specifier: ^3.2.7
@@ -533,13 +533,13 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@sonicfield/masa-validator@file:vendor/masa/sonicfield-masa-validator-0.1.1.tgz':
-    resolution: {integrity: sha512-fQ37bT+295q/PqgTpFNNkcx/weMW1g1rxdW6SHW2lY9EmSOGyi5YbeSmAOCvJ185TOW7T4jzv1vgwraB5gyqNA==, tarball: file:vendor/masa/sonicfield-masa-validator-0.1.1.tgz}
-    version: 0.1.1
+  '@sonicfield/masa-validator@file:vendor/masa/sonicfield-masa-validator-0.2.0.tgz':
+    resolution: {integrity: sha512-85WH4nvxkndx8l/gTEhMUFkwV7OonBndr86E5+NbPrRcbIDmDDigdANLo6OhPyu5TPh/7cInj9LvAMSHpax4rg==, tarball: file:vendor/masa/sonicfield-masa-validator-0.2.0.tgz}
+    version: 0.2.0
 
-  '@sonicfield/masa@file:vendor/masa/sonicfield-masa-0.1.1.tgz':
-    resolution: {integrity: sha512-nb0XAmDikiXjNykz8yTe+EFfv94CBL/f8wDy4k0hcJtnfcrbYITn/Q7Fe4L4DXr7JNb+fBiahiDVu35IgYmiUg==, tarball: file:vendor/masa/sonicfield-masa-0.1.1.tgz}
-    version: 0.1.1
+  '@sonicfield/masa@file:vendor/masa/sonicfield-masa-0.2.0.tgz':
+    resolution: {integrity: sha512-4QmDxelFOTLJBTMBaD4PDoqRWuITtzIu0FljZA2tMytFVesB1UlQ3A42Q3qfvc02cV7LbyFz+rOmt3CbaijjTg==, tarball: file:vendor/masa/sonicfield-masa-0.2.0.tgz}
+    version: 0.2.0
 
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
@@ -1256,13 +1256,13 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.62.4':
     optional: true
 
-  '@sonicfield/masa-validator@file:vendor/masa/sonicfield-masa-validator-0.1.1.tgz':
+  '@sonicfield/masa-validator@file:vendor/masa/sonicfield-masa-validator-0.2.0.tgz':
     dependencies:
-      '@sonicfield/masa': file:vendor/masa/sonicfield-masa-0.1.1.tgz
+      '@sonicfield/masa': file:vendor/masa/sonicfield-masa-0.2.0.tgz
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)
 
-  '@sonicfield/masa@file:vendor/masa/sonicfield-masa-0.1.1.tgz': {}
+  '@sonicfield/masa@file:vendor/masa/sonicfield-masa-0.2.0.tgz': {}
 
   '@types/babel__core@7.20.5':
     dependencies:

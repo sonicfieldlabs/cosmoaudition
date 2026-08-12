@@ -45,7 +45,7 @@ describe("MASA snapshot API", () => {
     expect(summaryResponse.status).toBe(200);
     expect(summary.signals.length).toBeGreaterThan(0);
     expect(summary.masa).toMatchObject({
-      masaVersion: "0.1.0",
+      masaVersion: "0.2.0",
       valid: true,
       mediaType: "application/vnd.sonicfield.masa.record+json",
       href: "/api/snapshot/masa?mode=fixture"

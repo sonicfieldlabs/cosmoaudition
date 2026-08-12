@@ -1,18 +1,17 @@
-# Vendored MASA tooling 0.1.1
+# Vendored MASA tooling 0.2.0
 
 These package tarballs are immutable local copies of the released MASA
-TypeScript tooling 0.1.1, packed from the public repository
-`https://github.com/sonicfieldlabs/MASA` at tag `v0.1.1`
-(commit `15ea570e84701da33e382ba9ff8f8cc0ce3cbe30`, released 2026-08-09,
-MIT). The packages continue to implement the normative MASA 0.1.0 protocol;
-schema identifiers, contexts, record versions, and protocol directories remain
-0.1.0.
+TypeScript tooling 0.2.0, packed from the public repository
+`https://github.com/sonicfieldlabs/MASA` for tag `v0.2.0`, peeled to commit
+`a967339d77cb7adfb977061e6f3299ff27e55619` (released 2026-08-11, MIT).
+The packages implement the normative MASA 0.2.0 protocol, including its
+Observation profile and canonical identifiers.
 
 They are vendored so COSMOAUDITION can build and validate records without an
 unpublished registry package or mutable sibling checkout at runtime. This
-update adds the audited public-projection and validation hardening, synchronized
-reference-tooling identity, stricter path/secret/coordinate/endpoint handling,
-and dependency maintenance recorded in the MASA 0.1.1 changelog.
+update adds the Observation profile used to carry epistemic status, temporal
+character, and signal kind as normative fields while retaining the audited
+public-projection and validation boundaries.
 
 - `@sonicfield/masa` is the browser-safe core.
 - `@sonicfield/masa-validator` is the browser-safe structural, semantic,

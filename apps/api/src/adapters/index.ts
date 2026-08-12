@@ -1,7 +1,5 @@
 import {
-  clamp01,
   getSourceDefinition,
-  linearNormalize,
   type CacheMetadata,
   type ObservedSignal,
   type SourceDefinition
@@ -10,9 +8,13 @@ import { carbonGenerationAdapter, carbonIntensityAdapter } from "./carbon";
 import { gbfsBogotaStationStatusAdapter } from "./gbfs";
 import { jplFireballAdapter } from "./fireball";
 import { inaturalistRecentObservationsAdapter } from "./inaturalist";
+import { eonetOpenEventsAdapter } from "./eonet";
 import { jplCloseApproachesAdapter } from "./jpl";
 import { mempoolHashrateAdapter, mempoolStatsAdapter } from "./mempool";
 import { openMeteoAdapter } from "./openMeteo";
+import { openMeteoAirQualityAdapter } from "./openMeteoAirQuality";
+import { openMeteoMarineAdapter } from "./openMeteoMarine";
+import { createSignal } from "./helpers";
 import {
   swpcMagneticFieldAdapter,
   swpcPlanetaryKIndexAdapter,
@@ -26,7 +28,10 @@ const activeAdapters: readonly SourceAdapter[] = [
   carbonIntensityAdapter,
   carbonGenerationAdapter,
   openMeteoAdapter,
+  openMeteoAirQualityAdapter,
+  openMeteoMarineAdapter,
   usgsEarthquakesAdapter,
+  eonetOpenEventsAdapter,
   swpcSolarWindSpeedAdapter,
   swpcMagneticFieldAdapter,
   swpcPlanetaryKIndexAdapter,
@@ -178,21 +183,21 @@ function createStaleSourceSignal(
   // the signal's own normalized value and the catalog mapping's input range
   // tell one story. Against the subset, three stale sources out of three
   // selected would read as total failure while the mapping read it as a
-  // fraction of fourteen.
-  const normalized = linearNormalize(count, [0, activeSourceIds.length]);
-
-  return {
+  // fraction of the complete active source aperture.
+  const source = getSourceDefinition("system");
+  if (source === undefined) {
+    throw new Error("Missing system source definition.");
+  }
+  return createSignal({
     id: "source_stale_count",
     label: "Stale source count",
     layer: "interface",
     unit: "sources",
     value: count,
-    normalized: clamp01(normalized),
     timestamp: now.toISOString(),
-    sourceId: "system",
+    source,
     confidence: count === 0 ? "high" : "medium",
-    staleAfterSeconds: 30,
     notes:
       "Counts stale, errored, or live-fallback API sources in the current snapshot."
-  };
+  });
 }

@@ -45,7 +45,7 @@ export const sourceDefinitions: readonly SourceDefinition[] = [
     status: "ready",
     layers: ["earth", "user"],
     sphere: "atmosphere",
-    temporalCharacter: "stream",
+    temporalCharacter: "forecast",
     endpointPattern:
       "https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,wind_speed_10m,precipitation&timezone=auto",
     route: "api-proxy",
@@ -55,6 +55,50 @@ export const sourceDefinitions: readonly SourceDefinition[] = [
     limitation: "Manual point weather, not automatic location or planetary weather.",
     fallback: "Last-known-good cache for same rounded coordinates as stale.",
     licenseNote: "Public API attribution required."
+  },
+  {
+    id: "open_meteo_air_quality",
+    label: "Open-Meteo air quality by manual coordinates",
+    status: "ready",
+    layers: ["earth", "user"],
+    sphere: "atmosphere",
+    temporalCharacter: "forecast",
+    endpointPattern:
+      "https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}&current=pm10,pm2_5,nitrogen_dioxide,ozone,us_aqi&timezone=auto",
+    route: "api-proxy",
+    ttlSeconds: 1800,
+    unit: "mixed",
+    parser:
+      "JSON current particulate concentrations, nitrogen dioxide, ozone, US AQI, current_units, and UTC offset",
+    limitation:
+      "Point values are modelled air-quality forecasts from Open-Meteo's stated CAMS domains, not readings from a local regulatory monitor; manual coordinates only.",
+    fallback:
+      "Use last-known-good cache for the same rounded coordinates as stale; otherwise retain explicit null values.",
+    licenseNote:
+      "Open-Meteo air-quality API attribution and upstream CAMS attribution requirements apply.",
+    requestPolicy: { maxResponseBytes: 262_144 }
+  },
+  {
+    id: "open_meteo_marine",
+    label: "Open-Meteo marine forecast by manual coordinates",
+    status: "ready",
+    layers: ["earth", "user"],
+    sphere: "hydrosphere",
+    temporalCharacter: "forecast",
+    endpointPattern:
+      "https://marine-api.open-meteo.com/v1/marine?latitude={lat}&longitude={lon}&current=wave_height,wave_period,sea_surface_temperature,ocean_current_velocity,sea_level_height_msl&timezone=auto",
+    route: "api-proxy",
+    ttlSeconds: 1800,
+    unit: "mixed",
+    parser:
+      "JSON current wave height/period, sea-surface temperature, ocean-current velocity, sea-level height, current_units, and UTC offset",
+    limitation:
+      "Marine-model forecast at a manually supplied point; inland or unsupported points may legitimately return null and are never relabelled as coastal observations.",
+    fallback:
+      "Use last-known-good cache for the same rounded coordinates as stale; otherwise retain explicit null values.",
+    licenseNote:
+      "Open-Meteo marine API attribution and upstream model attribution requirements apply.",
+    requestPolicy: { maxResponseBytes: 262_144 }
   },
   {
     id: "usgs_earthquakes",
@@ -72,6 +116,31 @@ export const sourceDefinitions: readonly SourceDefinition[] = [
     limitation: "Past-hour earthquake feed; zero events is valid data.",
     fallback: "Last-known-good cache as stale; otherwise null event signals.",
     licenseNote: "USGS public feed attribution required."
+  },
+  {
+    id: "nasa_eonet_open_events",
+    label: "NASA EONET open natural events, bounded thirty-day aperture",
+    status: "ready",
+    layers: ["earth"],
+    sphere: "geosphere",
+    temporalCharacter: "aggregate",
+    endpoint:
+      "https://eonet.gsfc.nasa.gov/api/v3/events?status=open&limit=200&days=30",
+    route: "api-proxy",
+    ttlSeconds: 1800,
+    unit: "events/hours",
+    parser:
+      "Reduce EONET v3 events to bounded counts by category and latest geometry age before cache persistence",
+    limitation:
+      "Catalog events reported open within a thirty-day, 200-row request aperture; counts are neither complete global incidence nor hazard severity, and category coverage varies.",
+    fallback:
+      "Use the aggregate-only last-known-good cache as stale; otherwise retain null aggregate values.",
+    licenseNote:
+      "NASA EONET public API attribution applies; upstream event-source attribution remains provider-specific.",
+    requestPolicy: {
+      maxResponseBytes: 2_097_152,
+      concurrencyKey: "nasa-eonet"
+    }
   },
   {
     id: "noaa_swpc_solar_wind_speed",

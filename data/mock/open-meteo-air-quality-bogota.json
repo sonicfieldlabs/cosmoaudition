@@ -1,0 +1,24 @@
+{
+  "latitude": 4.7000046,
+  "longitude": -74.1,
+  "utc_offset_seconds": -18000,
+  "timezone": "America/Bogota",
+  "current_units": {
+    "time": "iso8601",
+    "interval": "seconds",
+    "pm10": "ug/m3",
+    "pm2_5": "ug/m3",
+    "nitrogen_dioxide": "ug/m3",
+    "ozone": "ug/m3",
+    "us_aqi": "USAQI"
+  },
+  "current": {
+    "time": "2026-08-11T19:00",
+    "interval": 3600,
+    "pm10": 8.7,
+    "pm2_5": 8.6,
+    "nitrogen_dioxide": 26.4,
+    "ozone": 20.0,
+    "us_aqi": 34
+  }
+}

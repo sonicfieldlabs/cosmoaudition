@@ -11,6 +11,7 @@ export type StackLayer =
 export type ObservationSphere =
   | "cosmos"
   | "atmosphere"
+  | "hydrosphere"
   | "geosphere"
   | "biosphere"
   | "human"
@@ -32,6 +33,15 @@ export type TemporalCharacter =
   | "local";
 
 export type SignalKind = "observation" | "derived" | "generator";
+
+export interface SignalNormalization {
+  method: "linear" | "log";
+  inputRange: readonly [number, number];
+  outputRange: readonly [0, 1];
+  clipping: "clamp";
+  /** Why this operational envelope was chosen; it is not a physical claim. */
+  basis: string;
+}
 
 export interface GeneratorProvenance {
   algorithm:
@@ -89,6 +99,8 @@ export interface ObservedSignal {
   epistemicStatus?: EpistemicStatus;
   temporalCharacter?: TemporalCharacter;
   signalKind?: SignalKind;
+  /** Canonical, versioned normalization metadata when the signal is catalogued. */
+  normalization?: SignalNormalization;
   /** Stable provider/local event key used for deduplicated trigger projection. */
   eventKey?: string;
   /** Present only for authored local generator signals. */

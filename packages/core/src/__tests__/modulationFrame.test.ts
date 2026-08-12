@@ -4,6 +4,7 @@ import {
   MODULATION_CONTRACT,
   type ModulationFrameInput
 } from "../modulation-frame";
+import { SIGNAL_CATALOG_CONTRACT, SIGNAL_CATALOG_VERSION } from "../signal-catalog";
 import { mappingCatalog } from "../mappings";
 import type { ObservedSignal, SourceHealth } from "../types";
 
@@ -61,6 +62,12 @@ describe("modulation frame contract", () => {
     expect(frame.contract).toBe(MODULATION_CONTRACT);
     expect(frame.controls).toHaveLength(mappingCatalog.length);
     expect(frame.generatedAt).toBe("2026-08-07T12:00:00.000Z");
+    expect(frame.signalCatalog).toEqual({
+      contract: SIGNAL_CATALOG_CONTRACT,
+      version: SIGNAL_CATALOG_VERSION,
+      href: "/api/signals"
+    });
+    expect(frame.signals[0]?.normalization.inputRange).toEqual([0, 500]);
   });
 
   it("never emits a value without its status, and states absence explicitly", () => {

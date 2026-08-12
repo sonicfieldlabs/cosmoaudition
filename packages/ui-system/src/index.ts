@@ -28,6 +28,7 @@ export const epistemicMarks = {
 export const sourceStrata = [
   "cosmos",
   "atmosphere",
+  "hydrosphere",
   "geosphere",
   "biosphere",
   "human",
@@ -39,6 +40,7 @@ export type SourceStratum = (typeof sourceStrata)[number];
 export const sourceStratumLabels: Record<SourceStratum, string> = {
   cosmos: "Cosmos",
   atmosphere: "Atmosphere",
+  hydrosphere: "Hydrosphere",
   geosphere: "Geosphere",
   biosphere: "Biosphere",
   human: "Human activity",

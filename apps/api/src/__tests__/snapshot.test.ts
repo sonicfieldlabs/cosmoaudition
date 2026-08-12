@@ -3,7 +3,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { app } from "../app";
-import { collectSnapshot } from "../adapters";
+import { activeSourceIds, collectSnapshot } from "../adapters";
+import { getSignalDefinition, normalizeSignalValue } from "@cosmoaudition/core";
 
 describe("API snapshot", () => {
   it("collects a bounded fixture snapshot for the active source aperture", async () => {
@@ -15,8 +16,8 @@ describe("API snapshot", () => {
     const signalIds = snapshot.signals.map((signal) => signal.id);
 
     expect(snapshot.mode).toBe("fixture");
-    expect(snapshot.sources).toHaveLength(14);
-    expect(snapshot.cache).toHaveLength(14);
+    expect(snapshot.sources).toHaveLength(activeSourceIds.length);
+    expect(snapshot.cache).toHaveLength(activeSourceIds.length);
     expect(signalIds).toContain("carbon_intensity_actual");
     expect(signalIds).toContain("generation_mix_wind");
     expect(signalIds).toContain("local_temperature_2m");
@@ -31,7 +32,29 @@ describe("API snapshot", () => {
     expect(signalIds).toContain("fireball_latest_impact_energy_kt");
     expect(signalIds).toContain("inaturalist_observations_created_1h");
     expect(signalIds).toContain("wikimedia_pageviews_latest_hour");
+    expect(signalIds).toContain("air_quality_pm2_5");
+    expect(signalIds).toContain("marine_wave_height");
+    expect(signalIds).toContain("eonet_open_event_count_bounded");
     expect(signalIds).toContain("source_stale_count");
+    for (const signal of snapshot.signals) {
+      const definition = getSignalDefinition(signal.id, signal.sourceId);
+      expect(definition, signal.id).toBeDefined();
+      expect(signal.normalization).toEqual(definition?.normalization);
+      expect(signal.normalized).toBe(
+        normalizeSignalValue(signal.value, definition!.normalization)
+      );
+      expect(signal.epistemicStatus).toBe(definition?.epistemicStatus);
+      expect(signal.temporalCharacter).toBe(definition?.temporalCharacter);
+      expect(signal.signalKind).toBe(definition?.signalKind);
+    }
+    const marine = snapshot.signals.find(
+      (signal) => signal.id === "marine_wave_height"
+    );
+    expect(marine?.value).toBeNull();
+    expect(marine?.notes).toMatch(/no coastal value was substituted/i);
+    expect(
+      getSignalDefinition("source_stale_count")?.normalization.inputRange[1]
+    ).toBe(activeSourceIds.length);
     expect(snapshot.sources.every((source) => source.confidence === "low")).toBe(
       true
     );
@@ -112,11 +135,11 @@ describe("API snapshot", () => {
         (signal) => signal.id === "local_temperature_2m"
       );
 
-      expect(snapshot.sources).toHaveLength(14);
+      expect(snapshot.sources).toHaveLength(activeSourceIds.length);
       expect(snapshot.sources.every((source) => source.error !== undefined)).toBe(
         true
       );
-      expect(staleSourceSignal?.value).toBe(14);
+      expect(staleSourceSignal?.value).toBe(activeSourceIds.length);
       expect(staleSourceSignal?.confidence).toBe("medium");
       expect(weatherSignal?.value).toBeNull();
       expect(weatherSignal?.notes).toMatch(/Bogota fixture was not substituted/);
@@ -142,7 +165,7 @@ describe("API snapshot", () => {
     expect(body.definitions.some((source) => source.id === "mempool_stats")).toBe(
       true
     );
-    expect(body.sources).toHaveLength(14);
+    expect(body.sources).toHaveLength(activeSourceIds.length);
     expect(body.sources[0]?.confidence).toBe("low");
   });
 

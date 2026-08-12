@@ -13,7 +13,10 @@ describe("source metadata", () => {
     expect(ids).toContain("carbon_intensity_gb");
     expect(ids).toContain("carbon_generation_gb");
     expect(ids).toContain("open_meteo_local");
+    expect(ids).toContain("open_meteo_air_quality");
+    expect(ids).toContain("open_meteo_marine");
     expect(ids).toContain("usgs_earthquakes");
+    expect(ids).toContain("nasa_eonet_open_events");
     expect(ids).toContain("mempool_stats");
     expect(ids).toContain("mempool_hashrate");
     expect(ids).toContain("gbfs_bogota_station_status");
@@ -42,6 +45,9 @@ describe("source metadata", () => {
     );
     expect(getSourceDefinition("wikimedia_pageviews_hourly")?.sphere).toBe(
       "human"
+    );
+    expect(getSourceDefinition("open_meteo_marine")?.sphere).toBe(
+      "hydrosphere"
     );
     expect(getSourceDefinition("nasa_jpl_close_approaches")?.temporalCharacter).toBe(
       "forecast"

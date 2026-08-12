@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 - 2026-08-11
+
+- Added a versioned signal catalog that makes source identity, units, sphere, epistemic status, temporal character, signal kind, and normalization semantics available through `/api/signals` and every modulation frame.
+- Expanded the active aperture from fourteen to seventeen sources with Open-Meteo air quality, Open-Meteo marine forecasts, and a bounded NASA EONET aggregate; introduced the Hydrosphere stratum and preserved inland marine absence as null.
+- Reduced NASA EONET event rows, links, and coordinates in memory before cache persistence, following the existing aggregate-only privacy boundary for iNaturalist.
+- Upgraded modulation frames to `cosmo/modulation/v0.2` and MASA snapshots to protocol/tooling 0.2.0 with the normative Observation profile.
+- Centralized adapter normalization through the catalog so values and their declared operational envelopes cannot drift independently.
+
 ## 0.1.1 - 2026-08-09
 
 - Made Internal audio a true engine-wide arm and prevented delayed observations, material decoding, replay, Stop, or Panic from reviving an obsolete audio intent.

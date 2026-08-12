@@ -1,7 +1,7 @@
 # Audio safety
 
-Status: active Cosmoaudition System v0.1 behavior
-Date: 2026-07-28
+Status: active Cosmoaudition System v0.2 behavior
+Reviewed: 2026-08-11
 
 ## Implemented rules
 
@@ -24,7 +24,7 @@ Date: 2026-07-28
 The engine uses carbon, energy-mix, earthquake, hashrate, mempool, mobility,
 weather, browser, and stale-state modules. A tenth
 `controlFieldVoice` receives only executable mapping decisions and produces
-restrained cosmic, biospheric, and cultural control fields.
+restrained cosmic, hydrospheric, biospheric, and cultural control fields.
 
 These voices are authored instrumental relations. They are not the acoustic
 voice, intrinsic frequency, or audible essence of a source domain.
@@ -45,7 +45,7 @@ voice, intrinsic frequency, or audible essence of a source domain.
   and material parameter validation, but cannot prove what a person heard.
 - Browser automation verifies explicit start and Panic state transitions; it is
   not a substitute for device-level listening checks.
-- The system does not record audio in v0.1.
+- The system does not record audio in v0.2.
 
 ## Manual check
 

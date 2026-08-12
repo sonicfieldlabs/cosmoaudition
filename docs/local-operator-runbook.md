@@ -1,7 +1,7 @@
 # Local operator runbook
 
-Status: active Cosmoaudition System v0.1 operator procedure
-Date: 2026-07-28
+Status: active Cosmoaudition System v0.2 operator procedure
+Reviewed: 2026-08-11
 
 ## Local-only rule
 
