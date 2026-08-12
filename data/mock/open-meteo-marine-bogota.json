@@ -1,0 +1,24 @@
+{
+  "latitude": 4.708336,
+  "longitude": -74.04166,
+  "utc_offset_seconds": -18000,
+  "timezone": "America/Bogota",
+  "current_units": {
+    "time": "iso8601",
+    "interval": "seconds",
+    "wave_height": "m",
+    "wave_period": "s",
+    "sea_surface_temperature": "C",
+    "ocean_current_velocity": "km/h",
+    "sea_level_height_msl": "m"
+  },
+  "current": {
+    "time": "2026-08-11T19:00",
+    "interval": 900,
+    "wave_height": null,
+    "wave_period": null,
+    "sea_surface_temperature": null,
+    "ocean_current_velocity": null,
+    "sea_level_height_msl": null
+  }
+}

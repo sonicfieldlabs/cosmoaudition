@@ -11,6 +11,7 @@ import {
 import type { SnapshotLike } from "@cosmoaudition/masa";
 import {
   buildModulationFrame,
+  buildSignalCatalog,
   isValidLatitude,
   isValidLongitude,
   MODULATION_CONTRACT,
@@ -150,6 +151,14 @@ apiRoutes.get("/sources", async (context) => {
   });
 });
 
+apiRoutes.get("/signals", (context) => {
+  const sources = parseSources(context.req.query("sources"));
+  if ("error" in sources) {
+    return context.json({ error: sources.error }, 400);
+  }
+  return context.json(buildSignalCatalog(sources.value));
+});
+
 apiRoutes.get("/snapshot", async (context) => {
   const parsed = snapshotOptionsFromQuery(context);
   if ("error" in parsed) {
@@ -187,6 +196,7 @@ apiRoutes.get("/modulation", (context) =>
     frame: "/api/frame",
     stream: "/api/stream",
     masaRecord: "/api/snapshot/masa",
+    signalCatalog: "/api/signals",
     mappings: mappingCatalog.map((mapping) => ({
       id: mapping.id,
       signalId: mapping.signalId,

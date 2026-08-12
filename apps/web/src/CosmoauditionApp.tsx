@@ -146,10 +146,10 @@ const acquisitionScopes: Readonly<
     )
   },
   "earth-systems": {
-    label: "Atmosphere + geosphere + biosphere",
+    label: "Atmosphere + hydrosphere + geosphere + biosphere",
     sourceIds: activeApiSourceIds.filter((id) => {
       const sphere = sourceDefinitions.find((source) => source.id === id)?.sphere;
-      return sphere === "atmosphere" || sphere === "geosphere" || sphere === "biosphere";
+      return sphere === "atmosphere" || sphere === "hydrosphere" || sphere === "geosphere" || sphere === "biosphere";
     })
   },
   "human-infrastructure": {
@@ -193,6 +193,7 @@ function stratumForSource(sourceId: string): SourceStratum {
     return "cosmos";
   }
   if (id.includes("meteo") || id.includes("weather") || id.includes("atmos")) {
+    if (id.includes("marine") || id.includes("ocean")) return "hydrosphere";
     return "atmosphere";
   }
   if (id.includes("usgs") || id.includes("earthquake") || id.includes("quake")) {

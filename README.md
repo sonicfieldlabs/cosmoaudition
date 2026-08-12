@@ -1,6 +1,6 @@
 # Cosmoaudition System
 
-Cosmoaudition System is a **modulation framework** for situated observation, with a local instrument attached. Once its loopback gateway is running it publishes normalized, attributed, epistemically-typed modulation over HTTP, Server-Sent Events, OSC, MIDI, and MASA records, so any sonic project can consume these signals without inheriting this repository — see [the modulation framework](./docs/modulation-framework.md). It is also a live sound instrument and MASA-native research interface within the Sonic Matter Framework. It receives bounded observations from cosmic, atmospheric, geophysical, ecological, cultural, economic, and computational infrastructures, then makes explicitly authored relations available as sound-engine controls, triggers, MIDI, control frames, and transformations of imported sonic material.
+Cosmoaudition System is a **modulation framework** for situated observation, with a local instrument attached. Once its loopback gateway is running it publishes normalized, attributed, epistemically-typed modulation over HTTP, Server-Sent Events, OSC, MIDI, and MASA records, so any sonic project can consume these signals without inheriting this repository — see [the modulation framework](./docs/modulation-framework.md). It is also a live sound instrument and MASA-native research interface within the Sonic Matter Framework. It receives bounded observations from cosmic, atmospheric, hydrospheric, geophysical, ecological, cultural, economic, and computational infrastructures, then makes explicitly authored relations available as sound-engine controls, triggers, MIDI, control frames, and transformations of imported sonic material.
 
 It is not a machine for revealing “the sound of” the Sun, Earth, a species, a city, or a dataset. Provider values, normalized controls, synthesis states, and audible results remain distinct and attributable.
 
@@ -10,7 +10,7 @@ See [Cosmoaudition System architecture](./docs/cosmoaudition-system.md) and the 
 
 The interface has five connected workspaces:
 
-- **Observe** groups sources into Cosmos, Atmosphere, Geosphere, Biosphere, Human activity, and Machine/infrastructure; it exposes value, unit, evidence kind, health, freshness, and institutional scope.
+- **Observe** groups sources into Cosmos, Atmosphere, Hydrosphere, Geosphere, Biosphere, Human activity, and Machine/infrastructure; it exposes value, unit, evidence kind, health, freshness, and institutional scope.
 - **Patch** shows the complete `Observation → Feature → Control signal → Processor → Output` relation, provides a deterministic clock/pulse/LFO/envelope/sample-and-hold bank, and gives every mapping an enable switch and bounded amount.
 - **Transform** loads a private local sound as a parent representation and sends it through a bounded rate/filter-Q/delay-time/delay-feedback material path whose automation follows each mapping's declared smoothing.
 - **Route** independently arms internal audio, triggers, control-frame JSON, MIDI projection, and a bounded MASA account.
@@ -46,7 +46,7 @@ Packages:
 
 The internal control domain is floating point. MIDI is an optional projection, not the canonical representation.
 
-Snapshots can request an allowlisted subset of the fourteen active API sources. Provider HTTP bodies, local cache files, fixtures, posted MASA snapshots, and imported audio are independently bounded. Fresh identical acquisitions are coalesced, and NASA/JPL requests are serialized under one provider fair-use key.
+Snapshots can request an allowlisted subset of the seventeen active API sources. Every emitted signal resolves through the versioned `cosmo/signal-catalog/v0.2` catalog at `/api/signals`, which declares its source, unit, sphere, epistemic status, temporal character, signal kind, and normalization envelope. Provider HTTP bodies, local cache files, fixtures, posted MASA snapshots, and imported audio are independently bounded. Fresh identical acquisitions are coalesced, and provider requests with declared concurrency keys are serialized.
 
 ## Source ethics and limits
 
@@ -55,7 +55,8 @@ Each adapter declares endpoint, field, unit, cadence, coverage, attribution, fix
 - NOAA SWPC space-weather measurements and geomagnetic estimates;
 - NASA/JPL predicted close-approach relations;
 - NASA/JPL reported fireball events, with optional velocity derived from the documented vector components;
-- situated weather and USGS earthquake events;
+- situated weather, modelled air quality, marine forecasts, and USGS earthquake events;
+- NASA EONET open-event aggregates reduced before cache persistence;
 - aggregated iNaturalist observation activity;
 - Wikimedia infrastructure activity;
 - grid, mobility, mempool, browser, and other machine/infrastructure signals.
@@ -136,7 +137,7 @@ All variables are optional:
 - No automatic geolocation, analytics, cookies, accounts, or public upload are used.
 - A control or modulation receipt means the parameter was scheduled; it does not claim audition.
 - A live synthesis state is not represented as an audio artifact unless it is recorded.
-- MASA TypeScript tooling 0.1.1 is vendored immutably from the public release (`sonicfieldlabs/MASA`, tag `v0.1.1`, MIT) while records continue to implement the normative MASA 0.1.0 protocol; this repository does not depend at runtime on a mutable sibling checkout. See [`vendor/masa/README.md`](vendor/masa/README.md) for the checksum boundary and update procedure.
+- MASA TypeScript tooling 0.2.0 is vendored immutably from the public release (`sonicfieldlabs/MASA`, tag `v0.2.0`, MIT). Snapshot records implement the normative MASA 0.2.0 Observation profile, so epistemic status, temporal character, and signal kind are protocol fields rather than private extension conventions. This repository does not depend at runtime on a mutable sibling checkout. See [`vendor/masa/README.md`](vendor/masa/README.md) for the checksum boundary and update procedure.
 
 ## Licensing
 
@@ -145,8 +146,8 @@ The software in this repository is MIT licensed. See [`LICENSE`](./LICENSE).
 That grant covers the code, not the data. Three things in this tree carry terms of
 their own and are **not** relicensed by it:
 
-- **Provider fixtures under `data/mock/`** are captured responses from nine external
-  providers, included so fixture mode is reproducible offline. They remain subject to
+- **Provider fixtures under `data/mock/`** are seventeen provider-derived fixtures from
+  nine external provider organizations, included so fixture mode is reproducible offline. They remain subject to
   each provider's own terms. Every source declares its attribution and rights
   obligation, collected in the
   [source register](./docs/source-register.md#provider-attribution-and-rights).
@@ -154,7 +155,7 @@ their own and are **not** relicensed by it:
   provider they came from. This is why attribution and licence notes travel with every
   emitted signal rather than being stripped at the gateway.
 - **The vendored MASA release under `vendor/masa/`** is MIT from its own release
-  (`sonicfieldlabs/MASA`, tooling tag `v0.1.1`) and retains that repository's copyright notice.
+  (`sonicfieldlabs/MASA`, tooling tag `v0.2.0`) and retains that repository's copyright notice.
 
 Reusing the code and operating the system publicly are separate questions. Sources whose
 note says terms need review before public deployment mean exactly that, and

@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-07-29"
+updated_at: "2026-08-11"
 preflight_timezone: "America/Bogota"
 project: "Cosmoaudition System"
 policy:
@@ -98,6 +98,70 @@ sources:
     privacy_note: "No automatic geolocation. Manual coordinates or city selection only; do not persist precise coordinates without explicit user action."
     license_note: "Public API; record provider attribution in UI/docs."
 
+  - id: open_meteo_air_quality
+    label: "Open-Meteo air quality by manual coordinates"
+    status: ready
+    sphere: atmosphere
+    temporal_character: forecast
+    layers: [earth, user]
+    endpoint_pattern: "https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}&current=pm10,pm2_5,nitrogen_dioxide,ozone,us_aqi&timezone=auto"
+    preflight_endpoint: "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=4.7110&longitude=-74.0721&current=pm10,pm2_5,nitrogen_dioxide,ozone,us_aqi&timezone=auto"
+    route: api-proxy
+    ttl_seconds: 1800
+    unit: "ug/m3 and US AQI"
+    parser: "JSON current PM10, PM2.5, nitrogen dioxide, ozone, US AQI, current_units, and UTC offset"
+    primary_signals:
+      - air_quality_pm10
+      - air_quality_pm2_5
+      - air_quality_nitrogen_dioxide
+      - air_quality_ozone
+      - air_quality_us_aqi
+    preflight:
+      checked_at: "2026-08-11"
+      http_status: 200
+      sample_coordinates: "Bogota, Colombia: 4.7110,-74.0721"
+    confidence_rules:
+      high: "current model fields parse for manually supplied coordinates"
+      medium: "partial model fields parse"
+      stale: "same-coordinate cache is older than ttl"
+      error: "network, validation, or coordinate validation failure"
+    fallback: "Use last-known-good cache for the same rounded manual coordinates as stale; otherwise keep every value null."
+    privacy_note: "No automatic geolocation; coordinates are supplied manually and keyed only in the local cache."
+    limitation: "Modelled CAMS-domain forecast values, not a local regulatory monitoring-station reading."
+    license_note: "Open-Meteo and upstream CAMS attribution requirements apply."
+
+  - id: open_meteo_marine
+    label: "Open-Meteo marine forecast by manual coordinates"
+    status: ready
+    sphere: hydrosphere
+    temporal_character: forecast
+    layers: [earth, user]
+    endpoint_pattern: "https://marine-api.open-meteo.com/v1/marine?latitude={lat}&longitude={lon}&current=wave_height,wave_period,sea_surface_temperature,ocean_current_velocity,sea_level_height_msl&timezone=auto"
+    preflight_endpoint: "https://marine-api.open-meteo.com/v1/marine?latitude=4.7110&longitude=-74.0721&current=wave_height,wave_period,sea_surface_temperature,ocean_current_velocity,sea_level_height_msl&timezone=auto"
+    route: api-proxy
+    ttl_seconds: 1800
+    unit: "mixed marine units"
+    parser: "JSON current wave height/period, sea-surface temperature, current velocity, sea-level height, current_units, and UTC offset"
+    primary_signals:
+      - marine_wave_height
+      - marine_wave_period
+      - marine_sea_surface_temperature
+      - marine_ocean_current_velocity
+      - marine_sea_level_height_msl
+    preflight:
+      checked_at: "2026-08-11"
+      http_status: 200
+      sample_coordinates: "Bogota, Colombia: 4.7110,-74.0721"
+      sample_result: "All requested marine values were null at the inland point."
+    confidence_rules:
+      high: "provider response parses; null at an inland or unsupported point remains valid absence"
+      stale: "same-coordinate cache is older than ttl"
+      error: "network, validation, or coordinate validation failure"
+    fallback: "Use last-known-good cache for the same rounded manual coordinates as stale; never substitute a coastal fixture."
+    privacy_note: "No automatic geolocation; coordinates are supplied manually and keyed only in the local cache."
+    limitation: "Marine-model forecast, not an in-situ buoy; inland and unsupported points may legitimately be null."
+    license_note: "Open-Meteo and upstream marine-model attribution requirements apply."
+
   - id: usgs_earthquakes
     label: "USGS earthquakes, past hour"
     status: ready
@@ -125,6 +189,36 @@ sources:
     fallback: "No events is valid data; network failure uses last-known-good as stale or null event signals."
     ethical_note: "Earthquake events should trigger restrained resonances, not spectacle."
     license_note: "USGS public feed; record provider attribution in UI/docs."
+
+  - id: nasa_eonet_open_events
+    label: "NASA EONET open natural events, bounded thirty-day aperture"
+    status: ready
+    sphere: geosphere
+    temporal_character: aggregate
+    layers: [earth]
+    endpoint: "https://eonet.gsfc.nasa.gov/api/v3/events?status=open&limit=200&days=30"
+    route: api-proxy
+    ttl_seconds: 1800
+    unit: "events/hours"
+    parser: "Reduce EONET v3 events to bounded counts and latest geometry age before cache persistence"
+    primary_signals:
+      - eonet_open_event_count_bounded
+      - eonet_open_wildfire_count_bounded
+      - eonet_open_severe_storm_count_bounded
+      - eonet_latest_geometry_age_hours
+    preflight:
+      checked_at: "2026-08-11"
+      http_status: 200
+      aperture_days: 30
+      row_limit: 200
+    confidence_rules:
+      high: "events array parses and is reduced before persistence"
+      stale: "aggregate-only cache is older than ttl"
+      error: "network or malformed events payload keeps aggregate values null"
+    fallback: "Use aggregate-only cache as stale; never persist raw event rows or substitute fixture data during live acquisition."
+    privacy_note: "Event titles, provider URLs, geometry arrays, and coordinates are discarded before cache persistence."
+    limitation: "A bounded catalog aperture of reported open events, not complete global incidence or hazard severity."
+    license_note: "NASA EONET attribution applies; upstream event-source attribution remains provider-specific."
 
   - id: mempool_stats
     label: "mempool.space mempool"

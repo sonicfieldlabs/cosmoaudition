@@ -154,6 +154,7 @@ test("loads a reproducible fixture across source strata", async ({ page }) => {
   expect(await page.locator(".signal-node").count()).toBeGreaterThan(6);
   await expect(page.getByRole("button", { name: /Cosmos/ })).toBeVisible();
   await expect(page.getByRole("button", { name: /Atmosphere/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Hydrosphere/ })).toBeVisible();
   await expect(page.getByRole("button", { name: /Biosphere/ })).toBeVisible();
   await expect(page.getByRole("button", { name: /Human activity/ })).toBeVisible();
   await expect(page.getByRole("complementary", { name: "Signal" })).not.toContainText(

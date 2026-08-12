@@ -23,6 +23,7 @@ const hostname = assertLoopbackHost(process.env.HOST ?? "127.0.0.1", "HOST").rep
 serve({ fetch: app.fetch, hostname, port }, (info) => {
   console.log(`Cosmoaudition System API listening on http://${info.address}:${info.port}`);
   console.log(`Modulation contract ${MODULATION_CONTRACT} at /api/modulation`);
+  console.log("Signal catalog at /api/signals");
 });
 
 startOscEmission();

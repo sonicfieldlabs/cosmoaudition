@@ -1,8 +1,8 @@
 # Source register and transduction limits
 
-Status: active local v0.1 register, 2026-07-29
+Status: active local v0.2 register, 2026-08-11
 
-Cosmoaudition System currently collects fourteen API source families through its loopback ingestion gateway. Fixture mode supplies one reproducible payload per family; live mode applies timeouts, response bounds, parameter-aware caching, last-known-good state, and explicit nulls on unrecoverable failure. A snapshot may select an allowlisted subset; source health and stale-source normalization then use only that selected aperture.
+Cosmoaudition System currently collects seventeen API source families through its loopback ingestion gateway. Fixture mode supplies one reproducible payload per family; live mode applies timeouts, response bounds, parameter-aware caching, last-known-good state, and explicit nulls on unrecoverable failure. A snapshot may select an allowlisted subset. Source health follows the selected aperture, while `source_stale_count` remains normalized against the full active aperture so its scale does not change when a subset is requested.
 
 “Cadence” is the earliest local refresh interval, not a promise that a provider publishes at that rate. Provider observation time and local fetch time remain separate.
 
@@ -16,7 +16,10 @@ Cosmoaudition System currently collects fourteen API source families through its
 | Cosmos | NASA/JPL close approaches, next seven days within 0.2 AU | 6 h | predicted catalogue relation; time-to-event is derived and stably keyed | scheduling horizon, delay field, deduplicated event projection | Not a live detector, impact warning, or acoustic property. Sequential cached requests only. |
 | Cosmos | NASA/JPL reported fireballs, rolling thirty days | 6 h | reported peak-brightness events; optional speed derived from `vx/vy/vz` | deduplicated impact-energy event control, filter resonance, inspection | Dataset coverage and optional fields are incomplete; not a live detector or warning service. |
 | Atmosphere | Open-Meteo current conditions at manual coordinates | 10 min | reported current/forecast service value | filter, wind, precipitation controls | One selected point, not planetary weather. Fixture is truthfully Bogotá-only. |
+| Atmosphere | Open-Meteo air quality at manual coordinates | 30 min | modelled CAMS-domain forecast values | particulate and gas concentration control fields | Not a local regulatory monitor; one manually selected point. |
+| Hydrosphere | Open-Meteo marine conditions at manual coordinates | 30 min | marine-model forecast | wave, sea-surface, current, and sea-level fields | Not an in-situ buoy; inland or unsupported points remain explicitly null. |
 | Geosphere | USGS earthquakes, past hour | 5 min | preliminary event aggregate | restrained resonator density and event field | Publication latency and later revision remain possible; not an alert service. |
+| Geosphere | NASA EONET open events, bounded thirty-day aperture | 30 min | privacy-reduced catalogue aggregate | event-density and recency fields | At most 200 reported open events; not complete global incidence or hazard severity. |
 | Biosphere | iNaturalist submissions created in the previous hour | 5 min | privacy-reduced platform aggregate | filtered-noise body and activity density | Provider rows are reduced before cache persistence; submission activity is not abundance, ecological health, or organism voice. |
 | Human activity | Wikimedia all-project user pageviews, latest two complete hours | 15 min | delayed aggregate plus derived change | bipolar drift and continuous macro-control level | Wikimedia activity is not an event, culture, or collective attention as a whole. |
 | Machine / infrastructure | GB grid carbon intensity | 30 min | regional reported/forecast value | carbon drone filter | Great Britain only. |
@@ -36,7 +39,8 @@ Browser-local clock, viewport, API latency, AudioContext state, and archive stat
 - NOAA SWPC summaries: `https://services.swpc.noaa.gov/products/summary/solar-wind-speed.json`, `solar-wind-mag-field.json`, and `https://services.swpc.noaa.gov/json/planetary_k_index_1m.json`; product context: `https://www.swpc.noaa.gov/products/real-time-solar-wind`.
 - NASA/JPL CAD API: `https://ssd-api.jpl.nasa.gov/cad.api`; contract and fair-use rules: `https://ssd-api.jpl.nasa.gov/doc/cad.html` and `https://ssd-api.jpl.nasa.gov/doc/index.php`.
 - NASA/JPL Fireball API: `https://ssd-api.jpl.nasa.gov/fireball.api`; v1.2 contract: `https://ssd-api.jpl.nasa.gov/doc/fireball.html`; the adapter requests `vel-comp=true` and does not depend on undocumented convenience fields.
-- Open-Meteo forecast endpoint: `https://api.open-meteo.com/v1/forecast`.
+- Open-Meteo forecast endpoints: `https://api.open-meteo.com/v1/forecast`, `https://air-quality-api.open-meteo.com/v1/air-quality`, and `https://marine-api.open-meteo.com/v1/marine`.
+- NASA EONET v3 events: `https://eonet.gsfc.nasa.gov/api/v3/events`; API contract: `https://eonet.gsfc.nasa.gov/docs/v3`.
 - USGS GeoJSON feed: `https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson`; feed documentation: `https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php`.
 - iNaturalist API and request practice: `https://api.inaturalist.org/v1/docs/` and `https://www.inaturalist.org/pages/api+recommended+practices`.
 - Wikimedia aggregate pageviews: `https://wikimedia.org/api/rest_v1/metrics/pageviews/aggregate/`; access policy: `https://doc.wikimedia.org/generated-data-platform/aqs/analytics-api/documentation/access-policy.html`.
@@ -56,8 +60,9 @@ providers' full terms, which govern and can change.
 | --- | --- | :---: | --- |
 | NOAA SWPC | solar-wind speed, magnetic field, planetary K index | yes | Public operational product; attribution required. |
 | NASA/JPL | close approaches, fireballs | yes | Public API; attribution and API fair-use rules apply. |
+| NASA EONET | bounded open-event aggregates | yes, aggregate only | Public API attribution applies; upstream event-source attribution remains provider-specific. |
 | USGS | earthquakes | yes | Public feed; attribution required. |
-| Open-Meteo | local current conditions | yes | Public API; attribution required. |
+| Open-Meteo | local current conditions, air quality, marine forecast | yes | API and upstream model attribution requirements apply. |
 | iNaturalist | recent observation activity | yes | Attribution and recommended request-rate practices; no user, media, or precise-location fields are emitted. |
 | Wikimedia | hourly pageviews | yes | Attribution and identifying User-Agent requirements apply. |
 | Carbon Intensity GB | carbon intensity, generation mix | yes | Public API; attribution required. |
@@ -92,7 +97,10 @@ Fresh cache entries are read before network access, identical in-flight loads ar
 
 The iNaturalist live response is reduced in memory to count, query window, and
 newest creation time before persistence. User, observation, taxon, media, and
-coordinate fields cannot enter its cache envelope.
+coordinate fields cannot enter its cache envelope. NASA EONET responses are
+likewise reduced before persistence to bounded category counts and the latest
+geometry time; titles, upstream URLs, event rows, and coordinates do not enter
+the cache.
 
 ## Mapping discipline
 
@@ -102,4 +110,4 @@ The generated control field has restrained cosmic, biospheric, and cultural voic
 
 ## Deferred expansions
 
-Candidates for a later, independently reviewed adapter phase include NOAA CO-OPS coastal water level/wind, MET Norway forecast with required identifying headers, Wikimedia EventStreams with one server-side SSE aggregator and immediate personal-field removal, GBIF as slow ecological context, ECB daily statistics, and credentialed Copernicus Marine products. They are not operational merely because they are named here.
+Candidates for a later, independently reviewed adapter phase include NOAA CO-OPS coastal water level/wind, MET Norway forecast with required identifying headers, Wikimedia EventStreams with one server-side SSE aggregator and immediate personal-field removal, GBIF as slow ecological context, ECB daily statistics, and credentialed Copernicus Marine products. They are not operational merely because they are named here; the new Open-Meteo marine forecast does not replace an in-situ coastal station or a credentialed ocean product.

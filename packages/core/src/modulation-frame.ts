@@ -1,5 +1,5 @@
 /**
- * The Cosmoaudition System modulation contract, `cosmo/modulation/v0.1`.
+ * The Cosmoaudition System modulation contract, `cosmo/modulation/v0.2`.
  *
  * A ModulationFrame is what every transport carries — HTTP poll, SSE, OSC, MCP.
  * It is a projection of the same objects the instrument uses internally, so a
@@ -23,6 +23,11 @@ import {
   type ControlDecision
 } from "./control";
 import { mappingCatalog } from "./mappings";
+import {
+  getSignalDefinition,
+  SIGNAL_CATALOG_CONTRACT,
+  SIGNAL_CATALOG_VERSION
+} from "./signal-catalog";
 import { getSourceDefinition } from "./sources";
 import type {
   CacheMetadata,
@@ -32,7 +37,7 @@ import type {
   StackLayer
 } from "./types";
 
-export const MODULATION_CONTRACT = "cosmo/modulation/v0.1";
+export const MODULATION_CONTRACT = "cosmo/modulation/v0.2";
 
 export interface ModulationSignalView {
   id: string;
@@ -47,9 +52,11 @@ export interface ModulationSignalView {
   sourceId: string;
   confidence: ObservedSignal["confidence"];
   staleAfterSeconds: number;
-  sphere?: ObservedSignal["sphere"];
-  epistemicStatus?: ObservedSignal["epistemicStatus"];
-  temporalCharacter?: ObservedSignal["temporalCharacter"];
+  sphere: NonNullable<ObservedSignal["sphere"]>;
+  epistemicStatus: NonNullable<ObservedSignal["epistemicStatus"]>;
+  temporalCharacter: NonNullable<ObservedSignal["temporalCharacter"]>;
+  signalKind: NonNullable<ObservedSignal["signalKind"]>;
+  normalization: NonNullable<ObservedSignal["normalization"]>;
   /** Present only for authored local generator signals. */
   generator?: ObservedSignal["generator"];
   error?: string;
@@ -106,6 +113,11 @@ export interface ModulationFrame {
   acquisitionMode: string;
   /** The mode the observation was originally acquired in, when replayed. */
   originMode?: string;
+  signalCatalog: {
+    contract: typeof SIGNAL_CATALOG_CONTRACT;
+    version: typeof SIGNAL_CATALOG_VERSION;
+    href: string;
+  };
   signals: ModulationSignalView[];
   controls: ModulationControlView[];
   absences: ModulationAbsence[];
@@ -131,9 +143,14 @@ export interface ModulationFrameInput {
   previousOutputs?: ReadonlyMap<string, number>;
   masaRecordHref?: string;
   frameId?: string;
+  signalCatalogHref?: string;
 }
 
 function signalView(signal: ObservedSignal): ModulationSignalView {
+  const definition = getSignalDefinition(signal.id, signal.sourceId);
+  if (definition === undefined || definition.sourceId !== signal.sourceId) {
+    throw new Error(`Modulation signal is absent from the catalog: ${signal.id}`);
+  }
   return {
     id: signal.id,
     label: signal.label,
@@ -145,13 +162,11 @@ function signalView(signal: ObservedSignal): ModulationSignalView {
     sourceId: signal.sourceId,
     confidence: signal.confidence,
     staleAfterSeconds: signal.staleAfterSeconds,
-    ...(signal.sphere === undefined ? {} : { sphere: signal.sphere }),
-    ...(signal.epistemicStatus === undefined
-      ? {}
-      : { epistemicStatus: signal.epistemicStatus }),
-    ...(signal.temporalCharacter === undefined
-      ? {}
-      : { temporalCharacter: signal.temporalCharacter }),
+    sphere: definition.sphere,
+    epistemicStatus: definition.epistemicStatus,
+    temporalCharacter: definition.temporalCharacter,
+    signalKind: definition.signalKind,
+    normalization: definition.normalization,
     ...(signal.generator === undefined ? {} : { generator: signal.generator }),
     ...(signal.error === undefined ? {} : { error: signal.error })
   };
@@ -258,6 +273,11 @@ export function buildModulationFrame(
     generatedAt: input.generatedAt,
     acquisitionMode: input.mode,
     ...(input.originMode === undefined ? {} : { originMode: input.originMode }),
+    signalCatalog: {
+      contract: SIGNAL_CATALOG_CONTRACT,
+      version: SIGNAL_CATALOG_VERSION,
+      href: input.signalCatalogHref ?? "/api/signals"
+    },
     signals: input.signals.map(signalView),
     controls,
     absences,

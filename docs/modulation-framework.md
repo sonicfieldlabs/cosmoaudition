@@ -1,6 +1,6 @@
 # Cosmoaudition System modulation framework
 
-Contract: `cosmo/modulation/v0.1`  
+Contract: `cosmo/modulation/v0.2`
 Status: implemented, local-only
 
 Cosmoaudition System is a modulation framework with an instrument attached, not only an instrument. Once the local gateway is running it publishes normalized, attributed, epistemically-typed modulation that any sonic project can consume — SuperCollider, Max, Pd, VCV, TouchDesigner, a Python script, an agent — without inheriting this repository.
@@ -11,11 +11,12 @@ Every transport carries the same document, a **ModulationFrame**:
 
 | Field | What it holds |
 | --- | --- |
-| `contract` | `cosmo/modulation/v0.1` |
+| `contract` | `cosmo/modulation/v0.2` |
 | `frameId`, `generatedAt` | identity and time of this frame |
 | `acquisitionMode` | `live`, `fixture`, or `archive` — how this observation was obtained |
 | `originMode` | for a replay, the mode it was originally acquired in |
-| `signals[]` | value, unit, normalized, confidence, staleness, stratum, provenance |
+| `signalCatalog` | `cosmo/signal-catalog/v0.2`, version `0.2.0`, and the `/api/signals` route |
+| `signals[]` | value, unit, normalized value, normalization declaration, confidence, staleness, sphere, epistemic status, temporal character, signal kind, and provenance |
 | `controls[]` | every mapping decision: target, status, reason, raw and amount-scaled normalization, output, range, curve, smoothing, missing-data policy, epistemic note |
 | `absences[]` | every target that produced no value, with its reason |
 | `attribution[]` | provider, licence note, coverage limit, and original acquisition mode per contributing source |
@@ -34,6 +35,7 @@ Three rules hold on every transport:
 
 ```bash
 curl 'http://127.0.0.1:8797/api/modulation'            # contract + mapping catalog
+curl 'http://127.0.0.1:8797/api/signals'               # signal + normalization catalog
 curl 'http://127.0.0.1:8797/api/frame?mode=fixture'    # one frame
 curl -N 'http://127.0.0.1:8797/api/stream?mode=fixture&intervalMs=60000'
 ```
@@ -74,13 +76,13 @@ Reading the control without the status is a misuse of the framework.
 
 ### MASA
 
-`/api/snapshot/masa` returns the full provenance record for the same moment: sources, canonical representations, raw and derived observations, authored mappings, control-frame representations, receipts, policy, and lineage. Each frame points at it through `masaRecordHref`. Cosmoaudition is the concrete implementation of MASA 0.1.0's `sonification-system` adapter archetype.
+`/api/snapshot/masa` returns the full provenance record for the same moment: sources, canonical representations, raw and derived observations, authored mappings, control-frame representations, receipts, policy, and lineage. Each frame points at it through `masaRecordHref`. Cosmoaudition is a concrete implementation of MASA 0.2.0's `sonification-system` adapter archetype and uses its Observation profile for the fields that previously lived only in a private extension.
 
 ### MIDI
 
 Deterministic Standard MIDI File export and opt-in live Web MIDI remain available from the instrument. MIDI is a projection, not the canonical representation; the internal control domain is floating point.
 
-## What v0.1 deliberately does not do
+## What v0.2 deliberately does not do
 
 - **No consumer-supplied mappings.** The framework emits the catalog. Accepting posted mapping definitions means session state, validation, and an authority question, and it is much larger than the rest of this contract combined.
 - **Outbound OSC only.** Accepting OSC into the instrument would let any local process set control amounts, which the local-only posture has not answered.

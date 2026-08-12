@@ -5,6 +5,7 @@ export * from "./mappings";
 export * from "./modulation";
 export * from "./modulation-frame";
 export * from "./normalize";
+export * from "./signal-catalog";
 export * from "./sources";
 export * from "./stackIndices";
 export * from "./time";

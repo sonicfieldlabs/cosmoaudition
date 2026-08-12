@@ -19,5 +19,5 @@ overrides:
   # 3.3.17 can loop indefinitely on hostile input (GHSA-28wg-ghj8-5hjv,
   # GHSA-2v37-7h3g-55p8). Patched inside the declared ^3.3.x range.
   "nanoid": "3.3.17"
-  "@sonicfield/masa@0.1.1": "file:vendor/masa/sonicfield-masa-0.1.1.tgz"
-  "@sonicfield/masa-validator@0.1.1": "file:vendor/masa/sonicfield-masa-validator-0.1.1.tgz"
+  "@sonicfield/masa@0.2.0": "file:vendor/masa/sonicfield-masa-0.2.0.tgz"
+  "@sonicfield/masa-validator@0.2.0": "file:vendor/masa/sonicfield-masa-validator-0.2.0.tgz"

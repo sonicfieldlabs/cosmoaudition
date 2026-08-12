@@ -1,6 +1,7 @@
 # Workspaces and locality
 
-Status: active Cosmoaudition System v0.1 behavior
+Status: active Cosmoaudition System v0.2 behavior
+Reviewed: 2026-08-11
 
 ## Workspaces
 

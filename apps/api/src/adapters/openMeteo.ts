@@ -2,6 +2,7 @@ import {
   createHealthFromLoad,
   createSignal,
   loadPayload,
+  localWallClockToInstant,
   normalizeLinear,
   numberOrNull,
   requireSource
@@ -24,23 +25,6 @@ interface OpenMeteoPayload {
  * using the offset the same payload declares. Without the offset there is no
  * instant to resolve, so the acquisition time is used rather than a guess.
  */
-function openMeteoInstant(
-  localTime: unknown,
-  offsetSeconds: unknown,
-  fallback: string
-): string {
-  if (typeof localTime !== "string" || localTime.trim().length === 0) {
-    return fallback;
-  }
-  if (typeof offsetSeconds !== "number" || !Number.isFinite(offsetSeconds)) {
-    return fallback;
-  }
-  // Read the wall-clock string as UTC, then subtract the declared offset.
-  const asUtc = Date.parse(`${localTime.trim()}Z`);
-  if (!Number.isFinite(asUtc)) return fallback;
-  return new Date(asUtc - offsetSeconds * 1000).toISOString();
-}
-
 function openMeteoUrl(latitude: number, longitude: number): string {
   const lat = latitude.toFixed(4);
   const lon = longitude.toFixed(4);
@@ -79,7 +63,7 @@ export const openMeteoAdapter: SourceAdapter = {
     // observation by the difference between the two zones. Convert it with the
     // offset the provider reports, and fall back to acquisition time when that
     // offset is missing rather than guessing.
-    const timestamp = openMeteoInstant(
+    const timestamp = localWallClockToInstant(
       current?.time,
       loaded.payload.utc_offset_seconds,
       loaded.fetchedAt

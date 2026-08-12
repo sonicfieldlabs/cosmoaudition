@@ -24,10 +24,10 @@ export const MAX_MASA_SNAPSHOT_SIGNALS = 256;
 export const MAX_MASA_SNAPSHOT_SOURCES = 64;
 
 const SCHEMA_URI =
-  "https://masa.sonicfield.org/schemas/0.1.0/matter-record.schema.json";
+  "https://masa.sonicfield.org/schemas/0.2.0/matter-record.schema.json";
 const CONTEXT_URI =
-  "https://masa.sonicfield.org/contexts/0.1.0/masa.jsonld";
-const ADAPTER_VERSION = "0.1.1";
+  "https://masa.sonicfield.org/contexts/0.2.0/masa.jsonld";
+const ADAPTER_VERSION = "0.2.0";
 
 export interface SnapshotLike {
   generatedAt: string;
@@ -59,7 +59,7 @@ export interface SnapshotLike {
 }
 
 export interface MasaSnapshotSummary {
-  masaVersion: "0.1.0";
+  masaVersion: "0.2.0";
   recordId: string;
   profiles: MatterRecord["profiles"];
   valid: true;
@@ -336,7 +336,7 @@ export async function buildSnapshotMatterRecord(
     });
 
     const canonicalPayload = normalizeJsonValue({
-      schema: "cosmoaudition:canonical-source-snapshot:0.1.0",
+      schema: "cosmoaudition:canonical-source-snapshot:0.2.0",
       generatedAt: snapshot.generatedAt,
       mode: snapshot.mode,
       sourceId: group.sourceId,
@@ -356,7 +356,7 @@ export async function buildSnapshotMatterRecord(
       mediaType: "application/json",
       format: {
         state: "known",
-        value: "COSMOAUDITION canonical parsed source snapshot 0.1.0"
+        value: "COSMOAUDITION canonical parsed source snapshot 0.2.0"
       },
       availability: "available",
       locator: {
@@ -423,6 +423,9 @@ export async function buildSnapshotMatterRecord(
               }
             : { state: "known", value: signal.value },
         unit: { state: "known", value: signal.unit },
+        epistemicStatus: signal.epistemicStatus ?? "undetermined",
+        temporalCharacter: signal.temporalCharacter ?? "context",
+        signalKind: signal.signalKind ?? "observation",
         method: {
           name: "COSMOAUDITION canonical source parsing",
           version: { state: "known", value: ADAPTER_VERSION },
@@ -441,13 +444,9 @@ export async function buildSnapshotMatterRecord(
             originalSignalId: signal.id,
             confidence: signal.confidence,
             ...(signal.sphere ? { sphere: signal.sphere } : {}),
-            ...(signal.epistemicStatus
-              ? { epistemicStatus: signal.epistemicStatus }
+            ...(signal.normalization
+              ? { normalization: signal.normalization }
               : {}),
-            ...(signal.temporalCharacter
-              ? { temporalCharacter: signal.temporalCharacter }
-              : {}),
-            ...(signal.signalKind ? { signalKind: signal.signalKind } : {}),
             ...(signal.eventKey ? { eventKey: signal.eventKey } : {}),
             ...(signal.generator ? { generator: signal.generator } : {}),
             ...(signal.notes ? { notes: signal.notes } : {})
@@ -513,6 +512,9 @@ export async function buildSnapshotMatterRecord(
                 }
               : { state: "known", value: decision.normalizedInput },
           unit: { state: "known", value: "normalized-ratio" },
+          epistemicStatus: "derived",
+          temporalCharacter: "context",
+          signalKind: "derived",
           method: {
             name: "COSMOAUDITION core mapping normalization",
             version: { state: "known", value: ADAPTER_VERSION },
@@ -529,7 +531,6 @@ export async function buildSnapshotMatterRecord(
           freshness: observationFreshness,
           disclosure: "private",
           extensions: {
-            "cosmo:epistemicStatus": "derived",
             "cosmo:sourceObservationRef": rawObservationId,
             "cosmo:controlDecision": {
               status: decision.status,
@@ -677,7 +678,7 @@ export async function buildSnapshotMatterRecord(
             mediaType: "application/vnd.cosmoaudition.control-frame+json",
             format: {
               state: "known",
-              value: "COSMOAUDITION ControlFrame 0.1.0"
+              value: "COSMOAUDITION ControlFrame 0.2.0"
             },
             availability: "available",
             locator: {
@@ -866,11 +867,11 @@ export async function buildSnapshotMatterRecord(
   const rawRecord = {
     $schema: SCHEMA_URI,
     "@context": CONTEXT_URI,
-    masaVersion: "0.1.0",
+    masaVersion: "0.2.0",
     id: recordId,
     type: "masa:MatterRecord",
     revision: 1,
-    profiles: ["core", "mapping"],
+    profiles: ["core", "observation", "mapping"],
     createdAt,
     createdBy: humanActorId,
     title: `COSMOAUDITION snapshot ${createdAt}`,

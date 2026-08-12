@@ -208,15 +208,15 @@ if (( ${#archives[@]} > 0 )); then
     docs/deployment.md
     vendor/masa/CHECKSUMS.sha256
     vendor/masa/README.md
-    vendor/masa/sonicfield-masa-0.1.1.tgz
-    vendor/masa/sonicfield-masa-validator-0.1.1.tgz
+    vendor/masa/sonicfield-masa-0.2.0.tgz
+    vendor/masa/sonicfield-masa-validator-0.2.0.tgz
   )
   for required_entry in "${archive_required_files[@]}"; do
     grep -Fxq "$required_entry" "$TEMP_DIR/release-archive-list.txt" ||
       fail "archive missing required file: $required_entry"
   done
   if grep -E '^vendor/masa/.*\.tgz$' "$TEMP_DIR/release-archive-list.txt" \
-    | grep -v -E '^vendor/masa/sonicfield-masa(-validator)?-0\.1\.1\.tgz$' \
+    | grep -v -E '^vendor/masa/sonicfield-masa(-validator)?-0\.2\.0\.tgz$' \
     >"$TEMP_DIR/release-archive-extra-masa.txt"; then
     cat "$TEMP_DIR/release-archive-extra-masa.txt" >&2
     fail "archive contains an unexpected MASA package"
@@ -252,7 +252,7 @@ if (( ${#archives[@]} > 0 )); then
       fail "archived MASA artifacts do not match the archived checksums"
     }
   cat "$TEMP_DIR/archive-masa-checksums.txt"
-  pass "archive carries exactly the two verified MASA 0.1.1 packages"
+  pass "archive carries exactly the two verified MASA 0.2.0 packages"
 
   unexpected_archive_entry=""
   while IFS= read -r entry; do

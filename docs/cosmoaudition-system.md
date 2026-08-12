@@ -1,12 +1,12 @@
 # Cosmoaudition System: local instrument architecture
 
-Status: active implementation contract, 2026-07-29
+Status: active implementation contract, 2026-08-11
 
-Cosmoaudition System is the Sonic Matter Framework's interactive observation machine and data-conditioned sound instrument. It receives bounded observations from heterogeneous cosmic, atmospheric, terrestrial, ecological, cultural, economic, and computational sources; preserves their differences; derives declared relations; and makes those relations available as audio parameters, event triggers, MIDI, control frames, and transformations of imported sonic material.
+Cosmoaudition System is the Sonic Matter Framework's interactive observation machine and data-conditioned sound instrument. It receives bounded observations from heterogeneous cosmic, atmospheric, hydrospheric, terrestrial, ecological, cultural, economic, and computational sources; preserves their differences; derives declared relations; and makes those relations available as audio parameters, event triggers, MIDI, control frames, and transformations of imported sonic material.
 
 It does not claim to reveal the intrinsic sound of a planet, body, species, institution, or dataset. Every audible or actionable result is an authored material transduction through a specific source, field, normalization, temporal window, mapping, processor, apparatus, and listening situation.
 
-The [modulation contract](./modulation-framework.md) governs the transport surface, and the protocol boundary is the published MASA 0.1.0 release.
+The [modulation contract](./modulation-framework.md) governs the transport surface, the signal catalog fixes normalization semantics, and the protocol boundary is the published MASA 0.2.0 release.
 
 ## Operational chain
 
@@ -29,8 +29,9 @@ No link is equivalent to the one before it. A provider value is not an audible p
 | Stratum | Initial operational material | Function and limit |
 | --- | --- | --- |
 | Cosmos | NOAA SWPC solar wind, magnetic field, Kp; NASA/JPL close approaches and reported fireballs | Space-weather measurements, predicted encounter relations, and incomplete reported atmospheric events; not a universal cosmos. |
-| Atmosphere | local weather observation or forecast | Situated atmospheric conditions; forecast remains distinct from observation. |
-| Geosphere | USGS earthquake events | Preliminary and revisable events; not an alert service. |
+| Atmosphere | local weather and modelled air-quality forecasts | Situated atmospheric conditions; model forecast remains distinct from a local instrument reading. |
+| Hydrosphere | marine-model forecast at manual coordinates | Wave, sea-surface, current, and sea-level conditions; not a buoy, and inland absence remains null. |
+| Geosphere | USGS earthquake events and bounded NASA EONET aggregates | Preliminary or catalogue-reported events; not an alert service, severity measure, or complete planetary total. |
 | Biosphere | aggregated recent iNaturalist activity | Human-contributed observation activity; never organism voices or total biodiversity. |
 | Human activity | Wikimedia activity and slower economic statistics where enabled | Activity on named infrastructures; not global culture or social totality. |
 | Machine/infrastructure | grid, mobility, mempool, browser, and local engine state | Specific computational and civic systems; not “technology” in general. |
@@ -61,6 +62,8 @@ A mapping decision has one of five statuses:
 
 Every applied mapping records observation reference, source field and unit, input window, transform, clamp, curve, smoothing, cadence, target, output range, value, actor, software version, and epistemic note. Operator enable state and amount are executable inputs, not display-only settings. Null, unavailable, stale, or malformed values are never silently turned into zero, minimum, or neutral midpoint.
 
+The `cosmo/signal-catalog/v0.2` document at `/api/signals` is the canonical declaration for each signal's source, layer, unit, sphere, epistemic status, temporal character, signal kind, and normalization method/range. These ranges are authored modulation envelopes, not asserted physical extrema or safety thresholds. Modulation frames carry the matching catalog contract and normalization metadata so downstream consumers do not have to reconstruct them from prose.
+
 ## Sound and control
 
 The internal control domain is normalized floating point plus declared bipolar controls. MIDI is an optional projection:
@@ -83,7 +86,7 @@ The local deterministic generator bank is a third control source, not an observa
 
 ## MASA integration
 
-Cosmoaudition vendors immutable MASA TypeScript tooling rather than depending on a mutable sibling checkout. The current tooling boundary is the public MASA 0.1.1 release (`sonicfieldlabs/MASA`, tag `v0.1.1`), which implements the normative MASA 0.1.0 protocol and its canonical identifiers under `https://masa.sonicfield.org/`. One explicit snapshot or bounded performance take creates one MatterRecord with the `core` and `mapping` profiles. A recorded generated render adds `audio` and `generation`; a recorded imported-material descendant adds `audio` and `transformation`. MASA 0.1.0 also defines a `processing` profile for granular and spectral operations; this system does not yet emit it, and its imported-material path remains the bounded Web Audio chain described above.
+Cosmoaudition vendors immutable MASA TypeScript tooling rather than depending on a mutable sibling checkout. The current boundary is the public MASA 0.2.0 release (`sonicfieldlabs/MASA`, tag `v0.2.0`) and its canonical identifiers under `https://masa.sonicfield.org/`. One explicit snapshot or bounded performance take creates one MatterRecord with the `core`, `observation`, and `mapping` profiles. Raw and mapping-derived observations carry `epistemicStatus`, `temporalCharacter`, and `signalKind` as normative Observation-profile fields. A recorded generated render adds `audio` and `generation`; a recorded imported-material descendant adds `audio` and `transformation`. The imported-material path remains the bounded Web Audio chain described above.
 
 An archived observation replayed from the browser archive carries the mode it was acquired in, so a replayed fixture stays attributed to its local fixture and never acquires a live provider locator.
 
@@ -119,14 +122,14 @@ The initial server binds only to loopback. Secrets are never shipped to the brow
 
 Local records are private by default. A future public web publication receives a separately generated public projection that removes private paths, credentials, exact restricted locations, provider settings, and unlicensed media.
 
-## Initial completion criteria
+## v0.2 completion criteria
 
-The local v0.1 transformation is complete when:
+The local v0.2 system is complete when:
 
 1. active project identity is Cosmoaudition System;
-2. fixture mode exercises every initial stratum reproducibly;
+2. fixture mode exercises every active source reproducibly, including explicit inland marine absence;
 3. live adapters fail visibly and safely without converting failure to signal;
 4. mapping decisions are executable and missing-data safe;
 5. the user can observe, patch, transform imported audio, and export control/MIDI/MASA accounts;
-6. tests validate adapters, mapping decisions, MASA reference closure, MIDI bytes, audio safety, responsive behavior, and keyboard flow;
+6. tests validate adapters, signal-catalog coverage, pre-persistence aggregate reduction, mapping decisions, MASA reference closure, MIDI bytes, audio safety, responsive behavior, and keyboard flow;
 7. build, typecheck, unit, browser, and dependency audits pass locally.

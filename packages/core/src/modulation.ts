@@ -1,4 +1,5 @@
 import { isAbsoluteTime } from "./time";
+import { getSignalDefinition, normalizeSignalValue } from "./signal-catalog";
 import type { GeneratorProvenance, ObservedSignal } from "./types";
 
 export type ModulatorAlgorithm = GeneratorProvenance["algorithm"];
@@ -216,19 +217,24 @@ export function createModulatorSignals(
 ): ObservedSignal[] {
   return definitions.map((definition) => {
     const frame = evaluateModulator(definition, at);
+    const catalog = getSignalDefinition(definition.id, "local_modulation_bank");
+    if (catalog === undefined) {
+      throw new Error(`Local generator is absent from the signal catalog: ${definition.id}`);
+    }
     return {
       id: definition.id,
       label: definition.label,
       layer: "interface",
       unit: definition.outputRange[0] < 0 ? "bipolar" : "normalized",
       value: frame.value,
-      normalized: frame.normalized,
+      normalized: normalizeSignalValue(frame.value, catalog.normalization),
       timestamp: frame.generatedAt,
       sourceId: "local_modulation_bank",
-      sphere: "machine",
-      epistemicStatus: "interpreted",
-      temporalCharacter: "local",
-      signalKind: "generator",
+      sphere: catalog.sphere,
+      epistemicStatus: catalog.epistemicStatus,
+      temporalCharacter: catalog.temporalCharacter,
+      signalKind: catalog.signalKind,
+      normalization: catalog.normalization,
       ...(frame.eventKey ? { eventKey: frame.eventKey } : {}),
       generator: {
         algorithm: definition.algorithm,

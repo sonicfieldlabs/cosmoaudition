@@ -100,7 +100,7 @@ describe("COSMOAUDITION MASA snapshot adapter", () => {
 
     expect(validation.valid).toBe(true);
     expect(record.type).toBe("masa:MatterRecord");
-    expect(record.profiles).toEqual(["core", "mapping"]);
+    expect(record.profiles).toEqual(["core", "observation", "mapping"]);
     expect(record.agentRuns).toEqual([]);
     expect(record.extensions["cosmo:snapshot"]).toMatchObject({
       mode: "fixture",
@@ -108,8 +108,16 @@ describe("COSMOAUDITION MASA snapshot adapter", () => {
     });
     expect(record.extensions["cosmo:adapter"]).toMatchObject({
       package: "@cosmoaudition/masa",
-      version: "0.1.1"
+      version: "0.2.0"
     });
+    expect(
+      record.observations.every(
+        (observation) =>
+          observation.epistemicStatus !== undefined &&
+          observation.temporalCharacter !== undefined &&
+          observation.signalKind !== undefined
+      )
+    ).toBe(true);
     expect(record.sources).toHaveLength(4);
     expect(record.sources.every((source) => source.sourceKind === "local-fixture")).toBe(
       true

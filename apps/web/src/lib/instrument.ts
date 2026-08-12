@@ -1,9 +1,24 @@
 import {
+  getSignalDefinition,
   nullableLinearNormalize,
   nullableLogNormalize,
   type ObservedSignal,
   type SourceHealth
 } from "@cosmoaudition/core";
+
+function catalogMetadata(id: string, sourceId: string) {
+  const definition = getSignalDefinition(id, sourceId);
+  if (definition === undefined) {
+    throw new Error(`Browser signal is absent from the catalog: ${id}`);
+  }
+  return {
+    sphere: definition.sphere,
+    epistemicStatus: definition.epistemicStatus,
+    temporalCharacter: definition.temporalCharacter,
+    signalKind: definition.signalKind,
+    normalization: definition.normalization
+  };
+}
 
 export type SnapshotMode = "fixture" | "live" | "archive";
 
@@ -50,6 +65,7 @@ function createBrowserLatencySignal(latencyMs: number): ObservedSignal {
     normalized: nullableLogNormalize(latencyMs, [10, 3000]),
     timestamp: new Date().toISOString(),
     sourceId: "browser_fetch_latency",
+    ...catalogMetadata("browser_fetch_latency", "browser_fetch_latency"),
     confidence: "high",
     staleAfterSeconds: 30,
     notes: "Measured locally in the browser; not sent to the server."
@@ -76,6 +92,7 @@ export function createBrowserSessionSignals(
       normalized: nullableLinearNormalize(minuteOfDay, [0, 1439]),
       timestamp: now.toISOString(),
       sourceId: "browser_local_time",
+      ...catalogMetadata("browser_local_time", "browser_local_time"),
       confidence: "high",
       staleAfterSeconds: 60,
       notes: "Derived locally from the browser clock; not sent to the server."
@@ -89,6 +106,7 @@ export function createBrowserSessionSignals(
       normalized: nullableLogNormalize(viewportArea, [102_400, 8_294_400]),
       timestamp: now.toISOString(),
       sourceId: "browser_window_size",
+      ...catalogMetadata("browser_window_size", "browser_window_size"),
       confidence: viewportArea === null ? "error" : "high",
       staleAfterSeconds: 5,
       notes: "Measured locally for responsive instrument state; never persisted in public records."
@@ -102,6 +120,7 @@ export function createBrowserSessionSignals(
       normalized: nullableLinearNormalize(sampleRate, [22_050, 96_000]),
       timestamp: now.toISOString(),
       sourceId: "browser_audio_context",
+      ...catalogMetadata("browser_audio_context", "browser_audio_context"),
       confidence: sampleRate === null ? "low" : "high",
       staleAfterSeconds: 60,
       notes:

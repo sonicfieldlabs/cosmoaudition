@@ -1,7 +1,7 @@
 # Accessibility
 
-Status: active Cosmoaudition System v0.1 account
-Date: 2026-07-28
+Status: active Cosmoaudition System v0.2 account
+Reviewed: 2026-08-11
 
 ## Implemented
 

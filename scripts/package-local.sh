@@ -54,8 +54,8 @@ REQUIRED_TRACKED_INPUTS=(
   apps/web/vite.config.ts
   vendor/masa/CHECKSUMS.sha256
   vendor/masa/README.md
-  vendor/masa/sonicfield-masa-0.1.1.tgz
-  vendor/masa/sonicfield-masa-validator-0.1.1.tgz
+  vendor/masa/sonicfield-masa-0.2.0.tgz
+  vendor/masa/sonicfield-masa-validator-0.2.0.tgz
 )
 for required_input in "${REQUIRED_TRACKED_INPUTS[@]}"; do
   [[ -s "$required_input" ]] || fail "missing required release input: $required_input"
@@ -64,8 +64,8 @@ for required_input in "${REQUIRED_TRACKED_INPUTS[@]}"; do
 done
 
 unexpected_masa_archive="$(find vendor/masa -maxdepth 1 -type f -name '*.tgz' \
-  ! -name 'sonicfield-masa-0.1.1.tgz' \
-  ! -name 'sonicfield-masa-validator-0.1.1.tgz' -print -quit)"
+  ! -name 'sonicfield-masa-0.2.0.tgz' \
+  ! -name 'sonicfield-masa-validator-0.2.0.tgz' -print -quit)"
 [[ -z "$unexpected_masa_archive" ]] ||
   fail "unexpected vendored MASA archive: $unexpected_masa_archive"
 
