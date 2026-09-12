@@ -14,7 +14,7 @@
     "@cosmoaudition/core": "workspace:*",
     "@cosmoaudition/masa": "workspace:*",
     "@hono/node-server": "2.1.0",
-    "hono": "^4.13.1"
+    "hono": "^4.13.5"
   },
   "devDependencies": {
     "tsx": "^4.23.11",
