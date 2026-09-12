@@ -47,7 +47,7 @@ export function isLoopbackRequestHost(
   } catch {
     return false;
   }
-  if (parsed.username !== "" || parsed.password !== "" || parsed.pathname !== "/") {
+  if (parsed.username !== "" || parsed.password !== "" || parsed.pathname !== "/" || parsed.search !== "" || parsed.hash !== "") {
     return false;
   }
   return isLoopbackHost(parsed.hostname);

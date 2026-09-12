@@ -160,3 +160,5 @@ their own and are **not** relicensed by it:
 Reusing the code and operating the system publicly are separate questions. Sources whose
 note says terms need review before public deployment mean exactly that, and
 `opensky_states` must stay inactive without a prior written agreement.
+
+D5 local integration: [d5-delivery](docs/d5-delivery.md). Unreleased; no automatic publication.

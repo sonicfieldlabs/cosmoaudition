@@ -13,3 +13,4 @@ export * from "./triggers";
 export * from "./types";
 
 export const PROJECT_NAME = "Cosmoaudition System";
+export * from "./generation-frame";

@@ -20,6 +20,10 @@ app.use("*", async (context, next) => {
       421
     );
   }
+  const origin = context.req.header("origin");
+  if (origin && !corsOrigins.includes(origin)) {
+    return context.json({ error: "Local-only mode refuses an unapproved browser origin." }, 403);
+  }
   return next();
 });
 
