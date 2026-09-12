@@ -23,3 +23,10 @@ Exact requests verified without credentials on 2026-09-12:
 Responses are bounded to 1 MiB with the existing six-second timeout, public HTTPS redirect policy, cache and in-flight coalescing. HTTP 429 honours bounded Retry-After backoff (60 seconds–1 hour); other unavailable environmental fetches back off for one minute. Matching stale cache remains explicitly stale. An absent live source never falls back to a fixture or zero. Fixtures in `data/mock/phase4-*` are retained public provider examples from the date above, not evidence of current conditions.
 
 OSTIA remains **not built**: the feasibility pass did not identify a working credential-free ERDDAP product query. Account-based ocean products and GRIB2 adapters remain outside this release. Waveform rendering and two-parent sonification lineage belong to the later generation phase.
+
+
+The Phase 5 local candidate carries the same bounded series inside MASA snapshot extension
+`cosmo:observation-series`, including missing slots, quality, clocks and provenance hashes.
+Oída preserves this source snapshot in a new observation account. GERM resolves the retained
+series and creates a separate mapping/render; this adapter does not synthesize audio or turn
+a scalar observation into a sampled acoustic time series. Older accounts are not rewritten.

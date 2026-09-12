@@ -7,6 +7,7 @@ import {
   type CacheMetadata,
   type ControlDecision,
   type ObservedSignal,
+  type ObservationSeries,
   type SonicMapping,
   type SourceHealth
 } from "@cosmoaudition/core";
@@ -30,6 +31,7 @@ const CONTEXT_URI =
 const ADAPTER_VERSION = "0.2.0";
 
 export interface SnapshotLike {
+  series?: readonly ObservationSeries[];
   generatedAt: string;
   mode: string;
   /**
@@ -959,6 +961,7 @@ export async function buildSnapshotMatterRecord(
     },
     history: { mode: "embedded", events },
     extensions: {
+      "cosmo:observation-series": snapshot.series ?? [],
       "cosmo:snapshot": {
         generatedAt: snapshot.generatedAt,
         mode: snapshot.mode,

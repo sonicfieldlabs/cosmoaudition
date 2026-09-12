@@ -409,3 +409,18 @@ function eventRank(effectClass: string): number {
   if (effectClass === "map") return 2;
   return 3;
 }
+
+
+it("retains exact bounded observation series in the MASA source account", async () => {
+  const snapshot = fixtureSnapshot();
+  snapshot.series = [{
+    contract: "cosmo/observation-series/v1", sourceId: "usgs_earthquakes", seriesId: "test-series",
+    unit: "index", fetchedAt: generatedAt, sourceUrl: "https://example.org/fixture",
+    mode: "fixture", status: "available", cadence: "latest-point", normalizationVersion: "0.3.0",
+    provenanceHash: "a".repeat(64), attribution: "Synthetic test", coverage: "One fixture point",
+    points: [{timestamp: generatedAt, intervalEnd: null, value: 5, status: "reported", quality: "fixture"}]
+  }];
+  const record = await buildSnapshotMatterRecord(snapshot);
+  expect(record.extensions["cosmo:observation-series"]).toEqual(snapshot.series);
+  expect(validateSnapshotMatterRecord(record).valid).toBe(true);
+});
