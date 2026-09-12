@@ -138,7 +138,7 @@ export const mappingCatalog: readonly SonicMapping[] = [
     scale: "linear",
     // The full active API aperture, matching how the adapter normalizes the
     // same count so the module and this mapping agree.
-    inputRange: [0, 17],
+    inputRange: [0, 21],
     outputRange: [0, 0.12],
     smoothingMs: 700,
     missingData: "skip",

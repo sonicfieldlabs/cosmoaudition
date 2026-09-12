@@ -10,7 +10,7 @@ import type {
 } from "./types";
 
 export const SIGNAL_CATALOG_CONTRACT = "cosmo/signal-catalog/v0.2";
-export const SIGNAL_CATALOG_VERSION = "0.2.0";
+export const SIGNAL_CATALOG_VERSION = "0.3.0";
 
 export interface SignalDefinition {
   id: string;
@@ -22,6 +22,7 @@ export interface SignalDefinition {
   epistemicStatus: EpistemicStatus;
   temporalCharacter: TemporalCharacter;
   signalKind: SignalKind;
+  access_modes: readonly ["raw", "normalized"];
   normalization: SignalNormalization;
 }
 
@@ -66,6 +67,7 @@ function define(
     epistemicStatus: overrides.epistemicStatus ?? "reported",
     temporalCharacter,
     signalKind: overrides.signalKind ?? "observation",
+    access_modes: ["raw", "normalized"],
     normalization: {
       method,
       inputRange,
@@ -90,6 +92,10 @@ const generationFuels = [
 ] as const;
 
 export const signalDefinitions: readonly SignalDefinition[] = [
+  define("climate_trace_colombia_emissions", "Climate TRACE Colombia monthly inventory", "climate_trace_colombia", "earth", "t CO2e", "linear", [0, 100000000]),
+  define("coops_water_level", "NOAA CO-OPS San Francisco water level", "noaa_coops_water_level", "earth", "m", "linear", [-2, 5]),
+  define("usgs_water_streamflow", "USGS Neversink River streamflow", "usgs_water_streamflow", "earth", "ft^3/s", "linear", [0, 10000]),
+  define("nino34_anomaly", "NOAA PSL Ni\u00f1o 3.4 monthly anomaly", "noaa_psl_nino34", "earth", "C", "linear", [-3, 3]),
   define("carbon_intensity_actual", "Carbon intensity actual", "carbon_intensity_gb", "earth", "gCO2/kWh", "linear", [0, 500]),
   define("carbon_intensity_forecast", "Carbon intensity forecast", "carbon_intensity_gb", "earth", "gCO2/kWh", "linear", [0, 500], { temporalCharacter: "forecast" }),
   ...generationFuels.map((fuel) =>
@@ -143,7 +149,7 @@ export const signalDefinitions: readonly SignalDefinition[] = [
   define("bogota_bike_docks_available", "Bogota docks available", "gbfs_bogota_station_status", "city", "docks", "linear", [0, 4_000]),
   define("bogota_bike_availability_ratio", "Bogota bike availability ratio", "gbfs_bogota_station_status", "city", "ratio", "linear", [0, 1]),
   define("bogota_bike_stale_station_count", "Bogota stale station reports", "gbfs_bogota_station_status", "city", "stations", "linear", [0, 50]),
-  define("source_stale_count", "Stale source count", "system", "interface", "sources", "linear", [0, 17], { epistemicStatus: "derived", signalKind: "derived" }),
+  define("source_stale_count", "Stale source count", "system", "interface", "sources", "linear", [0, 21], { epistemicStatus: "derived", signalKind: "derived" }),
   define("browser_fetch_latency", "Browser fetch latency", "browser_fetch_latency", "interface", "ms", "log", [10, 3_000], { epistemicStatus: "measured" }),
   define("browser_local_time", "Browser local time", "browser_local_time", "interface", "minute-of-day", "linear", [0, 1_439], { epistemicStatus: "derived", signalKind: "derived" }),
   define("browser_window_size", "Browser viewport area", "browser_window_size", "interface", "CSS-pixels²", "log", [102_400, 8_294_400], { epistemicStatus: "measured" }),

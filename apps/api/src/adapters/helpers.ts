@@ -157,6 +157,8 @@ interface LoadPayloadOptions {
   context: AdapterContext;
   url: string;
   fixturePath: string;
+  format?: "json" | "text";
+  validate?: (payload: unknown) => void;
   cacheVariant?: string;
   allowLiveFixtureFallback?: boolean;
   timeoutMs?: number;
@@ -222,6 +224,7 @@ async function loadLivePayload<T>(
   try {
     const payload = (await fetchJson(options.url, {
       timeoutMs,
+      ...(options.format ? { format: options.format } : {}),
       ...(options.headers === undefined ? {} : { headers: options.headers }),
       ...(options.source.requestPolicy?.maxResponseBytes === undefined
         ? {}
@@ -230,6 +233,7 @@ async function loadLivePayload<T>(
         ? {}
         : { concurrencyKey: options.source.requestPolicy.concurrencyKey })
     })) as T;
+    options.validate?.(payload);
     const fetchedAt = options.context.now.toISOString();
     const metadata = await writeCache(
       options.source,

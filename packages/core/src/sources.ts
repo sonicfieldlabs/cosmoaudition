@@ -8,6 +8,94 @@ import type {
 
 export const sourceDefinitions: readonly SourceDefinition[] = [
   {
+    "id": "climate_trace_colombia",
+    "label": "Climate TRACE Colombia monthly inventory",
+    "status": "ready",
+    "layers": [
+      "earth"
+    ],
+    "sphere": "human",
+    "temporalCharacter": "aggregate",
+    "endpoint": "https://api.climatetrace.org/v7/rankings/countries?start=2025-01&end=2025-01&gas=co2e_100yr",
+    "route": "api-proxy",
+    "ttlSeconds": 86400,
+    "unit": "t CO2e",
+    "parser": "Bounded provider payload with explicit time, quality and missing-value checks",
+    "limitation": "Colombia, all sectors, January 2025 inventory estimate; not an instantaneous measurement.",
+    "fallback": "Matching cache explicitly stale; otherwise unavailable. No live fixture fallback.",
+    "licenseNote": "Climate TRACE CC BY 4.0; totals selected from country rankings; https://climatetrace.org/terms",
+    "requestPolicy": {
+      "maxResponseBytes": 1048576,
+      "concurrencyKey": "climate_trace_colombia"
+    }
+  },
+  {
+    "id": "noaa_coops_water_level",
+    "label": "NOAA CO-OPS San Francisco water level",
+    "status": "ready",
+    "layers": [
+      "earth"
+    ],
+    "sphere": "hydrosphere",
+    "temporalCharacter": "stream",
+    "endpoint": "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=latest&station=9414290&product=water_level&datum=MLLW&time_zone=gmt&units=metric&format=json",
+    "route": "api-proxy",
+    "ttlSeconds": 360,
+    "unit": "m",
+    "parser": "Bounded provider payload with explicit time, quality and missing-value checks",
+    "limitation": "Station 9414290 only; MLLW datum; latest preliminary observation, not a historical series.",
+    "fallback": "Matching cache explicitly stale; otherwise unavailable. No live fixture fallback.",
+    "licenseNote": "NOAA CO-OPS public government observations; attribute station and datum.",
+    "requestPolicy": {
+      "maxResponseBytes": 1048576,
+      "concurrencyKey": "noaa_coops_water_level"
+    }
+  },
+  {
+    "id": "usgs_water_streamflow",
+    "label": "USGS Neversink River streamflow",
+    "status": "ready",
+    "layers": [
+      "earth"
+    ],
+    "sphere": "hydrosphere",
+    "temporalCharacter": "stream",
+    "endpoint": "https://api.waterdata.usgs.gov/ogcapi/v1/collections/latest-continuous/items?limit=1&monitoring_location_id=USGS-01435000&parameter_code=00060&f=json",
+    "route": "api-proxy",
+    "ttlSeconds": 900,
+    "unit": "ft^3/s",
+    "parser": "Bounded provider payload with explicit time, quality and missing-value checks",
+    "limitation": "USGS-01435000, parameter 00060, statistic 00011; latest provisional point only.",
+    "fallback": "Matching cache explicitly stale; otherwise unavailable. No live fixture fallback.",
+    "licenseNote": "USGS public-domain government data; provisional values subject to revision; https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits",
+    "requestPolicy": {
+      "maxResponseBytes": 1048576,
+      "concurrencyKey": "usgs_water_streamflow"
+    }
+  },
+  {
+    "id": "noaa_psl_nino34",
+    "label": "NOAA PSL Niño 3.4 monthly anomaly",
+    "status": "ready",
+    "layers": [
+      "earth"
+    ],
+    "sphere": "hydrosphere",
+    "temporalCharacter": "aggregate",
+    "endpoint": "https://psl.noaa.gov/data/correlation/nina34.anom.data",
+    "route": "api-proxy",
+    "ttlSeconds": 86400,
+    "unit": "C",
+    "parser": "Bounded provider payload with explicit time, quality and missing-value checks",
+    "limitation": "Monthly Niño 3.4 SST anomalies; last 120 supplied monthly slots; future/missing slots remain null. Not an audio sample rate.",
+    "fallback": "Matching cache explicitly stale; otherwise unavailable. No live fixture fallback.",
+    "licenseNote": "NOAA/OAR/PSL public-domain government data; ERSST v6 dataset citation and climatology: https://psl.noaa.gov/data/timeseries/month/DS/NINO34/",
+    "requestPolicy": {
+      "maxResponseBytes": 1048576,
+      "concurrencyKey": "noaa_psl_nino34"
+    }
+  },
+  {
     id: "carbon_intensity_gb",
     label: "Carbon Intensity GB",
     status: "ready",

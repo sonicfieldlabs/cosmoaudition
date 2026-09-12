@@ -1,3 +1,4 @@
+import { environmentAdapters } from "./environment";
 import {
   getSourceDefinition,
   type CacheMetadata,
@@ -25,6 +26,7 @@ import { wikimediaPageviewsAdapter } from "./wikimedia";
 import type { AdapterContext, AdapterResult, FetchMode, SourceAdapter } from "./types";
 
 const activeAdapters: readonly SourceAdapter[] = [
+  ...environmentAdapters,
   carbonIntensityAdapter,
   carbonGenerationAdapter,
   openMeteoAdapter,
@@ -110,6 +112,7 @@ export async function collectSnapshot(options: SnapshotOptions) {
       ? { requestedCoordinates }
       : {}),
     signals,
+    series: results.flatMap(result => result.series ?? []),
     sources: results.map((result) => result.health),
     cache: results.map((result) => result.cache)
   };

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0 - 2026-09-12
+
+- Added credential-free Climate TRACE Colombia January 2025 emissions, NOAA CO-OPS station 9414290 water level, USGS OGC station 01435000 streamflow, and NOAA PSL monthly Niño 3.4 anomalies.
+- Added bounded `cosmo/observation-series/v1` metadata to snapshots, preserving units, time intervals, quality, missing slots, attribution, fetch mode and source hashes. Latest scalar points do not imply historical sampled coverage.
+- Signal catalog entries advertise raw and normalized access. Sonification is not implemented by this release.
+- Added provider Retry-After backoff, bounded plain-text retrieval for PSL, and validation before caching environmental payloads. Live outages never substitute fixtures.
+- OSTIA remains deferred: feasibility did not establish a credential-free product endpoint.
+
 ## 0.2.0 - 2026-08-11
 
 - Added a versioned signal catalog that makes source identity, units, sphere, epistemic status, temporal character, signal kind, and normalization semantics available through `/api/signals` and every modulation frame.

@@ -15,7 +15,7 @@ Every transport carries the same document, a **ModulationFrame**:
 | `frameId`, `generatedAt` | identity and time of this frame |
 | `acquisitionMode` | `live`, `fixture`, or `archive` — how this observation was obtained |
 | `originMode` | for a replay, the mode it was originally acquired in |
-| `signalCatalog` | `cosmo/signal-catalog/v0.2`, version `0.2.0`, and the `/api/signals` route |
+| `signalCatalog` | `cosmo/signal-catalog/v0.2`, version `0.3.0`, and the `/api/signals` route |
 | `signals[]` | value, unit, normalized value, normalization declaration, confidence, staleness, sphere, epistemic status, temporal character, signal kind, and provenance |
 | `controls[]` | every mapping decision: target, status, reason, raw and amount-scaled normalization, output, range, curve, smoothing, missing-data policy, epistemic note |
 | `absences[]` | every target that produced no value, with its reason |
