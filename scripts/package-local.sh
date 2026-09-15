@@ -72,6 +72,25 @@ unexpected_masa_archive="$(find vendor/masa -maxdepth 1 -type f -name '*.tgz' \
 # A build may import files that are not themselves selected for the release
 # archive. Refuse any ignored or untracked source/config file before Vite or
 # TypeScript can inline it into an accepted generated bundle.
+# Operating-system metadata is never a build input and is already ignored by
+# .gitignore, but Finder recreates it whenever anyone opens a folder. Requiring
+# every file under apps/ and packages/ to be tracked therefore halted the whole
+# release gate on apps/.DS_Store — a file that cannot affect the build and that
+# deleting does not keep deleted.
+#
+# The names below are excluded from the tracked-input requirement and are
+# separately asserted absent from the packaged output further down, so excusing
+# them here cannot let one travel. Every other untracked file still fails: a
+# source file someone forgot to add is exactly what this check is for.
+OS_METADATA_NAMES=(.DS_Store ._.DS_Store Thumbs.db desktop.ini .Spotlight-V100 .Trashes)
+os_metadata_find_args=()
+for os_metadata_name in "${OS_METADATA_NAMES[@]}"; do
+  os_metadata_find_args+=(! -name "$os_metadata_name")
+done
+# AppleDouble sidecars (._foo) are metadata for any file, so they are matched by
+# prefix rather than by an exact name.
+os_metadata_find_args+=(! -name '._*')
+
 build_symlink="$(find apps packages \
   \( -type d \( -name dist -o -name node_modules \) -prune \) -o \
   \( -type l -print -quit \))"
@@ -82,7 +101,7 @@ while IFS= read -r -d '' build_input; do
 done < <(
   find apps packages \
     \( -type d \( -name dist -o -name node_modules \) -prune \) -o \
-    \( -type f ! -name '*.tsbuildinfo' -print0 \)
+    \( -type f ! -name '*.tsbuildinfo' "${os_metadata_find_args[@]}" -print0 \)
 )
 
 # Vite copies public/ recursively. Validate that boundary before building so an
@@ -228,6 +247,15 @@ else
     --no-xattrs --no-acls --no-selinux --owner=0 --group=0 --numeric-owner \
     -czf "$ARCHIVE" --null -T "$MANIFEST"
 fi
+
+# The tracked-input scan above excuses operating-system metadata, so prove here
+# that excusing it did not let any travel. COPYFILE_DISABLE and --no-xattrs are
+# already set, but an assertion over the finished archive is what makes the
+# exclusion safe rather than merely intended.
+os_metadata_in_archive="$(tar -tzf "$ARCHIVE" \
+  | grep -E '(^|/)(\.DS_Store|Thumbs\.db|desktop\.ini|\._[^/]*|\.Spotlight-V100|\.Trashes)$' || true)"
+[[ -z "$os_metadata_in_archive" ]] ||
+  fail "operating-system metadata reached the package: $os_metadata_in_archive"
 
 # Tell the verifier exactly which archive this invocation produced. Sorting a
 # directory can accidentally select a manually named or future-dated stale
