@@ -12,7 +12,7 @@ describe("generation frame", () => {
  it("reuses the mapping decision and retains original clocks and evidence", () => {
   const frame = buildGenerationFrame({mode:"fixture", generatedAt:"2026-09-07T00:00:00Z", signals:[signal, {...signal, id:"unrelated-counter", value:1e22}], sources:[]});
   const receipt = frame.receipts[0]!;
-  expect(receipt.outputValue).toBe(executeMapping(generationMappings[0]!, signal).outputValue);
+  expect(receipt.outputValue).toBe(executeMapping(generationMappings[0]!, signal, { mode: "fixture" }).outputValue);
   expect(receipt.sourceClock).toBe(signal.timestamp);
   expect(frame.signals.map(s => s.id)).toEqual([signal.id]);
   expect(frame.originMode).toBe("fixture");

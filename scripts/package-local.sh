@@ -52,10 +52,11 @@ REQUIRED_TRACKED_INPUTS=(
   apps/web/package.json
   apps/web/tsconfig.json
   apps/web/vite.config.ts
-  vendor/masa/CHECKSUMS.sha256
-  vendor/masa/README.md
-  vendor/masa/sonicfield-masa-0.2.0.tgz
-  vendor/masa/sonicfield-masa-validator-0.2.0.tgz
+  vendor/masa-0.2.1/CHECKSUMS.sha256
+  vendor/masa-0.2.1/README.md
+  vendor/masa-0.2.1/PROVENANCE.json
+  vendor/masa-0.2.1/sonicfield-masa-0.2.1.tgz
+  vendor/masa-0.2.1/sonicfield-masa-validator-0.2.1.tgz
 )
 for required_input in "${REQUIRED_TRACKED_INPUTS[@]}"; do
   [[ -s "$required_input" ]] || fail "missing required release input: $required_input"
@@ -63,9 +64,9 @@ for required_input in "${REQUIRED_TRACKED_INPUTS[@]}"; do
     fail "required release input is not tracked: $required_input"
 done
 
-unexpected_masa_archive="$(find vendor/masa -maxdepth 1 -type f -name '*.tgz' \
-  ! -name 'sonicfield-masa-0.2.0.tgz' \
-  ! -name 'sonicfield-masa-validator-0.2.0.tgz' -print -quit)"
+unexpected_masa_archive="$(find vendor/masa-0.2.1 -maxdepth 1 -type f -name '*.tgz' \
+  ! -name 'sonicfield-masa-0.2.1.tgz' \
+  ! -name 'sonicfield-masa-validator-0.2.1.tgz' -print -quit)"
 [[ -z "$unexpected_masa_archive" ]] ||
   fail "unexpected vendored MASA archive: $unexpected_masa_archive"
 
@@ -136,7 +137,7 @@ if [[ "$SKIP_BUILD" == true ]]; then
       apps/api/package.json apps/api/src \
       apps/web/index.html apps/web/package.json apps/web/public apps/web/src \
       apps/web/tsconfig.json apps/web/vite.config.ts packages data/mock data/sources.yaml \
-      vendor/masa
+      vendor/masa-0.2.1
   )
 fi
 
@@ -171,7 +172,7 @@ RELEASE_INPUTS=(
   packages
   scripts
   tests
-  vendor
+  vendor/masa-0.2.1
   data/cache/.gitkeep
   data/mock
   data/snapshots/.gitkeep

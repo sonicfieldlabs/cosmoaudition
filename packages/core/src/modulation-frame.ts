@@ -17,6 +17,7 @@
  *    caveat its sources without reading this repository.
  */
 
+import { evaluateSignalFreshness } from "./freshness";
 import {
   executeMappings,
   isExecutableControlDecision,
@@ -52,6 +53,9 @@ export interface ModulationSignalView {
   sourceId: string;
   confidence: ObservedSignal["confidence"];
   staleAfterSeconds: number;
+  acquisitionMode: string;
+  observedInterval?: ObservedSignal["observedInterval"];
+  freshness: import("./freshness").SignalFreshness;
   sphere: NonNullable<ObservedSignal["sphere"]>;
   epistemicStatus: NonNullable<ObservedSignal["epistemicStatus"]>;
   temporalCharacter: NonNullable<ObservedSignal["temporalCharacter"]>;
@@ -146,7 +150,7 @@ export interface ModulationFrameInput {
   signalCatalogHref?: string;
 }
 
-function signalView(signal: ObservedSignal): ModulationSignalView {
+function signalView(signal: ObservedSignal, input: ModulationFrameInput): ModulationSignalView {
   const definition = getSignalDefinition(signal.id, signal.sourceId);
   if (definition === undefined || definition.sourceId !== signal.sourceId) {
     throw new Error(`Modulation signal is absent from the catalog: ${signal.id}`);
@@ -159,9 +163,12 @@ function signalView(signal: ObservedSignal): ModulationSignalView {
     value: signal.value,
     normalized: signal.normalized,
     timestamp: signal.timestamp,
+    ...(signal.observedInterval ? { observedInterval: signal.observedInterval } : {}),
     sourceId: signal.sourceId,
     confidence: signal.confidence,
     staleAfterSeconds: signal.staleAfterSeconds,
+    acquisitionMode: input.mode,
+    freshness: evaluateSignalFreshness(signal, { now: input.generatedAt, mode: input.mode }),
     sphere: definition.sphere,
     epistemicStatus: definition.epistemicStatus,
     temporalCharacter: definition.temporalCharacter,
@@ -233,6 +240,8 @@ export function buildModulationFrame(
   }
 
   const decisions = executeMappings(mappingCatalog, input.signals, {
+    now: input.generatedAt,
+    mode: input.mode,
     disabledMappingIds,
     mappingAmounts,
     ...(input.previousOutputs === undefined
@@ -278,7 +287,7 @@ export function buildModulationFrame(
       version: SIGNAL_CATALOG_VERSION,
       href: input.signalCatalogHref ?? "/api/signals"
     },
-    signals: input.signals.map(signalView),
+    signals: input.signals.map(signal => signalView(signal, input)),
     controls,
     absences,
     attribution: attributionFor(contributingSourceIds, originalAcquisitionMode),

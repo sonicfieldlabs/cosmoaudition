@@ -21,6 +21,7 @@ export function buildGenerationFrame(input: ModulationFrameInput) {
   const receipts = generationMappings.map(mapping => {
     const signal = input.signals.find(s => s.id === mapping.signalId);
     const decision = executeMapping(mapping, signal, {
+      now: input.generatedAt, mode: input.mode,
       previousOutput: input.previousOutputs?.get(mapping.id) ?? null,
       enabled: input.routes?.[mapping.id]?.enabled ?? true,
       amount: input.routes?.[mapping.id]?.amount ?? 1

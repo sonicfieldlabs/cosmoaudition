@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
 import {
   controlFrame,
   executeMapping,
@@ -6,6 +6,9 @@ import {
   updateControlState
 } from "../control";
 import type { ObservedSignal, SonicMapping } from "../types";
+
+beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date("2026-07-28T00:00:00.000Z")); });
+afterEach(() => vi.useRealTimers());
 
 const mapping: SonicMapping = {
   id: "test-cutoff",
@@ -88,16 +91,16 @@ describe("executable control mappings", () => {
     });
   });
 
-  it("marks low and stale observations as uncertainty without hiding them", () => {
+  it("maps low confidence with uncertainty and refuses stale observations", () => {
     expect(executeMapping(mapping, signal(25, "low"))).toMatchObject({
       status: "uncertainty",
       reason: "low-confidence",
       outputValue: 700
     });
     expect(executeMapping(mapping, signal(25, "stale"))).toMatchObject({
-      status: "uncertainty",
+      status: "refused",
       reason: "stale-input",
-      outputValue: 700
+      outputValue: null
     });
   });
 

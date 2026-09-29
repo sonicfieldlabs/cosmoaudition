@@ -61,6 +61,10 @@ export const carbonIntensityAdapter: SourceAdapter = {
       absoluteTimestampOrUndefined(row.from) ??
       absoluteTimestampOrUndefined(row.to) ??
       loaded.fetchedAt;
+    const intervalStart = absoluteTimestampOrUndefined(row.from);
+    const intervalEnd = absoluteTimestampOrUndefined(row.to);
+    const observedInterval = intervalStart && intervalEnd && Date.parse(intervalStart) <= Date.parse(intervalEnd)
+      ? { start: intervalStart, end: intervalEnd } : undefined;
     const actual = numberOrNull(row.intensity.actual);
     const forecast = numberOrNull(row.intensity.forecast);
     const confidence = carbonSignalConfidence(actual, loaded.confidence);
@@ -76,6 +80,7 @@ export const carbonIntensityAdapter: SourceAdapter = {
           value: actual,
           normalized: normalizeLinear(actual, [0, 500]),
           timestamp,
+          ...(observedInterval ? { observedInterval } : {}),
           source,
           sourceUrl: loaded.sourceUrl,
           confidence,
@@ -89,6 +94,7 @@ export const carbonIntensityAdapter: SourceAdapter = {
           value: forecast,
           normalized: normalizeLinear(forecast, [0, 500]),
           timestamp,
+          ...(observedInterval ? { observedInterval } : {}),
           source,
           sourceUrl: loaded.sourceUrl,
           confidence: loaded.confidence

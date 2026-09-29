@@ -50,6 +50,7 @@ export function createSignal(options: {
   value: number | null;
   normalized?: number | null;
   timestamp: string;
+  observedInterval?: ObservedSignal["observedInterval"];
   source: SourceDefinition;
   sourceUrl?: string | undefined;
   sphere?: ObservationSphere | undefined;
@@ -106,6 +107,7 @@ export function createSignal(options: {
     value: options.value,
     normalized,
     timestamp: options.timestamp,
+    ...(options.observedInterval ? { observedInterval: options.observedInterval } : {}),
     sourceId: options.source.id,
     ...(options.sourceUrl === undefined ? {} : { sourceUrl: options.sourceUrl }),
     sphere: definition.sphere,

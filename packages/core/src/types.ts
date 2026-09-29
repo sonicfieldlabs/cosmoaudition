@@ -99,6 +99,9 @@ export interface ObservedSignal {
   epistemicStatus?: EpistemicStatus;
   temporalCharacter?: TemporalCharacter;
   signalKind?: SignalKind;
+  observedInterval?: { start: string; end: string };
+  acquisitionMode?: string;
+  freshness?: import("./freshness").SignalFreshness;
   /** Canonical, versioned normalization metadata when the signal is catalogued. */
   normalization?: SignalNormalization;
   /** Stable provider/local event key used for deduplicated trigger projection. */

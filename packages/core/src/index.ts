@@ -1,4 +1,5 @@
 export * from "./control";
+export * from "./freshness";
 export * from "./indices";
 export * from "./localities";
 export * from "./mappings";

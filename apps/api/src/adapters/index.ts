@@ -1,3 +1,4 @@
+import { evaluateSignalFreshness } from "@cosmoaudition/core";
 import { environmentAdapters } from "./environment";
 import {
   getSourceDefinition,
@@ -96,6 +97,10 @@ export async function collectSnapshot(options: SnapshotOptions) {
 
   const signals = results.flatMap((result) => result.signals);
   signals.push(createStaleSourceSignal(results, now));
+  for (const signal of signals) {
+    signal.acquisitionMode = options.mode;
+    signal.freshness = evaluateSignalFreshness(signal, { now: now.toISOString(), mode: options.mode });
+  }
 
   return {
     generatedAt: now.toISOString(),

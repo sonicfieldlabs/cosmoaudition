@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@cosmoaudition/core": "workspace:*",
-    "@sonicfield/masa": "file:../../vendor/masa/sonicfield-masa-0.2.0.tgz",
-    "@sonicfield/masa-validator": "file:../../vendor/masa/sonicfield-masa-validator-0.2.0.tgz"
+    "@sonicfield/masa": "file:../../vendor/masa-0.2.1/sonicfield-masa-0.2.1.tgz",
+    "@sonicfield/masa-validator": "file:../../vendor/masa-0.2.1/sonicfield-masa-validator-0.2.1.tgz"
   },
   "devDependencies": {
     "vitest": "^4.1.11"
