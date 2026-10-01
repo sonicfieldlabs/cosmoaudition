@@ -137,7 +137,7 @@ All variables are optional:
 - No automatic geolocation, analytics, cookies, accounts, or public upload are used.
 - A control or modulation receipt means the parameter was scheduled; it does not claim audition.
 - A live synthesis state is not represented as an audio artifact unless it is recorded.
-- MASA TypeScript tooling 0.2.0 is vendored immutably from the public release (`sonicfieldlabs/MASA`, tag `v0.2.0`, MIT). Snapshot records implement the normative MASA 0.2.0 Observation profile, so epistemic status, temporal character, and signal kind are protocol fields rather than private extension conventions. This repository does not depend at runtime on a mutable sibling checkout. See [`vendor/masa/README.md`](vendor/masa/README.md) for the checksum boundary and update procedure.
+- MASA TypeScript tooling 0.2.2 is selected as an unpublished, locally verified validation candidate. It repairs generating-lineage and completed-preservation checks while snapshot records retain the normative MASA 0.2.0 Observation profile. Epistemic status, temporal character, and signal kind remain protocol fields. Runtime dependencies are reviewed package archives, not mutable sibling checkouts. See [`vendor/masa-0.2.2/README.md`](vendor/masa-0.2.2/README.md) for checksums and source provenance. The original public 0.2.0 archives remain unchanged under `vendor/masa/` and are excluded from new local build archives.
 
 ## Licensing
 
@@ -154,9 +154,13 @@ their own and are **not** relicensed by it:
 - **Live provider responses** fetched at runtime are governed by the terms of the
   provider they came from. This is why attribution and licence notes travel with every
   emitted signal rather than being stripped at the gateway.
-- **The vendored MASA release under `vendor/masa/`** is MIT from its own release
-  (`sonicfieldlabs/MASA`, tooling tag `v0.2.0`) and retains that repository's copyright notice.
+- **The selected MASA tooling under `vendor/masa-0.2.2/` and historical `vendor/masa/` release** are MIT from their canonical source
+  (`sonicfieldlabs/MASA`), and each archive retains that repository's copyright notice. Only the historical set comes from public tag `v0.2.0`; the candidate has the source identity recorded in its provenance receipt.
 
 Reusing the code and operating the system publicly are separate questions. Sources whose
 note says terms need review before public deployment mean exactly that, and
 `opensky_states` must stay inactive without a prior written agreement.
+
+Local observation feeds and mapping receipts: [operator runbook](docs/local-operator-runbook.md).
+
+Observation freshness is distinct from transport health. See the [freshness and mapping policy](docs/freshness.md) for live, forecast, aggregate, fixture and archive behavior.

@@ -141,6 +141,7 @@ describe("imported material controls", () => {
       timestamp: "2026-07-28T00:00:00.000Z",
       sourceId: "noaa_swpc_solar_wind_speed",
       confidence: "high",
+      acquisitionMode: "fixture",
       staleAfterSeconds: 300
     };
     const mapped = executeMapping(mapping!, signal);

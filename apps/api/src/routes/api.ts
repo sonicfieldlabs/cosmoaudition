@@ -1,3 +1,4 @@
+import { producerEnvelope, producerId } from "../producer";
 import { Hono } from "hono";
 import { streamSSE } from "hono/streaming";
 import {
@@ -10,6 +11,7 @@ import {
 } from "@cosmoaudition/masa";
 import type { SnapshotLike } from "@cosmoaudition/masa";
 import {
+  buildGenerationFrame,
   buildModulationFrame,
   buildSignalCatalog,
   isValidLatitude,
@@ -23,6 +25,12 @@ import { activeSourceIds, collectSnapshot, type SnapshotOptions } from "../adapt
 import type { FetchMode } from "../adapters/types";
 
 export const apiRoutes = new Hono();
+apiRoutes.get("/identity", context => context.json({
+  contract: "cosmoaudition/owner-client/v1", producerId,
+  authority: "loopback-only", publicReplay: "application-owned",
+  restart: "producerId changes; never resume this process as a durable journal",
+  snapshots: "/api/snapshot", health: "/health"
+}));
 const decimalNumberPattern = /^[-+]?(?:\d+\.?\d*|\.\d+)$/;
 const MAX_POSTED_SNAPSHOT_BYTES = 1024 * 1024;
 
@@ -168,13 +176,14 @@ apiRoutes.get("/snapshot", async (context) => {
   const snapshot = await collectSnapshot(parsed.options);
 
   if (context.req.query("masa") !== "summary") {
-    return context.json(snapshot);
+    return context.json({ ...snapshot, producer: producerEnvelope(snapshot) });
   }
 
   try {
     const record = await buildSnapshotMatterRecord(snapshot);
     return context.json({
       ...snapshot,
+      producer: producerEnvelope(snapshot),
       masa: createMasaSnapshotSummary(
         record,
         masaRecordHref(parsed.options)
@@ -383,9 +392,9 @@ function parseIntervalMs(value: string | undefined): number | { error: string } 
   return parsed;
 }
 
-async function collectFrame(options: SnapshotOptions): Promise<ModulationFrame> {
+async function collectFrame(options: SnapshotOptions): Promise<ModulationFrame & { producer: ReturnType<typeof producerEnvelope> }> {
   const snapshot = await collectSnapshot(options);
-  return buildModulationFrame({
+  const frame = buildModulationFrame({
     generatedAt: snapshot.generatedAt,
     mode: options.mode,
     signals: snapshot.signals,
@@ -393,6 +402,7 @@ async function collectFrame(options: SnapshotOptions): Promise<ModulationFrame> 
     ...(snapshot.cache === undefined ? {} : { cache: snapshot.cache }),
     masaRecordHref: masaRecordHref(options)
   });
+  return { ...frame, producer: producerEnvelope(snapshot) };
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -423,3 +433,23 @@ function safeFilenamePart(value: string): string {
   const safe = value.toLowerCase().replace(/[^a-z0-9_-]+/g, "-").slice(0, 32);
   return safe || "local";
 }
+
+
+// Existing owner middleware and source collection retain the loopback boundary.
+apiRoutes.get("/generation-frame", async context => {
+  const parsed = snapshotOptionsFromQuery(context);
+  if ("error" in parsed) return context.json({ error: parsed.error }, 400);
+  const snapshot = await collectSnapshot(parsed.options);
+  context.header("Cache-Control", "no-store");
+  return context.json(buildGenerationFrame(snapshot));
+});
+
+apiRoutes.get("/observation-feed", async context => {
+  const parsed = snapshotOptionsFromQuery(context);
+  if ("error" in parsed) return context.json({error:parsed.error},400);
+  const snapshot = await collectSnapshot(parsed.options);
+  const record = await buildSnapshotMatterRecord(snapshot);
+  context.header("Cache-Control", "no-store");
+  return context.json({contract:"cosmo/observation-feed/v1", producer:producerEnvelope(snapshot), source_record:record,
+    relation:{of:"signal"}, source_register:"non-acoustic", delivery:"one bounded poll; no durable stream replay"});
+});

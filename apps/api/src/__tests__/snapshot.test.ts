@@ -210,3 +210,25 @@ describe("API snapshot", () => {
     expect(unknown.status).toBe(400);
   });
 });
+
+it("keeps successful carbon acquisition separate from an expired provider interval", async () => {
+  const originalFetch = globalThis.fetch;
+  const previousCache = process.env.COSMOAUDITION_CACHE_DIR;
+  const cacheDir = await mkdtemp(join(tmpdir(), "cosmo-freshness-"));
+  process.env.COSMOAUDITION_CACHE_DIR = cacheDir;
+  globalThis.fetch = (async () => new Response(JSON.stringify({data:[{from:"2026-07-01T00:00:00Z",to:"2026-07-01T00:30:00Z",intensity:{actual:250,forecast:260}}]}), {status:200,headers:{"content-type":"application/json"}})) as typeof fetch;
+  try {
+    const snapshot = await collectSnapshot({mode:"live", now:new Date("2026-09-26T12:00:00Z"), sourceIds:["carbon_intensity_gb"]});
+    const carbon = snapshot.signals.find(s => s.id === "carbon_intensity_actual")!;
+    expect(snapshot.sources[0]!.confidence).toBe("high");
+    expect(carbon.confidence).toBe("high");
+    expect(carbon.timestamp).toBe("2026-07-01T00:00:00Z");
+    expect(carbon.observedInterval).toEqual({start:"2026-07-01T00:00:00Z",end:"2026-07-01T00:30:00Z"});
+    expect(carbon.freshness).toMatchObject({status:"expired", mappingAllowed:false, ageSeconds:7560000});
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (previousCache === undefined) delete process.env.COSMOAUDITION_CACHE_DIR;
+    else process.env.COSMOAUDITION_CACHE_DIR = previousCache;
+    await rm(cacheDir, {recursive:true, force:true});
+  }
+});

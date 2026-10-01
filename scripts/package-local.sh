@@ -52,10 +52,11 @@ REQUIRED_TRACKED_INPUTS=(
   apps/web/package.json
   apps/web/tsconfig.json
   apps/web/vite.config.ts
-  vendor/masa/CHECKSUMS.sha256
-  vendor/masa/README.md
-  vendor/masa/sonicfield-masa-0.2.0.tgz
-  vendor/masa/sonicfield-masa-validator-0.2.0.tgz
+  vendor/masa-0.2.2/CHECKSUMS.sha256
+  vendor/masa-0.2.2/README.md
+  vendor/masa-0.2.2/PROVENANCE.json
+  vendor/masa-0.2.2/sonicfield-masa-0.2.2.tgz
+  vendor/masa-0.2.2/sonicfield-masa-validator-0.2.2.tgz
 )
 for required_input in "${REQUIRED_TRACKED_INPUTS[@]}"; do
   [[ -s "$required_input" ]] || fail "missing required release input: $required_input"
@@ -63,15 +64,34 @@ for required_input in "${REQUIRED_TRACKED_INPUTS[@]}"; do
     fail "required release input is not tracked: $required_input"
 done
 
-unexpected_masa_archive="$(find vendor/masa -maxdepth 1 -type f -name '*.tgz' \
-  ! -name 'sonicfield-masa-0.2.0.tgz' \
-  ! -name 'sonicfield-masa-validator-0.2.0.tgz' -print -quit)"
+unexpected_masa_archive="$(find vendor/masa-0.2.2 -maxdepth 1 -type f -name '*.tgz' \
+  ! -name 'sonicfield-masa-0.2.2.tgz' \
+  ! -name 'sonicfield-masa-validator-0.2.2.tgz' -print -quit)"
 [[ -z "$unexpected_masa_archive" ]] ||
   fail "unexpected vendored MASA archive: $unexpected_masa_archive"
 
 # A build may import files that are not themselves selected for the release
 # archive. Refuse any ignored or untracked source/config file before Vite or
 # TypeScript can inline it into an accepted generated bundle.
+# Operating-system metadata is never a build input and is already ignored by
+# .gitignore, but Finder recreates it whenever anyone opens a folder. Requiring
+# every file under apps/ and packages/ to be tracked therefore halted the whole
+# release gate on apps/.DS_Store — a file that cannot affect the build and that
+# deleting does not keep deleted.
+#
+# The names below are excluded from the tracked-input requirement and are
+# separately asserted absent from the packaged output further down, so excusing
+# them here cannot let one travel. Every other untracked file still fails: a
+# source file someone forgot to add is exactly what this check is for.
+OS_METADATA_NAMES=(.DS_Store ._.DS_Store Thumbs.db desktop.ini .Spotlight-V100 .Trashes)
+os_metadata_find_args=()
+for os_metadata_name in "${OS_METADATA_NAMES[@]}"; do
+  os_metadata_find_args+=(! -name "$os_metadata_name")
+done
+# AppleDouble sidecars (._foo) are metadata for any file, so they are matched by
+# prefix rather than by an exact name.
+os_metadata_find_args+=(! -name '._*')
+
 build_symlink="$(find apps packages \
   \( -type d \( -name dist -o -name node_modules \) -prune \) -o \
   \( -type l -print -quit \))"
@@ -82,7 +102,7 @@ while IFS= read -r -d '' build_input; do
 done < <(
   find apps packages \
     \( -type d \( -name dist -o -name node_modules \) -prune \) -o \
-    \( -type f ! -name '*.tsbuildinfo' -print0 \)
+    \( -type f ! -name '*.tsbuildinfo' "${os_metadata_find_args[@]}" -print0 \)
 )
 
 # Vite copies public/ recursively. Validate that boundary before building so an
@@ -107,18 +127,8 @@ WEB_BUILD="apps/web/dist/index.html"
 [[ -s "$WEB_BUILD" ]] || fail "missing or empty web build: $WEB_BUILD"
 
 if [[ "$SKIP_BUILD" == true ]]; then
-  while IFS= read -r -d '' build_input; do
-    if [[ "$build_input" -nt "$API_BUILD" || "$build_input" -nt "$WEB_BUILD" ]]; then
-      fail "--skip-build cannot package stale output; rebuild after: $build_input"
-    fi
-  done < <(
-    git ls-files -z -- \
-      package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json \
-      apps/api/package.json apps/api/src \
-      apps/web/index.html apps/web/package.json apps/web/public apps/web/src \
-      apps/web/tsconfig.json apps/web/vite.config.ts packages data/mock data/sources.yaml \
-      vendor/masa
-  )
+  node scripts/profile-local-build.mjs --verify-build ||
+    fail "--skip-build requires unchanged, verified build inputs and outputs"
 fi
 
 dist_symlink="$(find apps/api/dist apps/web/dist -type l -print -quit)"
@@ -152,7 +162,7 @@ RELEASE_INPUTS=(
   packages
   scripts
   tests
-  vendor
+  vendor/masa-0.2.2
   data/cache/.gitkeep
   data/mock
   data/snapshots/.gitkeep
@@ -228,6 +238,15 @@ else
     --no-xattrs --no-acls --no-selinux --owner=0 --group=0 --numeric-owner \
     -czf "$ARCHIVE" --null -T "$MANIFEST"
 fi
+
+# The tracked-input scan above excuses operating-system metadata, so prove here
+# that excusing it did not let any travel. COPYFILE_DISABLE and --no-xattrs are
+# already set, but an assertion over the finished archive is what makes the
+# exclusion safe rather than merely intended.
+os_metadata_in_archive="$(tar -tzf "$ARCHIVE" \
+  | grep -E '(^|/)(\.DS_Store|Thumbs\.db|desktop\.ini|\._[^/]*|\.Spotlight-V100|\.Trashes)$' || true)"
+[[ -z "$os_metadata_in_archive" ]] ||
+  fail "operating-system metadata reached the package: $os_metadata_in_archive"
 
 # Tell the verifier exactly which archive this invocation produced. Sorting a
 # directory can accidentally select a manually named or future-dated stale

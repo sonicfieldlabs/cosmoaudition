@@ -1,5 +1,6 @@
 import {
   executeMapping,
+  evaluateSignalFreshness,
   getSourceDefinition,
   isExecutableControlDecision,
   mappingCatalog,
@@ -7,6 +8,7 @@ import {
   type CacheMetadata,
   type ControlDecision,
   type ObservedSignal,
+  type ObservationSeries,
   type SonicMapping,
   type SourceHealth
 } from "@cosmoaudition/core";
@@ -27,9 +29,10 @@ const SCHEMA_URI =
   "https://masa.sonicfield.org/schemas/0.2.0/matter-record.schema.json";
 const CONTEXT_URI =
   "https://masa.sonicfield.org/contexts/0.2.0/masa.jsonld";
-const ADAPTER_VERSION = "0.2.0";
+const ADAPTER_VERSION = "0.2.1";
 
 export interface SnapshotLike {
+  series?: readonly ObservationSeries[];
   generatedAt: string;
   mode: string;
   /**
@@ -248,7 +251,9 @@ export async function buildSnapshotMatterRecord(
       sourceObservedAt === null
         ? null
         : toMasaTimestamp(sourceObservedAt, createdAt),
-      createdAt
+      createdAt,
+      group.health?.staleAfterSeconds ?? Math.min(...group.signals.map(signal => signal.staleAfterSeconds)),
+      snapshot.mode
     );
     const isFixture = acquisitionMode === "fixture";
     const isSystem = group.sourceId === "system";
@@ -393,11 +398,14 @@ export async function buildSnapshotMatterRecord(
         createdAt,
         signal.error
       );
-      const observationFreshness = toMasaFreshness(
-        signal.confidence,
+      const effectiveFreshness = evaluateSignalFreshness(signal, { now: createdAt, mode: snapshot.mode });
+      const observationFreshness = {
+        status: effectiveFreshness.status,
         observedAt,
-        createdAt
-      );
+        ...(effectiveFreshness.ageSeconds === undefined ? {} : { ageSeconds: effectiveFreshness.ageSeconds }),
+        ...(effectiveFreshness.expiresAt === undefined ? {} : { expiresAt: effectiveFreshness.expiresAt }),
+        reason: effectiveFreshness.reason
+      };
       rawObservationIds.push(rawObservationId);
 
       observations.push({
@@ -411,6 +419,7 @@ export async function buildSnapshotMatterRecord(
           value: {
             label: signal.label,
             layer: signal.layer,
+            ...(signal.observedInterval ? { observedInterval: signal.observedInterval } : {}),
             acquisitionMode
           }
         },
@@ -440,6 +449,7 @@ export async function buildSnapshotMatterRecord(
         freshness: observationFreshness,
         disclosure: "private",
         extensions: {
+          "cosmo:effectiveFreshness": effectiveFreshness,
           "cosmo:signal": {
             originalSignalId: signal.id,
             confidence: signal.confidence,
@@ -481,6 +491,7 @@ export async function buildSnapshotMatterRecord(
         const route = snapshot.mappingRoutes?.[catalogMapping.id];
         const previousOutput = snapshot.previousOutputs?.[catalogMapping.id];
         const decision = executeMapping(catalogMapping, signal, {
+          now: createdAt, mode: snapshot.mode,
           ...(route === undefined
             ? {}
             : { enabled: route.enabled, amount: route.amount }),
@@ -959,6 +970,7 @@ export async function buildSnapshotMatterRecord(
     },
     history: { mode: "embedded", events },
     extensions: {
+      "cosmo:observation-series": snapshot.series ?? [],
       "cosmo:snapshot": {
         generatedAt: snapshot.generatedAt,
         mode: snapshot.mode,
@@ -1152,24 +1164,14 @@ function toMasaHealth(
 }
 
 function toMasaFreshness(
-  confidence: ObservedSignal["confidence"],
-  observedAt: string | null,
-  generatedAt: string
+  confidence: ObservedSignal["confidence"], observedAt: string | null,
+  generatedAt: string, staleAfterSeconds: number, mode: string
 ): Record<string, unknown> {
-  if (observedAt === null || !Number.isFinite(Date.parse(observedAt))) {
-    return { status: "unknown" };
-  }
-  const ageSeconds = Math.max(
-    0,
-    (Date.parse(generatedAt) - Date.parse(observedAt)) / 1000
-  );
-  return {
-    status:
-      confidence === "stale" || confidence === "error" ? "stale" : "current",
-    observedAt,
-    retrievedAt: generatedAt,
-    ageSeconds
-  };
+  if (observedAt === null) return { status: "unknown" };
+  const result = evaluateSignalFreshness({ timestamp: observedAt, confidence, staleAfterSeconds } as ObservedSignal, { now: generatedAt, mode });
+  return { status: result.status, observedAt, reason: result.reason,
+    ...(result.ageSeconds === undefined ? {} : { ageSeconds: result.ageSeconds }),
+    ...(result.expiresAt === undefined ? {} : { expiresAt: result.expiresAt }) };
 }
 
 function aggregateConfidence(
@@ -1193,56 +1195,19 @@ function firstSignalTimestamp(
 
 function toMasaTimestamp(value: string, fallback: string): string {
   const parsed = parseAbsoluteTime(value);
-  const fallbackTime = Date.parse(fallback);
-  if (
-    parsed === null ||
-    (Number.isFinite(fallbackTime) && parsed > fallbackTime)
-  ) {
+  if (parsed === null) {
     return fallback;
   }
   return new Date(parsed).toISOString();
 }
 
-function sourceTimestampContext(
-  signal: ObservedSignal,
-  observedAt: string,
-  snapshotGeneratedAt: string
-): Record<string, unknown> {
-  if (observedAt === signal.timestamp) return {};
-  // A zoneless source timestamp has no absolute instant, so it can only be
-  // reported as unusable. Parsing it as host-local would make the recorded
-  // reason (and therefore the record bytes) depend on the machine's timezone
-  // while every receipt still claims determinism.
+function sourceTimestampContext(signal: ObservedSignal, observedAt: string, _snapshotGeneratedAt: string): Record<string, unknown> {
   const sourceTime = parseAbsoluteTime(signal.timestamp);
-  const observedTime = Date.parse(observedAt);
-  if (
-    sourceTime !== null &&
-    Number.isFinite(observedTime) &&
-    sourceTime === observedTime
-  ) {
-    return {};
-  }
-  const snapshotTime = Date.parse(snapshotGeneratedAt);
-  const sourceIsFuture =
-    sourceTime !== null && Number.isFinite(snapshotTime) && sourceTime > snapshotTime;
-
-  if (sourceIsFuture) {
-    return {
-      "cosmo:sourceTimestamp": signal.timestamp,
-      "cosmo:sourceTimestampRole":
-        signal.temporalCharacter === "forecast"
-          ? "forecast-valid-at"
-          : "future-source-time",
-      "cosmo:timestampDecision":
-        "used-snapshot-generatedAt-as-observedAt-because-source-timestamp-is-a-future-validity-or-event-time"
-    };
-  }
-
+  if (sourceTime !== null && sourceTime === Date.parse(observedAt)) return {};
   return {
     "cosmo:sourceTimestamp": signal.timestamp,
     "cosmo:sourceTimestampRole": "source-reported-time",
-    "cosmo:timestampDecision":
-      "used-snapshot-generatedAt-as-observedAt-because-source-time-lacked-a-usable-explicit-zone"
+    "cosmo:timestampDecision": "used-snapshot-generatedAt-as-observedAt-because-source-time-lacked-a-usable-explicit-zone"
   };
 }
 

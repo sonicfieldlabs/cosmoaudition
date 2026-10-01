@@ -1,6 +1,6 @@
 {
   "name": "cosmoaudition-system",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -12,7 +12,7 @@
     "dev": "pnpm --parallel --filter @cosmoaudition/api --filter @cosmoaudition/web dev",
     "dev:api": "pnpm --filter @cosmoaudition/api dev",
     "dev:web": "pnpm --filter @cosmoaudition/web dev",
-    "build": "pnpm build:api && pnpm build:web",
+    "build": "node scripts/profile-local-build.mjs --begin-build && pnpm build:api && pnpm build:web && node scripts/profile-local-build.mjs --record-build",
     "build:api": "pnpm --filter @cosmoaudition/api build",
     "build:web": "pnpm --filter @cosmoaudition/web build",
     "e2e": "playwright test",
@@ -30,6 +30,6 @@
     "@playwright/test": "^1.62.1",
     "@types/node": "^22.20.1",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.7"
+    "vitest": "^4.1.11"
   }
 }

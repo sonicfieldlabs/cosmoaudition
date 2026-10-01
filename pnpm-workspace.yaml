@@ -10,14 +10,9 @@ overrides:
   # read an attacker-selected source map when the input path is unset
   # (GHSA-fxqj-rqcc-2cmp), so keep the workspace on the patched line.
   "postcss": "8.5.26"
-  # ajv (through the vendored MASA validator) resolves fast-uri, and versions
-  # before 3.1.5 are vulnerable to host confusion via backslash
-  # (GHSA-7p8r-x3mc-p8w7). Pinned to the patched release inside ajv's declared
-  # ^3.0.1 range rather than crossing a major boundary.
-  "fast-uri": "3.1.5"
-  # postcss (a build-time dependency of vite) resolves nanoid; builds before
-  # 3.3.17 can loop indefinitely on hostile input (GHSA-28wg-ghj8-5hjv,
-  # GHSA-2v37-7h3g-55p8). Patched inside the declared ^3.3.x range.
-  "nanoid": "3.3.17"
-  "@sonicfield/masa@0.2.0": "file:vendor/masa/sonicfield-masa-0.2.0.tgz"
-  "@sonicfield/masa-validator@0.2.0": "file:vendor/masa/sonicfield-masa-validator-0.2.0.tgz"
+  # Stay within the declared dependency majors while closing current advisories:
+  # GHSA-hrr3-gc8f-f4qj (fast-uri), GHSA-2v37-7h3g-55p8 (nanoid).
+  "fast-uri": "3.1.8"
+  "nanoid": "3.3.18"
+  "@sonicfield/masa@0.2.2": "file:vendor/masa-0.2.2/sonicfield-masa-0.2.2.tgz"
+  "@sonicfield/masa-validator@0.2.2": "file:vendor/masa-0.2.2/sonicfield-masa-validator-0.2.2.tgz"

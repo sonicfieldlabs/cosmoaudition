@@ -1,4 +1,5 @@
 import type {
+  ObservationSeries,
   CacheMetadata,
   Confidence,
   ObservedSignal,
@@ -25,6 +26,7 @@ export interface LoadedPayload<T> {
 }
 
 export interface AdapterResult {
+  series?: ObservationSeries[];
   source: SourceDefinition;
   signals: ObservedSignal[];
   health: SourceHealth;
