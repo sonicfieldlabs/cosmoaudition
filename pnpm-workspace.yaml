@@ -11,8 +11,8 @@ overrides:
   # (GHSA-fxqj-rqcc-2cmp), so keep the workspace on the patched line.
   "postcss": "8.5.26"
   # Stay within the declared dependency majors while closing current advisories:
-  # GHSA-58mr-gqgx-xq4g (fast-uri), GHSA-2v37-7h3g-55p8 (nanoid).
-  "fast-uri": "3.1.7"
+  # GHSA-hrr3-gc8f-f4qj (fast-uri), GHSA-2v37-7h3g-55p8 (nanoid).
+  "fast-uri": "3.1.8"
   "nanoid": "3.3.18"
-  "@sonicfield/masa@0.2.1": "file:vendor/masa-0.2.1/sonicfield-masa-0.2.1.tgz"
-  "@sonicfield/masa-validator@0.2.1": "file:vendor/masa-0.2.1/sonicfield-masa-validator-0.2.1.tgz"
+  "@sonicfield/masa@0.2.2": "file:vendor/masa-0.2.2/sonicfield-masa-0.2.2.tgz"
+  "@sonicfield/masa-validator@0.2.2": "file:vendor/masa-0.2.2/sonicfield-masa-validator-0.2.2.tgz"
