@@ -1,3 +1,4 @@
+import { producerEnvelope, producerId } from "../producer";
 import { Hono } from "hono";
 import { streamSSE } from "hono/streaming";
 import {
@@ -6,10 +7,11 @@ import {
   MasaSnapshotValidationError,
   buildSnapshotMatterRecord,
   createMasaSnapshotSummary,
-  serializeSnapshotMatterRecord
+  serializeSnapshotMatterRecord,
 } from "@cosmoaudition/masa";
 import type { SnapshotLike } from "@cosmoaudition/masa";
 import {
+  buildGenerationFrame,
   buildModulationFrame,
   buildSignalCatalog,
   isValidLatitude,
@@ -17,16 +19,50 @@ import {
   MODULATION_CONTRACT,
   mappingCatalog,
   sourceDefinitions,
-  type ModulationFrame
+  type ModulationFrame,
 } from "@cosmoaudition/core";
-import { activeSourceIds, collectSnapshot, type SnapshotOptions } from "../adapters";
+import {
+  activeSourceIds,
+  collectSnapshot,
+  type SnapshotOptions,
+} from "../adapters";
 import type { FetchMode } from "../adapters/types";
+import { localObservationSnapshot } from "../adapters/localObservation";
 
 export const apiRoutes = new Hono();
+apiRoutes.get("/local-observations", async (context) => {
+  try {
+    return context.json(await localObservationSnapshot());
+  } catch {
+    return context.json(
+      {
+        contract: "cosmo/local-import-snapshot/v1",
+        status: "refused",
+        signals: [],
+        reason: "Local import failed provenance, freshness or byte validation",
+      },
+      422,
+    );
+  }
+});
+apiRoutes.get("/identity", (context) =>
+  context.json({
+    contract: "cosmoaudition/owner-client/v1",
+    producerId,
+    authority: "loopback-only",
+    publicReplay: "application-owned",
+    restart:
+      "producerId changes; never resume this process as a durable journal",
+    snapshots: "/api/snapshot",
+    health: "/health",
+  }),
+);
 const decimalNumberPattern = /^[-+]?(?:\d+\.?\d*|\.\d+)$/;
 const MAX_POSTED_SNAPSHOT_BYTES = 1024 * 1024;
 
-function parseMode(value: string | undefined): { value: FetchMode } | { error: string } {
+function parseMode(
+  value: string | undefined,
+): { value: FetchMode } | { error: string } {
   if (value === undefined || value === "" || value === "live") {
     return { value: "live" };
   }
@@ -41,7 +77,7 @@ function parseMode(value: string | undefined): { value: FetchMode } | { error: s
 function parseCoordinate(
   value: string | undefined,
   label: "lat" | "lon",
-  isValid: (value: number) => boolean
+  isValid: (value: number) => boolean,
 ): { value?: number; error?: string } {
   if (value === undefined) {
     return {};
@@ -68,7 +104,11 @@ function snapshotOptionsFromQuery(context: {
     return { error: mode.error };
   }
 
-  const latitude = parseCoordinate(context.req.query("lat"), "lat", isValidLatitude);
+  const latitude = parseCoordinate(
+    context.req.query("lat"),
+    "lat",
+    isValidLatitude,
+  );
   if (latitude.error !== undefined) {
     return { error: latitude.error };
   }
@@ -76,7 +116,7 @@ function snapshotOptionsFromQuery(context: {
   const longitude = parseCoordinate(
     context.req.query("lon"),
     "lon",
-    isValidLongitude
+    isValidLongitude,
   );
   if (longitude.error !== undefined) {
     return { error: longitude.error };
@@ -89,17 +129,20 @@ function snapshotOptionsFromQuery(context: {
       mode: mode.value,
       ...(latitude.value === undefined ? {} : { latitude: latitude.value }),
       ...(longitude.value === undefined ? {} : { longitude: longitude.value }),
-      ...(sources.value === undefined ? {} : { sourceIds: sources.value })
-    }
+      ...(sources.value === undefined ? {} : { sourceIds: sources.value }),
+    },
   };
 }
 
 function parseSources(
-  value: string | undefined
+  value: string | undefined,
 ): { value?: string[] } | { error: string } {
   if (value === undefined || value.trim() === "") return {};
   if (value.length > 2048) return { error: "sources selection is too long." };
-  const ids = value.split(",").map((id) => id.trim()).filter(Boolean);
+  const ids = value
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
   if (ids.length === 0 || ids.length > activeSourceIds.length) {
     return { error: "sources must select one or more active source ids." };
   }
@@ -113,23 +156,32 @@ function parseSources(
 
 function masaRecordHref(options: SnapshotOptions): string {
   const query = new URLSearchParams({ mode: options.mode });
-  if (options.latitude !== undefined) query.set("lat", String(options.latitude));
-  if (options.longitude !== undefined) query.set("lon", String(options.longitude));
-  if (options.sourceIds !== undefined) query.set("sources", options.sourceIds.join(","));
+  if (options.latitude !== undefined)
+    query.set("lat", String(options.latitude));
+  if (options.longitude !== undefined)
+    query.set("lon", String(options.longitude));
+  if (options.sourceIds !== undefined)
+    query.set("sources", options.sourceIds.join(","));
   return `/api/snapshot/masa?${query.toString()}`;
 }
 
-function masaErrorResponse(context: {
-  json(value: unknown, status: 422 | 500): Response;
-}, error: unknown): Response {
+function masaErrorResponse(
+  context: {
+    json(value: unknown, status: 422 | 500): Response;
+  },
+  error: unknown,
+): Response {
   if (error instanceof MasaSnapshotInputError) {
     return context.json({ error: error.message }, 422);
   }
   if (error instanceof MasaSnapshotValidationError) {
-    return context.json({
-      error: "The snapshot could not be represented as a valid MASA record.",
-      diagnostics: error.diagnostics
-    }, 500);
+    return context.json(
+      {
+        error: "The snapshot could not be represented as a valid MASA record.",
+        diagnostics: error.diagnostics,
+      },
+      500,
+    );
   }
   throw error;
 }
@@ -147,7 +199,7 @@ apiRoutes.get("/sources", async (context) => {
     mode: parsed.options.mode,
     definitions: sourceDefinitions,
     sources: snapshot.sources,
-    cache: snapshot.cache
+    cache: snapshot.cache,
   });
 });
 
@@ -168,17 +220,15 @@ apiRoutes.get("/snapshot", async (context) => {
   const snapshot = await collectSnapshot(parsed.options);
 
   if (context.req.query("masa") !== "summary") {
-    return context.json(snapshot);
+    return context.json({ ...snapshot, producer: producerEnvelope(snapshot) });
   }
 
   try {
     const record = await buildSnapshotMatterRecord(snapshot);
     return context.json({
       ...snapshot,
-      masa: createMasaSnapshotSummary(
-        record,
-        masaRecordHref(parsed.options)
-      )
+      producer: producerEnvelope(snapshot),
+      masa: createMasaSnapshotSummary(record, masaRecordHref(parsed.options)),
     });
   } catch (error) {
     return masaErrorResponse(context, error);
@@ -206,10 +256,10 @@ apiRoutes.get("/modulation", (context) =>
       curve: mapping.scale,
       smoothingMs: mapping.smoothingMs,
       missingData: mapping.missingData,
-      epistemicNote: mapping.epistemicNote
+      epistemicNote: mapping.epistemicNote,
     })),
-    note: "A control value without its status discards the frame's evidence. Read controls[] and absences[], not values{} alone."
-  })
+    note: "A control value without its status discards the frame's evidence. Read controls[] and absences[], not values{} alone.",
+  }),
 );
 
 apiRoutes.get("/frame", async (context) => {
@@ -242,7 +292,7 @@ apiRoutes.get("/stream", async (context) => {
         await stream.writeSSE({
           event: "frame",
           id: frame.frameId,
-          data: JSON.stringify(frame)
+          data: JSON.stringify(frame),
         });
       } catch (error) {
         // A failed acquisition is reported as an event rather than closing the
@@ -252,8 +302,9 @@ apiRoutes.get("/stream", async (context) => {
           event: "acquisition-error",
           data: JSON.stringify({
             generatedAt: new Date().toISOString(),
-            message: error instanceof Error ? error.message : "Acquisition failed."
-          })
+            message:
+              error instanceof Error ? error.message : "Acquisition failed.",
+          }),
         });
       }
       if (closed) break;
@@ -271,14 +322,11 @@ apiRoutes.get("/snapshot/masa", async (context) => {
   const snapshot = await collectSnapshot(parsed.options);
   try {
     const record = await buildSnapshotMatterRecord(snapshot);
-    context.header(
-      "Content-Type",
-      `${MASA_RECORD_MEDIA_TYPE}; charset=UTF-8`
-    );
+    context.header("Content-Type", `${MASA_RECORD_MEDIA_TYPE}; charset=UTF-8`);
     context.header("Cache-Control", "no-store");
     context.header(
       "Content-Disposition",
-      `inline; filename="cosmoaudition-${snapshot.mode}-snapshot.masa.json"`
+      `inline; filename="cosmoaudition-${snapshot.mode}-snapshot.masa.json"`,
     );
     return context.body(serializeSnapshotMatterRecord(record));
   } catch (error) {
@@ -288,20 +336,38 @@ apiRoutes.get("/snapshot/masa", async (context) => {
 
 apiRoutes.post("/snapshot/masa", async (context) => {
   const contentLength = Number(context.req.header("content-length"));
-  if (Number.isFinite(contentLength) && contentLength > MAX_POSTED_SNAPSHOT_BYTES) {
-    return context.json({ error: "Snapshot payload exceeds the 1 MiB boundary." }, 413);
+  if (
+    Number.isFinite(contentLength) &&
+    contentLength > MAX_POSTED_SNAPSHOT_BYTES
+  ) {
+    return context.json(
+      { error: "Snapshot payload exceeds the 1 MiB boundary." },
+      413,
+    );
   }
   const contentType = context.req.header("content-type")?.toLowerCase() ?? "";
   if (!contentType.includes("json")) {
-    return context.json({ error: "Snapshot payload must use a JSON content type." }, 415);
+    return context.json(
+      { error: "Snapshot payload must use a JSON content type." },
+      415,
+    );
   }
   let text: string;
   try {
-    text = await readBoundedText(context.req.raw.body, MAX_POSTED_SNAPSHOT_BYTES);
+    text = await readBoundedText(
+      context.req.raw.body,
+      MAX_POSTED_SNAPSHOT_BYTES,
+    );
   } catch (error) {
     return error instanceof PayloadTooLargeError
-      ? context.json({ error: "Snapshot payload exceeds the 1 MiB boundary." }, 413)
-      : context.json({ error: "Snapshot payload could not be read as UTF-8 JSON." }, 400);
+      ? context.json(
+          { error: "Snapshot payload exceeds the 1 MiB boundary." },
+          413,
+        )
+      : context.json(
+          { error: "Snapshot payload could not be read as UTF-8 JSON." },
+          400,
+        );
   }
   let value: unknown;
   try {
@@ -310,7 +376,10 @@ apiRoutes.post("/snapshot/masa", async (context) => {
     return context.json({ error: "Snapshot payload is not valid JSON." }, 400);
   }
   if (!isSnapshotEnvelope(value)) {
-    return context.json({ error: "Snapshot payload is missing its bounded envelope." }, 422);
+    return context.json(
+      { error: "Snapshot payload is missing its bounded envelope." },
+      422,
+    );
   }
 
   try {
@@ -319,7 +388,7 @@ apiRoutes.post("/snapshot/masa", async (context) => {
     context.header("Cache-Control", "no-store");
     context.header(
       "Content-Disposition",
-      `attachment; filename="cosmoaudition-${safeFilenamePart(value.mode)}-snapshot.masa.json"`
+      `attachment; filename="cosmoaudition-${safeFilenamePart(value.mode)}-snapshot.masa.json"`,
     );
     return context.body(serializeSnapshotMatterRecord(record));
   } catch (error) {
@@ -336,7 +405,7 @@ class PayloadTooLargeError extends Error {}
  */
 async function readBoundedText(
   body: ReadableStream<Uint8Array> | null,
-  maxBytes: number
+  maxBytes: number,
 ): Promise<string> {
   if (!body) return "";
   const reader = body.getReader();
@@ -349,7 +418,9 @@ async function readBoundedText(
       total += value.byteLength;
       if (total > maxBytes) {
         await reader.cancel();
-        throw new PayloadTooLargeError("Payload exceeds the configured boundary.");
+        throw new PayloadTooLargeError(
+          "Payload exceeds the configured boundary.",
+        );
       }
       chunks.push(value);
     }
@@ -369,30 +440,38 @@ const MIN_STREAM_INTERVAL_MS = 1_000;
 const MAX_STREAM_INTERVAL_MS = 600_000;
 const DEFAULT_STREAM_INTERVAL_MS = 60_000;
 
-function parseIntervalMs(value: string | undefined): number | { error: string } {
-  if (value === undefined || value.trim() === "") return DEFAULT_STREAM_INTERVAL_MS;
+function parseIntervalMs(
+  value: string | undefined,
+): number | { error: string } {
+  if (value === undefined || value.trim() === "")
+    return DEFAULT_STREAM_INTERVAL_MS;
   if (!/^\d{1,7}$/.test(value.trim())) {
     return { error: "intervalMs must be an integer number of milliseconds." };
   }
   const parsed = Number.parseInt(value, 10);
   if (parsed < MIN_STREAM_INTERVAL_MS || parsed > MAX_STREAM_INTERVAL_MS) {
     return {
-      error: `intervalMs must be between ${MIN_STREAM_INTERVAL_MS} and ${MAX_STREAM_INTERVAL_MS}. Provider cadence is measured in minutes; a faster stream repeats one observation rather than acquiring a new one.`
+      error: `intervalMs must be between ${MIN_STREAM_INTERVAL_MS} and ${MAX_STREAM_INTERVAL_MS}. Provider cadence is measured in minutes; a faster stream repeats one observation rather than acquiring a new one.`,
     };
   }
   return parsed;
 }
 
-async function collectFrame(options: SnapshotOptions): Promise<ModulationFrame> {
+async function collectFrame(
+  options: SnapshotOptions,
+): Promise<
+  ModulationFrame & { producer: ReturnType<typeof producerEnvelope> }
+> {
   const snapshot = await collectSnapshot(options);
-  return buildModulationFrame({
+  const frame = buildModulationFrame({
     generatedAt: snapshot.generatedAt,
     mode: options.mode,
     signals: snapshot.signals,
     sources: snapshot.sources,
     ...(snapshot.cache === undefined ? {} : { cache: snapshot.cache }),
-    masaRecordHref: masaRecordHref(options)
+    masaRecordHref: masaRecordHref(options),
   });
+  return { ...frame, producer: producerEnvelope(snapshot) };
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -414,12 +493,41 @@ function isSnapshotEnvelope(value: unknown): value is SnapshotLike {
     record.sources.every(isPlainObject) &&
     (record.cache === undefined ||
       (Array.isArray(record.cache) && record.cache.every(isPlainObject))) &&
-    (record.mappingRoutes === undefined || isPlainObject(record.mappingRoutes)) &&
+    (record.mappingRoutes === undefined ||
+      isPlainObject(record.mappingRoutes)) &&
     (record.coordinates === undefined || isPlainObject(record.coordinates))
   );
 }
 
 function safeFilenamePart(value: string): string {
-  const safe = value.toLowerCase().replace(/[^a-z0-9_-]+/g, "-").slice(0, 32);
+  const safe = value
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, "-")
+    .slice(0, 32);
   return safe || "local";
 }
+
+// Existing owner middleware and source collection retain the loopback boundary.
+apiRoutes.get("/generation-frame", async (context) => {
+  const parsed = snapshotOptionsFromQuery(context);
+  if ("error" in parsed) return context.json({ error: parsed.error }, 400);
+  const snapshot = await collectSnapshot(parsed.options);
+  context.header("Cache-Control", "no-store");
+  return context.json(buildGenerationFrame(snapshot));
+});
+
+apiRoutes.get("/observation-feed", async (context) => {
+  const parsed = snapshotOptionsFromQuery(context);
+  if ("error" in parsed) return context.json({ error: parsed.error }, 400);
+  const snapshot = await collectSnapshot(parsed.options);
+  const record = await buildSnapshotMatterRecord(snapshot);
+  context.header("Cache-Control", "no-store");
+  return context.json({
+    contract: "cosmo/observation-feed/v1",
+    producer: producerEnvelope(snapshot),
+    source_record: record,
+    relation: { of: "signal" },
+    source_register: "non-acoustic",
+    delivery: "one bounded poll; no durable stream replay",
+  });
+});

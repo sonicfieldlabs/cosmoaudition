@@ -24,6 +24,7 @@ function signal(
     normalized: 0.5,
     timestamp: generatedAt,
     confidence: "low",
+    acquisitionMode: "fixture",
     staleAfterSeconds: 300,
     ...values
   };
@@ -108,7 +109,7 @@ describe("COSMOAUDITION MASA snapshot adapter", () => {
     });
     expect(record.extensions["cosmo:adapter"]).toMatchObject({
       package: "@cosmoaudition/masa",
-      version: "0.2.0"
+      version: "0.2.1"
     });
     expect(
       record.observations.every(
@@ -189,7 +190,7 @@ describe("COSMOAUDITION MASA snapshot adapter", () => {
     ).toBe(true);
   });
 
-  it("makes missing, held, and stale-uncertainty decisions explicit", async () => {
+  it("makes missing, held, and stale-refusal decisions explicit", async () => {
     const snapshot = fixtureSnapshot();
     const quakeMapping = mappingCatalog.find(
       (mapping) => mapping.signalId === "earthquake_count_1h"
@@ -230,12 +231,12 @@ describe("COSMOAUDITION MASA snapshot adapter", () => {
     );
     expect(stale).toEqual(
       expect.objectContaining({
-        status: "uncertainty",
+        status: "refused",
         reason: "stale-input",
         confidence: "stale"
       })
     );
-    expect(stale.outputValue).toBeTypeOf("number");
+    expect(stale.outputValue).toBeNull();
     expect(held).toMatchObject({
       status: "held",
       reason: "missing-value",
@@ -262,13 +263,8 @@ describe("COSMOAUDITION MASA snapshot adapter", () => {
         | undefined;
       return frame?.decisionReason === "stale-input";
     });
-    expect(staleControl?.extensions["cosmo:controlFrame"]).toMatchObject({
-      decisionStatus: "uncertainty",
-      decisionReason: "stale-input",
-      confidence: "stale",
-      scheduledOnly: true,
-      completionSemantics: "scheduled-not-heard"
-    });
+    expect(staleControl).toBeUndefined();
+    expect(embeddedEvents(record).some(event => event.effectClass === "map" && event.finalStatus === "refused" && event.outputs.length === 0)).toBe(true);
     expect(
       record.observations.some(
         (observation) =>
@@ -281,7 +277,7 @@ describe("COSMOAUDITION MASA snapshot adapter", () => {
   it("keeps future forecast validity separate from MASA observation time", async () => {
     const snapshot: SnapshotLike = {
       generatedAt,
-      mode: "fixture",
+      mode: "live",
       sources: [],
       cache: [],
       signals: [
@@ -307,18 +303,9 @@ describe("COSMOAUDITION MASA snapshot adapter", () => {
     );
 
     expect(temporalDiagnostics).toEqual([]);
-    expect(raw?.observedAt).toBe(generatedAt);
-    expect(raw?.freshness).toMatchObject({
-      observedAt: generatedAt,
-      retrievedAt: generatedAt,
-      ageSeconds: 0
-    });
-    expect(raw?.extensions).toMatchObject({
-      "cosmo:sourceTimestamp": "2026-07-30T06:00:00.000Z",
-      "cosmo:sourceTimestampRole": "forecast-valid-at",
-      "cosmo:timestampDecision":
-        "used-snapshot-generatedAt-as-observedAt-because-source-timestamp-is-a-future-validity-or-event-time"
-    });
+    expect(raw?.observedAt).toBe("2026-07-30T06:00:00.000Z");
+    expect(raw?.freshness).toMatchObject({ status: "unknown", reason: "future-source-time" });
+    expect(raw?.extensions["cosmo:effectiveFreshness"]).toMatchObject({ mappingAllowed: false, sourceTimestamp: "2026-07-30T06:00:00.000Z" });
   });
 
   it("keeps fixture attribution when an archived fixture observation is replayed", async () => {
@@ -409,3 +396,18 @@ function eventRank(effectClass: string): number {
   if (effectClass === "map") return 2;
   return 3;
 }
+
+
+it("retains exact bounded observation series in the MASA source account", async () => {
+  const snapshot = fixtureSnapshot();
+  snapshot.series = [{
+    contract: "cosmo/observation-series/v1", sourceId: "usgs_earthquakes", seriesId: "test-series",
+    unit: "index", fetchedAt: generatedAt, sourceUrl: "https://example.org/fixture",
+    mode: "fixture", status: "available", cadence: "latest-point", normalizationVersion: "0.3.0",
+    provenanceHash: "a".repeat(64), attribution: "Synthetic test", coverage: "One fixture point",
+    points: [{timestamp: generatedAt, intervalEnd: null, value: 5, status: "reported", quality: "fixture"}]
+  }];
+  const record = await buildSnapshotMatterRecord(snapshot);
+  expect(record.extensions["cosmo:observation-series"]).toEqual(snapshot.series);
+  expect(validateSnapshotMatterRecord(record).valid).toBe(true);
+});

@@ -1,3 +1,4 @@
+import { evaluateSignalFreshness } from "@cosmoaudition/core";
 import {
   type ChangeEvent,
   type CSSProperties,
@@ -394,9 +395,10 @@ function mergeRecentTriggers(
 
 function modulatedMaterialControls(
   base: MaterialControls,
-  normalized: number | null | undefined,
+  signal: ObservedSignal | null | undefined,
   depth: number
 ): MaterialControls {
+  const normalized = signal && evaluateSignalFreshness(signal).mappingAllowed ? signal.normalized : null;
   if (normalized === null || normalized === undefined || !Number.isFinite(normalized)) {
     return base;
   }
@@ -505,10 +507,10 @@ export function CosmoauditionApp() {
     () =>
       modulatedMaterialControls(
         materialControls,
-        selectedSignal?.normalized,
+        selectedSignal,
         materialModulationDepth
       ),
-    [materialControls, materialModulationDepth, selectedSignal?.normalized]
+    [materialControls, materialModulationDepth, selectedSignal]
   );
   const modulationDefinitions = useMemo(
     () =>
@@ -754,7 +756,7 @@ export function CosmoauditionApp() {
       engine.setMaterialControl(
         modulatedMaterialControls(
           runtime.materialControls,
-          activeSignal?.normalized,
+          activeSignal,
           runtime.materialModulationDepth
         )
       );
@@ -1089,7 +1091,7 @@ export function CosmoauditionApp() {
         engine.setMaterialControl(
           modulatedMaterialControls(
             runtime.materialControls,
-            signal?.normalized,
+            signal,
             runtime.materialModulationDepth
           )
         );
@@ -1138,7 +1140,7 @@ export function CosmoauditionApp() {
       engineRef.current?.setMaterialControl(
         modulatedMaterialControls(
           next,
-          signal?.normalized,
+          signal,
           runtimeRef.current.materialModulationDepth
         )
       );
@@ -1158,7 +1160,7 @@ export function CosmoauditionApp() {
       engineRef.current.setMaterialControl(
         modulatedMaterialControls(
           runtimeRef.current.materialControls,
-          signal.normalized,
+          signal,
           runtimeRef.current.materialModulationDepth
         )
       );
@@ -1178,7 +1180,7 @@ export function CosmoauditionApp() {
       engineRef.current.setMaterialControl(
         modulatedMaterialControls(
           runtimeRef.current.materialControls,
-          signal?.normalized,
+          signal,
           value
         )
       );
@@ -1200,7 +1202,7 @@ export function CosmoauditionApp() {
     engine.setMaterialControl(
       modulatedMaterialControls(
         runtimeRef.current.materialControls,
-        signal?.normalized,
+        signal,
         runtimeRef.current.materialModulationDepth
       )
     );
@@ -1310,6 +1312,7 @@ export function CosmoauditionApp() {
     const replayed: ApiSnapshot = {
       ...entry.snapshot,
       mode: "archive",
+      signals: entry.snapshot.signals.map(signal => ({ ...signal, acquisitionMode: "archive" })),
       originMode: entry.snapshot.originMode ?? entry.snapshot.mode
     };
     snapshotRef.current = replayed;

@@ -1,6 +1,6 @@
 {
   "name": "@cosmoaudition/masa",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -14,10 +14,10 @@
   },
   "dependencies": {
     "@cosmoaudition/core": "workspace:*",
-    "@sonicfield/masa": "file:../../vendor/masa/sonicfield-masa-0.2.0.tgz",
-    "@sonicfield/masa-validator": "file:../../vendor/masa/sonicfield-masa-validator-0.2.0.tgz"
+    "@sonicfield/masa": "file:../../vendor/masa-0.2.2/sonicfield-masa-0.2.2.tgz",
+    "@sonicfield/masa-validator": "file:../../vendor/masa-0.2.2/sonicfield-masa-validator-0.2.2.tgz"
   },
   "devDependencies": {
-    "vitest": "^3.2.7"
+    "vitest": "^4.1.11"
   }
 }

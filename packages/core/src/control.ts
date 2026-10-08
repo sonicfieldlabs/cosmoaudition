@@ -1,3 +1,4 @@
+import { evaluateSignalFreshness, type FreshnessContext } from "./freshness";
 import { linearNormalize, logNormalize } from "./normalize";
 import type {
   Confidence,
@@ -18,6 +19,9 @@ export type ControlDecisionReason =
   | "mapped"
   | "low-confidence"
   | "stale-input"
+  | "future-input"
+  | "archive-input"
+  | "unknown-freshness"
   | "missing-signal"
   | "missing-value"
   | "source-error"
@@ -53,7 +57,7 @@ export interface ControlDecision {
   epistemicNote: string;
 }
 
-export interface ExecuteMappingOptions {
+export interface ExecuteMappingOptions extends FreshnessContext {
   previousOutput?: number | null;
   /** Override the mapping's declared MASA missing-data policy for one call. */
   missingData?: MissingDataPolicy;
@@ -61,7 +65,7 @@ export interface ExecuteMappingOptions {
   amount?: number;
 }
 
-export interface ExecuteMappingsOptions {
+export interface ExecuteMappingsOptions extends FreshnessContext {
   /** Prior values are keyed by mapping id, not by target. */
   previousOutputs?: ReadonlyMap<string, number>;
   missingData?: MissingDataPolicy;
@@ -372,6 +376,10 @@ export function executeMapping(
     );
   }
 
+  if ((options.mode ?? signal?.acquisitionMode) === "archive") {
+    return decisionWithoutOutput(mapping, signal, previousOutput, "refused", "archive-input");
+  }
+
   const missingData = options.missingData ?? mapping.missingData;
   if (!signal) {
     return decideMissing(
@@ -393,6 +401,14 @@ export function executeMapping(
     );
   }
 
+  const freshness = evaluateSignalFreshness(signal, options);
+  if (!freshness.mappingAllowed) {
+    const reason = freshness.reason === "archive" ? "archive-input"
+      : freshness.reason === "future-source-time" ? "future-input"
+      : freshness.status === "stale" || freshness.status === "expired" ? "stale-input" : "unknown-freshness";
+    return decisionWithoutOutput(mapping, signal, previousOutput, "refused", reason);
+  }
+
   if (signal.value === null) {
     return decideMissing(
       mapping,
@@ -402,6 +418,7 @@ export function executeMapping(
       "missing-value"
     );
   }
+
 
   if (!Number.isFinite(signal.value)) {
     return decisionWithoutOutput(
@@ -424,16 +441,11 @@ export function executeMapping(
         "invalid-input"
       );
     }
-    const uncertain = signal.confidence === "low" || signal.confidence === "stale";
+    const uncertain = signal.confidence === "low";
     return {
       ...baseDecision(mapping, signal, previousOutput),
       status: uncertain ? "uncertainty" : "applied",
-      reason:
-        signal.confidence === "low"
-          ? "low-confidence"
-          : signal.confidence === "stale"
-            ? "stale-input"
-            : "mapped",
+      reason: uncertain ? "low-confidence" : "mapped",
       rawNormalizedInput: categorical.rawNormalized,
       normalizedInput: categorical.normalized,
       mappingAmount: amount,
@@ -466,16 +478,11 @@ export function executeMapping(
     );
   }
 
-  const uncertain = signal.confidence === "low" || signal.confidence === "stale";
+  const uncertain = signal.confidence === "low";
   return {
     ...baseDecision(mapping, signal, previousOutput),
     status: uncertain ? "uncertainty" : "applied",
-    reason:
-      signal.confidence === "low"
-        ? "low-confidence"
-        : signal.confidence === "stale"
-          ? "stale-input"
-          : "mapped",
+    reason: uncertain ? "low-confidence" : "mapped",
     rawNormalizedInput,
     normalizedInput,
     mappingAmount: amount,
@@ -494,6 +501,8 @@ export function executeMappings(
     const previousOutput = options.previousOutputs?.get(mapping.id);
     const amount = options.mappingAmounts?.get(mapping.id);
     return executeMapping(mapping, signalsById.get(mapping.signalId), {
+      ...(options.now === undefined ? {} : { now: options.now }),
+      ...(options.mode === undefined ? {} : { mode: options.mode }),
       ...(previousOutput === undefined ? {} : { previousOutput }),
       ...(options.missingData ? { missingData: options.missingData } : {}),
       enabled: !options.disabledMappingIds?.has(mapping.id),

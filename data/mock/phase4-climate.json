@@ -1,0 +1,2533 @@
+{
+  "totals": {
+    "gas": "co2e_100yr",
+    "emissionsQuantity": 6256116430.974631,
+    "start": "2025-01-01",
+    "end": "2025-01-31"
+  },
+  "location": {
+    "name": "Global"
+  },
+  "rankings": [
+    {
+      "rank": 1,
+      "country": "CHN",
+      "name": "China",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1593041007.7114859,
+      "emissionsPerCapita": 1.129072121267178,
+      "percentage": 25.463736573446543,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 2,
+      "country": "USA",
+      "name": "United States of America",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 674457016.961239,
+      "emissionsPerCapita": 2.0345545087250967,
+      "percentage": 10.780761905611886,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 3,
+      "country": "IND",
+      "name": "India",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 438845227.72653157,
+      "emissionsPerCapita": 0.31800277774228347,
+      "percentage": 7.014658895313502,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 4,
+      "country": "RUS",
+      "name": "Russian Federation",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 286821084.7515957,
+      "emissionsPerCapita": 1.9903744901018463,
+      "percentage": 4.584650684113183,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 5,
+      "country": "BRA",
+      "name": "Brazil",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 163871016.80406296,
+      "emissionsPerCapita": 0.7709421924675325,
+      "percentage": 2.6193728747233966,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 6,
+      "country": "IDN",
+      "name": "Indonesia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 150633686.83501592,
+      "emissionsPerCapita": 0.5507154602746939,
+      "percentage": 2.4077826635261155,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 7,
+      "country": "MMR",
+      "name": "Myanmar",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 147117878.82683405,
+      "emissionsPerCapita": 2.7038859736692635,
+      "percentage": 2.3515847323179497,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 8,
+      "country": "JPN",
+      "name": "Japan",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 119528278.13006303,
+      "emissionsPerCapita": 0.9498733127461415,
+      "percentage": 1.9105826985295074,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 9,
+      "country": "BOL",
+      "name": "Bolivia (Plurinational State of)",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 118521431.71551602,
+      "emissionsPerCapita": 10.153442753848724,
+      "percentage": 1.894488905748382,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 10,
+      "country": "IRN",
+      "name": "Iran (Islamic Republic of)",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 114227148.81353506,
+      "emissionsPerCapita": 1.3599611007072827,
+      "percentage": 1.8258475537313454,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 11,
+      "country": "AUS",
+      "name": "Australia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 104815201.16037205,
+      "emissionsPerCapita": 4.0794812571080215,
+      "percentage": 1.6754036200704634,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 12,
+      "country": "CAN",
+      "name": "Canada",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 88602757.52324042,
+      "emissionsPerCapita": 2.329370937023668,
+      "percentage": 1.4162581291575662,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 13,
+      "country": "SAU",
+      "name": "Saudi Arabia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 80884543.34166755,
+      "emissionsPerCapita": 2.3233426881784647,
+      "percentage": 1.2928874363846625,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 14,
+      "country": "MEX",
+      "name": "Mexico",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 73319992.54331045,
+      "emissionsPerCapita": 0.5686684790117718,
+      "percentage": 1.1719729540245791,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 15,
+      "country": "DEU",
+      "name": "Germany",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 69949819.12286739,
+      "emissionsPerCapita": 0.8411386061945815,
+      "percentage": 1.118102898094082,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 16,
+      "country": "KOR",
+      "name": "Republic of Korea",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 61980689.600596726,
+      "emissionsPerCapita": 1.1957019026900606,
+      "percentage": 0.9907214848771739,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 17,
+      "country": "NGA",
+      "name": "Nigeria",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 60828238.68850433,
+      "emissionsPerCapita": 0.29508276199517336,
+      "percentage": 0.9723002977907812,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 18,
+      "country": "TUR",
+      "name": "Turkey",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 59512883.505947985,
+      "emissionsPerCapita": 0.7056383906398678,
+      "percentage": 0.9512751906485308,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 19,
+      "country": "THA",
+      "name": "Thailand",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 54689835.52972689,
+      "emissionsPerCapita": 0.7835222459486576,
+      "percentage": 0.8741818687860775,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 20,
+      "country": "VNM",
+      "name": "Viet Nam",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 52222858.58347848,
+      "emissionsPerCapita": 0.53650728183991,
+      "percentage": 0.8347488279616746,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 21,
+      "country": "CAF",
+      "name": "Central African Republic",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 50476823.88740197,
+      "emissionsPerCapita": 10.45119883443621,
+      "percentage": 0.8068395856171471,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 22,
+      "country": "ZAF",
+      "name": "South Africa",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 49642003.08905411,
+      "emissionsPerCapita": 0.83701061495464,
+      "percentage": 0.793495511740667,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 23,
+      "country": "VEN",
+      "name": "Venezuela (Bolivarian Republic of)",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 46671241.970478915,
+      "emissionsPerCapita": 1.6412763934179682,
+      "percentage": 0.7460098047313367,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 24,
+      "country": "ARG",
+      "name": "Argentina",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 45025809.95077161,
+      "emissionsPerCapita": 0.9922657980423065,
+      "percentage": 0.7197086315057136,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 25,
+      "country": "PAK",
+      "name": "Pakistan",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 44957931.12799511,
+      "emissionsPerCapita": 0.20352870977668805,
+      "percentage": 0.7186236321530733,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 26,
+      "country": "GBR",
+      "name": "United Kingdom of Great Britain and Northern Ireland",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 40082616.359851524,
+      "emissionsPerCapita": 0.5963317955015316,
+      "percentage": 0.6406948592164726,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 27,
+      "country": "COD",
+      "name": "Democratic Republic of the Congo",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 40009992.19294566,
+      "emissionsPerCapita": 0.4467325254631522,
+      "percentage": 0.6395340085880173,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 28,
+      "country": "KAZ",
+      "name": "Kazakhstan",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 39673000.38144442,
+      "emissionsPerCapita": 2.1153924287499075,
+      "percentage": 0.6341474110842886,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 29,
+      "country": "FRA",
+      "name": "France",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 39193033.6256983,
+      "emissionsPerCapita": 0.5816724122819862,
+      "percentage": 0.6264754509946432,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 30,
+      "country": "MYS",
+      "name": "Malaysia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 38457346.023057856,
+      "emissionsPerCapita": 1.1882020762362357,
+      "percentage": 0.6147159575332047,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 31,
+      "country": "ETH",
+      "name": "Ethiopia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 37971248.775711216,
+      "emissionsPerCapita": 0.3302893645521749,
+      "percentage": 0.6069460054757282,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 32,
+      "country": "SSD",
+      "name": "South Sudan",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 37768029.37297726,
+      "emissionsPerCapita": 3.374034637874229,
+      "percentage": 0.603697673943281,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 33,
+      "country": "KHM",
+      "name": "Cambodia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 36595402.21823291,
+      "emissionsPerCapita": 2.188854937198761,
+      "percentage": 0.5849539825864744,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 34,
+      "country": "POL",
+      "name": "Poland",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 36363305.410504036,
+      "emissionsPerCapita": 0.9594775125221816,
+      "percentage": 0.5812440642962754,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 35,
+      "country": "ARE",
+      "name": "United Arab Emirates",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 34996821.871154316,
+      "emissionsPerCapita": 3.538463749813386,
+      "percentage": 0.5594017032336819,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 36,
+      "country": "IRQ",
+      "name": "Iraq",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 33918543.20929095,
+      "emissionsPerCapita": 0.8432728119702285,
+      "percentage": 0.5421661118926271,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 37,
+      "country": "ITA",
+      "name": "Italy",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 32951779.99340219,
+      "emissionsPerCapita": 0.5542816176384749,
+      "percentage": 0.5267130232783835,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 38,
+      "country": "EGY",
+      "name": "Egypt",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 32395607.122834384,
+      "emissionsPerCapita": 0.3165661417190696,
+      "percentage": 0.5178229574251628,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 39,
+      "country": "DZA",
+      "name": "Algeria",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 31517370.450218063,
+      "emissionsPerCapita": 0.7187370765666409,
+      "percentage": 0.5037849087042648,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 40,
+      "country": "COL",
+      "name": "Colombia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 28979655.098507173,
+      "emissionsPerCapita": 0.5695364102889131,
+      "percentage": 0.4632211599359969,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 41,
+      "country": "ESP",
+      "name": "Spain",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 28485475.858947452,
+      "emissionsPerCapita": 0.6014235555703327,
+      "percentage": 0.45532202242773384,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 42,
+      "country": "BGD",
+      "name": "Bangladesh",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 28344712.496145193,
+      "emissionsPerCapita": 0.17211013836966765,
+      "percentage": 0.4530720105496728,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 43,
+      "country": "UKR",
+      "name": "Ukraine",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 27365441.3755007,
+      "emissionsPerCapita": 0.6200437686402555,
+      "percentage": 0.4374189911174252,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 44,
+      "country": "TZA",
+      "name": "United Republic of Tanzania",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 27267047.215878442,
+      "emissionsPerCapita": 0.45647286281110694,
+      "percentage": 0.43584622371918597,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 45,
+      "country": "UNK",
+      "name": "Unknown",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 26220451.792122055,
+      "emissionsPerCapita": 0,
+      "percentage": 0.4191170685747166,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 46,
+      "country": "CMR",
+      "name": "Cameroon",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 25069117.763424516,
+      "emissionsPerCapita": 0.9443700066957518,
+      "percentage": 0.40071373415150835,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 47,
+      "country": "TWN",
+      "name": "Taiwan",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 23784891.014841065,
+      "emissionsPerCapita": 0,
+      "percentage": 0.38018619501836304,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 48,
+      "country": "UZB",
+      "name": "Uzbekistan",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 23529644.8552164,
+      "emissionsPerCapita": 0.6873571654404688,
+      "percentage": 0.3761062492174678,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 49,
+      "country": "PHL",
+      "name": "Philippines",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 23094775.07575424,
+      "emissionsPerCapita": 0.2107551232564839,
+      "percentage": 0.3691551353074217,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 50,
+      "country": "TKM",
+      "name": "Turkmenistan",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 21762622.48973092,
+      "emissionsPerCapita": 3.6083481559651394,
+      "percentage": 0.3478615324673642,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 51,
+      "country": "MDG",
+      "name": "Madagascar",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 21507379.045671202,
+      "emissionsPerCapita": 0.7766914986288949,
+      "percentage": 0.34378163007302914,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 52,
+      "country": "LAO",
+      "name": "Lao People's Democratic Republic",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 20542395.76139507,
+      "emissionsPerCapita": 2.8234812241696816,
+      "percentage": 0.3283569925215538,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 53,
+      "country": "QAT",
+      "name": "Qatar",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 20286835.8687883,
+      "emissionsPerCapita": 7.041448587946206,
+      "percentage": 0.32427203190059306,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 54,
+      "country": "SDN",
+      "name": "Sudan",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 19972091.75102756,
+      "emissionsPerCapita": 0.45547148690272493,
+      "percentage": 0.3192410494814934,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 55,
+      "country": "NLD",
+      "name": "Netherlands",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 19292648.71624228,
+      "emissionsPerCapita": 1.1061347198487677,
+      "percentage": 0.3083805892857513,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 56,
+      "country": "MOZ",
+      "name": "Mozambique",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 18686105.706247658,
+      "emissionsPerCapita": 0.597851404283692,
+      "percentage": 0.298685389129444,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 57,
+      "country": "PER",
+      "name": "Peru",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 18575568.820056874,
+      "emissionsPerCapita": 0.5633766705102552,
+      "percentage": 0.29691852805180313,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 58,
+      "country": "KWT",
+      "name": "Kuwait",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 16959387.814809773,
+      "emissionsPerCapita": 3.971229979468696,
+      "percentage": 0.2710849134910952,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 59,
+      "country": "TCD",
+      "name": "Chad",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 16397157.575486755,
+      "emissionsPerCapita": 0.9982526682766943,
+      "percentage": 0.26209802449172553,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 60,
+      "country": "GHA",
+      "name": "Ghana",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 15496235.58975164,
+      "emissionsPerCapita": 0.4987050821784559,
+      "percentage": 0.2476973656217185,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 61,
+      "country": "OMN",
+      "name": "Oman",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 14821229.215789523,
+      "emissionsPerCapita": 2.902354867031381,
+      "percentage": 0.23690782259754944,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 62,
+      "country": "CHL",
+      "name": "Chile",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 12418556.228352638,
+      "emissionsPerCapita": 0.6496348846339062,
+      "percentage": 0.1985026392230678,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 63,
+      "country": "LBY",
+      "name": "Libya",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 12204297.450899899,
+      "emissionsPerCapita": 1.7761297775656728,
+      "percentage": 0.19507785038135245,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 64,
+      "country": "ROU",
+      "name": "Romania",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 11958529.154869484,
+      "emissionsPerCapita": 0.6209797084395854,
+      "percentage": 0.1911494021380686,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 65,
+      "country": "MNG",
+      "name": "Mongolia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 11669284.064505257,
+      "emissionsPerCapita": 3.5595621331184826,
+      "percentage": 0.18652600528227886,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 66,
+      "country": "BEL",
+      "name": "Belgium",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 11632642.377397725,
+      "emissionsPerCapita": 1.0076576171094942,
+      "percentage": 0.18594031146548679,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 67,
+      "country": "GIN",
+      "name": "Guinea",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 11023977.430652972,
+      "emissionsPerCapita": 0.839423744063941,
+      "percentage": 0.17621119351411374,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 68,
+      "country": "MAR",
+      "name": "Morocco",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 10844870.448710985,
+      "emissionsPerCapita": 0.29381486047192745,
+      "percentage": 0.17334828352965098,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 69,
+      "country": "UGA",
+      "name": "Uganda",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 10809040.324196113,
+      "emissionsPerCapita": 0.23630966363210495,
+      "percentage": 0.17277556201926678,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 70,
+      "country": "CIV",
+      "name": "C\u00f4te d'Ivoire",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 10803729.817188274,
+      "emissionsPerCapita": 0.40956923139167645,
+      "percentage": 0.17269067697810056,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 71,
+      "country": "BLR",
+      "name": "Belarus",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 10328240.55600616,
+      "emissionsPerCapita": 1.1010973783241278,
+      "percentage": 0.16509028676112952,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 72,
+      "country": "AGO",
+      "name": "Angola",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 10309600.147912947,
+      "emissionsPerCapita": 0.3136833226064166,
+      "percentage": 0.16479233181897207,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 73,
+      "country": "CZE",
+      "name": "Czechia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 10282210.269406276,
+      "emissionsPerCapita": 0.9611466397671642,
+      "percentage": 0.16435452221601998,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 74,
+      "country": "PRK",
+      "name": "Democratic People's Republic of Korea",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 10210073.860663593,
+      "emissionsPerCapita": 0.39606451501605455,
+      "percentage": 0.1632014680882942,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 75,
+      "country": "KEN",
+      "name": "Kenya",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 10033837.170403305,
+      "emissionsPerCapita": 0.18660209387541876,
+      "percentage": 0.16038443787146955,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 76,
+      "country": "NPL",
+      "name": "Nepal",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 9715990.210498378,
+      "emissionsPerCapita": 0.3334610369982319,
+      "percentage": 0.15530385851506184,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 77,
+      "country": "SGP",
+      "name": "Singapore",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 9490880.723951997,
+      "emissionsPerCapita": 1.669223159342552,
+      "percentage": 0.15170562806283044,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 78,
+      "country": "ECU",
+      "name": "Ecuador",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 9059252.035566024,
+      "emissionsPerCapita": 0.5134739685500148,
+      "percentage": 0.14480632091041018,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 79,
+      "country": "NOR",
+      "name": "Norway",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 8966765.338546276,
+      "emissionsPerCapita": 1.6668476642323415,
+      "percentage": 0.14332798050482187,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 80,
+      "country": "MLI",
+      "name": "Mali",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 8838324.216465337,
+      "emissionsPerCapita": 0.43644248016972226,
+      "percentage": 0.1412749317245112,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 81,
+      "country": "ISR",
+      "name": "Israel",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 8541889.253295166,
+      "emissionsPerCapita": 0.9269448246134243,
+      "percentage": 0.136536609373244,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 82,
+      "country": "AZE",
+      "name": "Azerbaijan",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 8506751.219731739,
+      "emissionsPerCapita": 0.8428266360555609,
+      "percentage": 0.13597495049187383,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 83,
+      "country": "PRY",
+      "name": "Paraguay",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 8385609.2944991775,
+      "emissionsPerCapita": 1.1756851067572345,
+      "percentage": 0.13403857468159036,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 84,
+      "country": "PNG",
+      "name": "Papua New Guinea",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 7878262.63667103,
+      "emissionsPerCapita": 0.8805453070244484,
+      "percentage": 0.12592896445572843,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 85,
+      "country": "NZL",
+      "name": "New Zealand",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 7640704.806157956,
+      "emissionsPerCapita": 1.5028036910013092,
+      "percentage": 0.12213175522642282,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 86,
+      "country": "GRC",
+      "name": "Greece",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 7588480.109752713,
+      "emissionsPerCapita": 0.7091668984072148,
+      "percentage": 0.1212969770220615,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 87,
+      "country": "SEN",
+      "name": "Senegal",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 7491221.231580693,
+      "emissionsPerCapita": 0.44739922058803955,
+      "percentage": 0.11974235636809667,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 88,
+      "country": "PRT",
+      "name": "Portugal",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 7296653.484299297,
+      "emissionsPerCapita": 0.7086137794098442,
+      "percentage": 0.11663231598716525,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 89,
+      "country": "AUT",
+      "name": "Austria",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 7040677.776630595,
+      "emissionsPerCapita": 0.7895912482943102,
+      "percentage": 0.11254070882970664,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 90,
+      "country": "SYR",
+      "name": "Syrian Arab Republic",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 6760626.833443205,
+      "emissionsPerCapita": 0.386307030269961,
+      "percentage": 0.10806427450695602,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 91,
+      "country": "HUN",
+      "name": "Hungary",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 6703587.2384329215,
+      "emissionsPerCapita": 0.6875369020958471,
+      "percentage": 0.10715253324319253,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 92,
+      "country": "SLE",
+      "name": "Sierra Leone",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 6675425.297224542,
+      "emissionsPerCapita": 0.8368356336666726,
+      "percentage": 0.10670238271420067,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 93,
+      "country": "SWE",
+      "name": "Sweden",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 6515484.203986185,
+      "emissionsPerCapita": 0.6293060997479084,
+      "percentage": 0.10414582714169766,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 94,
+      "country": "FIN",
+      "name": "Finland",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 6287142.215316848,
+      "emissionsPerCapita": 1.1370093722603927,
+      "percentage": 0.1004959272207372,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 95,
+      "country": "IRL",
+      "name": "Ireland",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 6226873.7658553375,
+      "emissionsPerCapita": 1.2489532540345272,
+      "percentage": 0.09953257479393271,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 96,
+      "country": "SRB",
+      "name": "Serbia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 6074533.050657738,
+      "emissionsPerCapita": 0.8804786360848806,
+      "percentage": 0.09709750637923142,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 97,
+      "country": "ZMB",
+      "name": "Zambia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 6057988.609611912,
+      "emissionsPerCapita": 0.32952584360036064,
+      "percentage": 0.09683305412313348,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 98,
+      "country": "BHR",
+      "name": "Bahrain",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 5836208.348952437,
+      "emissionsPerCapita": 3.429869920510746,
+      "percentage": 0.09328803920682822,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 99,
+      "country": "BGR",
+      "name": "Bulgaria",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 5794377.760406527,
+      "emissionsPerCapita": 0.835645403190868,
+      "percentage": 0.0926194041357352,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 100,
+      "country": "LBR",
+      "name": "Liberia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 5560644.519059716,
+      "emissionsPerCapita": 1.0994463503817495,
+      "percentage": 0.08888332850597909,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 101,
+      "country": "GTM",
+      "name": "Guatemala",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 5546126.676928225,
+      "emissionsPerCapita": 0.32898428788470513,
+      "percentage": 0.08865127013092054,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 102,
+      "country": "TUN",
+      "name": "Tunisia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 5358402.842968364,
+      "emissionsPerCapita": 0.45338658402939874,
+      "percentage": 0.08565062530547544,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 103,
+      "country": "BFA",
+      "name": "Burkina Faso",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 5020194.453245946,
+      "emissionsPerCapita": 0.24016302386859834,
+      "percentage": 0.08024458158084276,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 104,
+      "country": "NER",
+      "name": "Niger",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 4933144.358564566,
+      "emissionsPerCapita": 0.20379305734859507,
+      "percentage": 0.07885314176923076,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 105,
+      "country": "COG",
+      "name": "Congo",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 4909209.5923057245,
+      "emissionsPerCapita": 0.8896570757257626,
+      "percentage": 0.0784705599147701,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 106,
+      "country": "HKG",
+      "name": "China, Hong Kong Special Administrative Region",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 4853591.384482818,
+      "emissionsPerCapita": 0.6487197445110559,
+      "percentage": 0.07758153861159332,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 107,
+      "country": "DNK",
+      "name": "Denmark",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 4700438.877333935,
+      "emissionsPerCapita": 0.806056119132534,
+      "percentage": 0.075133494224334,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 108,
+      "country": "DOM",
+      "name": "Dominican Republic",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 4310108.854344861,
+      "emissionsPerCapita": 0.3973218102174264,
+      "percentage": 0.06889431969336599,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 109,
+      "country": "AFG",
+      "name": "Afghanistan",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 4271096.324747201,
+      "emissionsPerCapita": 0.10971688530850059,
+      "percentage": 0.0682707294832397,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 110,
+      "country": "CUB",
+      "name": "Cuba",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 4213138.577644782,
+      "emissionsPerCapita": 0.37196798917212187,
+      "percentage": 0.06734431214843013,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 111,
+      "country": "YEM",
+      "name": "Yemen",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 4139689.6916885446,
+      "emissionsPerCapita": 0.13879481436071228,
+      "percentage": 0.06617027891604678,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 112,
+      "country": "LKA",
+      "name": "Sri Lanka",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 3984066.943296296,
+      "emissionsPerCapita": 0.18176317091547498,
+      "percentage": 0.06368274931027176,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 113,
+      "country": "CHE",
+      "name": "Switzerland",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 3814719.9084797185,
+      "emissionsPerCapita": 0.4416943165780591,
+      "percentage": 0.06097584580735542,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 114,
+      "country": "URY",
+      "name": "Uruguay",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 3739462.640296083,
+      "emissionsPerCapita": 1.0764987116995903,
+      "percentage": 0.05977290674741355,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 115,
+      "country": "TTO",
+      "name": "Trinidad and Tobago",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 3722752.5152795003,
+      "emissionsPerCapita": 2.6600760671411967,
+      "percentage": 0.05950580613953724,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 116,
+      "country": "BEN",
+      "name": "Benin",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 3667910.1817966644,
+      "emissionsPerCapita": 0.3025530212239926,
+      "percentage": 0.05862918668898951,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 117,
+      "country": "ZWE",
+      "name": "Zimbabwe",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 3532163.2708654655,
+      "emissionsPerCapita": 0.237649237654566,
+      "percentage": 0.05645935956973861,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 118,
+      "country": "SVK",
+      "name": "Slovakia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 3415538.128544758,
+      "emissionsPerCapita": 0.6256908541972036,
+      "percentage": 0.05459518163111706,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 119,
+      "country": "JOR",
+      "name": "Jordan",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 3411672.6719895843,
+      "emissionsPerCapita": 0.3343747779594894,
+      "percentage": 0.05453339479262353,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 120,
+      "country": "SOM",
+      "name": "Somalia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 3292495.1309224465,
+      "emissionsPerCapita": 0.20716351614625372,
+      "percentage": 0.05262841840060693,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 121,
+      "country": "PAN",
+      "name": "Panama",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 3284136.117687929,
+      "emissionsPerCapita": 0.7611385172245481,
+      "percentage": 0.0524948049468494,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 122,
+      "country": "GAB",
+      "name": "Gabon",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 2925083.8764902847,
+      "emissionsPerCapita": 1.314214439720525,
+      "percentage": 0.046755585653871695,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 123,
+      "country": "BIH",
+      "name": "Bosnia and Herzegovina",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 2865191.8236541077,
+      "emissionsPerCapita": 0.8733170945798857,
+      "percentage": 0.045798249685192374,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 124,
+      "country": "HND",
+      "name": "Honduras",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 2821307.7213123683,
+      "emissionsPerCapita": 0.284847994116715,
+      "percentage": 0.04509679051597895,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 125,
+      "country": "TJK",
+      "name": "Tajikistan",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 2771765.7880452643,
+      "emissionsPerCapita": 0.2906133180554758,
+      "percentage": 0.044304894556021795,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 126,
+      "country": "PRI",
+      "name": "Puerto Rico",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 2758619.6865827683,
+      "emissionsPerCapita": 0.840648405285195,
+      "percentage": 0.04409476257386417,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 127,
+      "country": "LTU",
+      "name": "Lithuania",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 2720350.872941462,
+      "emissionsPerCapita": 0.973331952098731,
+      "percentage": 0.043483060185273155,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 128,
+      "country": "HRV",
+      "name": "Croatia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 2559754.048256832,
+      "emissionsPerCapita": 0.6324003004824571,
+      "percentage": 0.04091602316707606,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 129,
+      "country": "KGZ",
+      "name": "Kyrgyzstan",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 2437416.9133432806,
+      "emissionsPerCapita": 0.3704337320237816,
+      "percentage": 0.03896054269826879,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 130,
+      "country": "GUY",
+      "name": "Guyana",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 2402641.971565526,
+      "emissionsPerCapita": 3.0546239653548253,
+      "percentage": 0.03840468760571359,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 131,
+      "country": "TGO",
+      "name": "Togo",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 2308590.0292031774,
+      "emissionsPerCapita": 0.2788577568297166,
+      "percentage": 0.036901327759392824,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 132,
+      "country": "MWI",
+      "name": "Malawi",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 2231733.356940679,
+      "emissionsPerCapita": 0.11666171493559074,
+      "percentage": 0.03567282325327504,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 133,
+      "country": "NIC",
+      "name": "Nicaragua",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 2125845.049715288,
+      "emissionsPerCapita": 0.3209038751462043,
+      "percentage": 0.033980266722499375,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 134,
+      "country": "GEO",
+      "name": "Georgia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 2036802.4289908523,
+      "emissionsPerCapita": 0.5471280723511684,
+      "percentage": 0.0325569776627949,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 135,
+      "country": "MRT",
+      "name": "Mauritania",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1967500.1454374897,
+      "emissionsPerCapita": 0.42314925079199117,
+      "percentage": 0.03144922520457273,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 136,
+      "country": "LBN",
+      "name": "Lebanon",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1961728.616914611,
+      "emissionsPerCapita": 0.2874141508952257,
+      "percentage": 0.03135697103081242,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 137,
+      "country": "EST",
+      "name": "Estonia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1865134.1648645035,
+      "emissionsPerCapita": 1.4029060743829,
+      "percentage": 0.02981297080134324,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 138,
+      "country": "CRI",
+      "name": "Costa Rica",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1669305.020918178,
+      "emissionsPerCapita": 0.3276929061497599,
+      "percentage": 0.026682767805491742,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 139,
+      "country": "MDA",
+      "name": "Republic of Moldova",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1645159.010842043,
+      "emissionsPerCapita": 0.6278046746290464,
+      "percentage": 0.026296809354389623,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 140,
+      "country": "LVA",
+      "name": "Latvia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1596837.1860405176,
+      "emissionsPerCapita": 0.8402420617656763,
+      "percentage": 0.025524416044024112,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 141,
+      "country": "BWA",
+      "name": "Botswana",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1533698.9106555711,
+      "emissionsPerCapita": 0.652186854050102,
+      "percentage": 0.024515191294427977,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 142,
+      "country": "GNQ",
+      "name": "Equatorial Guinea",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1518078.197551787,
+      "emissionsPerCapita": 1.0820345175121522,
+      "percentage": 0.024265504235752973,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 143,
+      "country": "NAM",
+      "name": "Namibia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1470692.8831750026,
+      "emissionsPerCapita": 0.5788042120144872,
+      "percentage": 0.02350808044258034,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 144,
+      "country": "SVN",
+      "name": "Slovenia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1421619.7552370627,
+      "emissionsPerCapita": 0.6761828899173108,
+      "percentage": 0.02272367803448298,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 145,
+      "country": "SLV",
+      "name": "El Salvador",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1419394.3046675501,
+      "emissionsPerCapita": 0.2188329200201397,
+      "percentage": 0.022688105637548448,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 146,
+      "country": "BRN",
+      "name": "Brunei Darussalam",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1386139.0434517092,
+      "emissionsPerCapita": 3.168440930165765,
+      "percentage": 0.022156541661993406,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 147,
+      "country": "RWA",
+      "name": "Rwanda",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1277879.553239508,
+      "emissionsPerCapita": 0.09866112824766092,
+      "percentage": 0.02042608329526292,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 148,
+      "country": "ARM",
+      "name": "Armenia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1253988.6333157117,
+      "emissionsPerCapita": 0.4231824531291527,
+      "percentage": 0.020044202296285504,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 149,
+      "country": "GNB",
+      "name": "Guinea-Bissau",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1208701.9041570364,
+      "emissionsPerCapita": 0.6141784209928244,
+      "percentage": 0.019320323038948536,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 150,
+      "country": "JAM",
+      "name": "Jamaica",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1158261.6615651217,
+      "emissionsPerCapita": 0.39115119426641165,
+      "percentage": 0.018514068181826947,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 151,
+      "country": "XKX",
+      "name": "Kosovo",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1075867.184793295,
+      "emissionsPerCapita": 0.6009984648030594,
+      "percentage": 0.017197045430078214,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 152,
+      "country": "BDI",
+      "name": "Burundi",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1075192.5773560086,
+      "emissionsPerCapita": 0.09042236816538868,
+      "percentage": 0.017186262263800385,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 153,
+      "country": "ALB",
+      "name": "Albania",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1046019.9310010494,
+      "emissionsPerCapita": 0.3685960496844791,
+      "percentage": 0.016719956262676066,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 154,
+      "country": "HTI",
+      "name": "Haiti",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1021483.9824617931,
+      "emissionsPerCapita": 0.08958395318494523,
+      "percentage": 0.01632776489587579,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 155,
+      "country": "MKD",
+      "name": "The former Yugoslav Republic of Macedonia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 966581.1412567211,
+      "emissionsPerCapita": 0.46637716939178286,
+      "percentage": 0.015450178268279748,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 156,
+      "country": "CYP",
+      "name": "Cyprus",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 924591.2111851304,
+      "emissionsPerCapita": 0.7657951608384985,
+      "percentage": 0.01477899622531625,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 157,
+      "country": "ERI",
+      "name": "Eritrea",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 907223.8477599726,
+      "emissionsPerCapita": 0,
+      "percentage": 0.01450139008392204,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 158,
+      "country": "MUS",
+      "name": "Mauritius",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 803471.6268485265,
+      "emissionsPerCapita": 0.6347841000904819,
+      "percentage": 0.012842977519894955,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 159,
+      "country": "BHS",
+      "name": "Bahamas",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 766195.0367570047,
+      "emissionsPerCapita": 1.9483761818420047,
+      "percentage": 0.01224713518699076,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 160,
+      "country": "SUR",
+      "name": "Suriname",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 695777.2043036527,
+      "emissionsPerCapita": 1.1860499123877115,
+      "percentage": 0.01112155139662672,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 161,
+      "country": "ISL",
+      "name": "Iceland",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 684746.3923573435,
+      "emissionsPerCapita": 1.868528043369572,
+      "percentage": 0.010945230957772757,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 162,
+      "country": "LUX",
+      "name": "Luxembourg",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 609960.524240069,
+      "emissionsPerCapita": 0.967547812232926,
+      "percentage": 0.009749826924896987,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 163,
+      "country": "REU",
+      "name": "R\u00e9union",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 602720.7648400422,
+      "emissionsPerCapita": 0,
+      "percentage": 0.00963410402427797,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 164,
+      "country": "NCL",
+      "name": "New Caledonia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 583824.9232338578,
+      "emissionsPerCapita": 2.1467308546619277,
+      "percentage": 0.009332066141596802,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 165,
+      "country": "PSE",
+      "name": "State of Palestine",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 558992.2847696146,
+      "emissionsPerCapita": 0.11637746808884003,
+      "percentage": 0.008935132377044491,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 166,
+      "country": "GMB",
+      "name": "Gambia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 513958.639728961,
+      "emissionsPerCapita": 0.21267277525090827,
+      "percentage": 0.008215298506663056,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 167,
+      "country": "FLK",
+      "name": "Falkland Islands (Malvinas)",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 478720.4440737944,
+      "emissionsPerCapita": 0,
+      "percentage": 0.007652038598636107,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 168,
+      "country": "BTN",
+      "name": "Bhutan",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 446397.42378425796,
+      "emissionsPerCapita": 0.5785257665565828,
+      "percentage": 0.007135375895085673,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 169,
+      "country": "LSO",
+      "name": "Lesotho",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 426261.0927831208,
+      "emissionsPerCapita": 0.19897803469578781,
+      "percentage": 0.006813509586756751,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 170,
+      "country": "MNE",
+      "name": "Montenegro",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 378525.6420196498,
+      "emissionsPerCapita": 0.6092418905010571,
+      "percentage": 0.0060504890884947905,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 171,
+      "country": "BLZ",
+      "name": "Belize",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 374053.7320881082,
+      "emissionsPerCapita": 0.9407293178381126,
+      "percentage": 0.005979008482580861,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 172,
+      "country": "SWZ",
+      "name": "Eswatini",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 355460.3379040318,
+      "emissionsPerCapita": 0.30638800885394807,
+      "percentage": 0.0056818050275425445,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 173,
+      "country": "FJI",
+      "name": "Fiji",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 343925.8454166084,
+      "emissionsPerCapita": 0.3836556945181276,
+      "percentage": 0.00549743357898198,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 174,
+      "country": "MTQ",
+      "name": "Martinique",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 336412.9842975208,
+      "emissionsPerCapita": 0,
+      "percentage": 0.005377345322921228,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 175,
+      "country": "MLT",
+      "name": "Malta",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 332892.01299786405,
+      "emissionsPerCapita": 0.6459758233485676,
+      "percentage": 0.005321064859817567,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 176,
+      "country": "DJI",
+      "name": "Djibouti",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 273931.8196221602,
+      "emissionsPerCapita": 0.27725836549132515,
+      "percentage": 0.004378624065656732,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 177,
+      "country": "GLP",
+      "name": "Guadeloupe",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 270272.5392662111,
+      "emissionsPerCapita": 0,
+      "percentage": 0.004320132821187052,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 178,
+      "country": "MDV",
+      "name": "Maldives",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 270083.50232406677,
+      "emissionsPerCapita": 0.4996531302360719,
+      "percentage": 0.004317111187171286,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 179,
+      "country": "BRB",
+      "name": "Barbados",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 265095.8906943456,
+      "emissionsPerCapita": 0.9224865790018673,
+      "percentage": 0.0042373874210817185,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 180,
+      "country": "ZNC",
+      "name": "Turkish Republic of Northern Cyprus",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 258107.2038660986,
+      "emissionsPerCapita": 0,
+      "percentage": 0.004125677754144489,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 181,
+      "country": "CUW",
+      "name": "Cura\u00e7ao",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 245707.88841045153,
+      "emissionsPerCapita": 1.5857544089943756,
+      "percentage": 0.003927482666306021,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 182,
+      "country": "GUM",
+      "name": "Guam",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 224940.90884761183,
+      "emissionsPerCapita": 1.3327225422442535,
+      "percentage": 0.003595535846070701,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 183,
+      "country": "MAC",
+      "name": "China, Macao Special Administrative Region",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 207122.6681941616,
+      "emissionsPerCapita": 0.31897315774147,
+      "percentage": 0.003310722721985759,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 184,
+      "country": "PYF",
+      "name": "French Polynesia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 201010.10238559055,
+      "emissionsPerCapita": 0.7155829122603827,
+      "percentage": 0.0032130172864170223,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 185,
+      "country": "VIR",
+      "name": "United States Virgin Islands",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 173985.4307012719,
+      "emissionsPerCapita": 1.6368936936802323,
+      "percentage": 0.0027810452797817726,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 186,
+      "country": "TLS",
+      "name": "Timor-Leste",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 173873.84772221564,
+      "emissionsPerCapita": 0.13187826823039286,
+      "percentage": 0.0027792616975820584,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 187,
+      "country": "CPV",
+      "name": "Cabo Verde",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 170839.27628274396,
+      "emissionsPerCapita": 0.3072715171599818,
+      "percentage": 0.0027307560236075907,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 188,
+      "country": "ABW",
+      "name": "Aruba",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 163885.27985028175,
+      "emissionsPerCapita": 1.5349950344705408,
+      "percentage": 0.002619600860349562,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 189,
+      "country": "GUF",
+      "name": "French Guiana",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 143988.84666418837,
+      "emissionsPerCapita": 0,
+      "percentage": 0.0023015691643986326,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 190,
+      "country": "SYC",
+      "name": "Seychelles",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 141966.06399762482,
+      "emissionsPerCapita": 1.4418360788692575,
+      "percentage": 0.002269236283626968,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 191,
+      "country": "ATA",
+      "name": "Antarctica",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 136427.91076340506,
+      "emissionsPerCapita": 0,
+      "percentage": 0.0021807124638527735,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 192,
+      "country": "FRO",
+      "name": "Faroe Islands",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 134203.16139984597,
+      "emissionsPerCapita": 2.746406659159848,
+      "percentage": 0.002145151275244707,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 193,
+      "country": "ATG",
+      "name": "Antigua and Barbuda",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 126093.4144231414,
+      "emissionsPerCapita": 1.2876134958657524,
+      "percentage": 0.002015522182401223,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 194,
+      "country": "LCA",
+      "name": "Saint Lucia",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 111387.28218294898,
+      "emissionsPerCapita": 0.6065887315345015,
+      "percentage": 0.001780454110979455,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 195,
+      "country": "CYM",
+      "name": "Cayman Islands",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 110363.29832965686,
+      "emissionsPerCapita": 1.6792954706277672,
+      "percentage": 0.0017640863872551604,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 196,
+      "country": "SXM",
+      "name": "Sint Maarten (Dutch part)",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 106758.58015741396,
+      "emissionsPerCapita": 2.523246990248498,
+      "percentage": 0.0017064672842219176,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 197,
+      "country": "SLB",
+      "name": "Solomon Islands",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 98712.85682358364,
+      "emissionsPerCapita": 0.14371235768736754,
+      "percentage": 0.0015778615681582722,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 198,
+      "country": "BES",
+      "name": "Bonaire, Sint Eustatius and Saba",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 98269.57237540642,
+      "emissionsPerCapita": 0,
+      "percentage": 0.0015707759511773849,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 199,
+      "country": "JEY",
+      "name": "Jersey",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 97286.45129841137,
+      "emissionsPerCapita": 0,
+      "percentage": 0.0015550613926674514,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 200,
+      "country": "ESH",
+      "name": "Western Sahara",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 95021.22785948138,
+      "emissionsPerCapita": 0,
+      "percentage": 0.00151885325197949,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 201,
+      "country": "VUT",
+      "name": "Vanuatu",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 94557.4627289198,
+      "emissionsPerCapita": 0.3078543471558515,
+      "percentage": 0.0015114402644547463,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 202,
+      "country": "GRL",
+      "name": "Greenland",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 85167.15095727911,
+      "emissionsPerCapita": 1.5109399286334044,
+      "percentage": 0.001361342166453431,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 203,
+      "country": "VGB",
+      "name": "British Virgin Islands",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 84634.56536782172,
+      "emissionsPerCapita": 2.7990397647855847,
+      "percentage": 0.001352829128127921,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 204,
+      "country": "TCA",
+      "name": "Turks and Caicos Islands",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 78843.4790141202,
+      "emissionsPerCapita": 2.036352058838788,
+      "percentage": 0.0012602623350127977,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 205,
+      "country": "BMU",
+      "name": "Bermuda",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 76993.47200067963,
+      "emissionsPerCapita": 1.204849099426938,
+      "percentage": 0.0012306911620039163,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 206,
+      "country": "COM",
+      "name": "Comoros",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 73682.0840216647,
+      "emissionsPerCapita": 0.08473149457122535,
+      "percentage": 0.0011777607535700208,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 207,
+      "country": "GRD",
+      "name": "Grenada",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 72825.2040362485,
+      "emissionsPerCapita": 0.6472258377362801,
+      "percentage": 0.0011640640777669025,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 208,
+      "country": "GGY",
+      "name": "Guernsey",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 70688.33126117305,
+      "emissionsPerCapita": 0,
+      "percentage": 0.0011299075399426447,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 209,
+      "country": "KNA",
+      "name": "Saint Kitts and Nevis",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 69485.77628243587,
+      "emissionsPerCapita": 1.3063200534372812,
+      "percentage": 0.0011106854715555667,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 210,
+      "country": "IMN",
+      "name": "Isle of Man",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 67715.50351707461,
+      "emissionsPerCapita": 0.7963531790040762,
+      "percentage": 0.001082388799252659,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 211,
+      "country": "VCT",
+      "name": "Saint Vincent and the Grenadines",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 64191.449706889,
+      "emissionsPerCapita": 0.5785776064867819,
+      "percentage": 0.0010260590641994927,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 212,
+      "country": "GIB",
+      "name": "Gibraltar",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 61861.28442106489,
+      "emissionsPerCapita": 1.8361367849296515,
+      "percentage": 0.0009888128698306148,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 213,
+      "country": "PLW",
+      "name": "Palau",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 61074.643715923565,
+      "emissionsPerCapita": 3.3757817663013245,
+      "percentage": 0.000976238923776053,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 214,
+      "country": "MYT",
+      "name": "Mayotte",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 58970.56628313567,
+      "emissionsPerCapita": 0,
+      "percentage": 0.0009426065984188969,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 215,
+      "country": "MNP",
+      "name": "Northern Mariana Islands",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 58093.81129815793,
+      "emissionsPerCapita": 1.009326603161352,
+      "percentage": 0.0009285922335225398,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 216,
+      "country": "WSM",
+      "name": "Samoa",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 47591.848971919244,
+      "emissionsPerCapita": 0.23986618099853457,
+      "percentage": 0.0007607251159247524,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 217,
+      "country": "DMA",
+      "name": "Dominica",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 42833.48027959241,
+      "emissionsPerCapita": 0.5949838213053356,
+      "percentage": 0.000684665650842426,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 218,
+      "country": "MAF",
+      "name": "Saint Martin (French Part)",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 41514.38272503867,
+      "emissionsPerCapita": 1.0738607497617287,
+      "percentage": 0.0006635807242892249,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 219,
+      "country": "FSM",
+      "name": "Micronesia (Federated States of)",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 38100.460196553715,
+      "emissionsPerCapita": 0.33124786079545226,
+      "percentage": 0.0006090113669866291,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 220,
+      "country": "TON",
+      "name": "Tonga",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 38067.362278311106,
+      "emissionsPerCapita": 0.36015556050134917,
+      "percentage": 0.0006084823180373683,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 221,
+      "country": "MHL",
+      "name": "Marshall Islands",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 34075.88151680426,
+      "emissionsPerCapita": 0.5756644510728157,
+      "percentage": 0.0005446810636082684,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 222,
+      "country": "BLM",
+      "name": "Saint Barth\u00e9lemy",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 31851.68049670505,
+      "emissionsPerCapita": 0,
+      "percentage": 0.0005091286399179582,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 223,
+      "country": "ALA",
+      "name": "\u00c5land Islands",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 29269.517245706316,
+      "emissionsPerCapita": 0,
+      "percentage": 0.0004678544200486764,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 224,
+      "country": "KIR",
+      "name": "Kiribati",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 28802.79926354848,
+      "emissionsPerCapita": 0.24113657438129765,
+      "percentage": 0.00046039423308912643,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 225,
+      "country": "ASM",
+      "name": "American Samoa",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 26857.772518935588,
+      "emissionsPerCapita": 0.48658029456194335,
+      "percentage": 0.0004293042307518477,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 226,
+      "country": "STP",
+      "name": "Sao Tome and Principe",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 26713.528473286846,
+      "emissionsPerCapita": 0.12188997345917771,
+      "percentage": 0.0004269985823957113,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 227,
+      "country": "AND",
+      "name": "Andorra",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 23324.885327892694,
+      "emissionsPerCapita": 0.3018816453490286,
+      "percentage": 0.00037283329978337606,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 228,
+      "country": "SGS",
+      "name": "South Georgia and the South Sandwich Islands",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 20057.1439198213,
+      "emissionsPerCapita": 0,
+      "percentage": 0.000320600553731968,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 229,
+      "country": "AIA",
+      "name": "Anguilla",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 16638.23293512713,
+      "emissionsPerCapita": 0,
+      "percentage": 0.0002659514591632222,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 230,
+      "country": "COK",
+      "name": "Cook Islands",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 15295.764079183282,
+      "emissionsPerCapita": 0,
+      "percentage": 0.00024449295737931744,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 231,
+      "country": "SJM",
+      "name": "Svalbard and Jan Mayen Islands",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 14455.38822947461,
+      "emissionsPerCapita": 0,
+      "percentage": 0.00023106008957737102,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 232,
+      "country": "LIE",
+      "name": "Liechtenstein",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 9947.428913108228,
+      "emissionsPerCapita": 0.2608340696202698,
+      "percentage": 0.00015900325741793352,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 233,
+      "country": "MCO",
+      "name": "Monaco",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 8545.953814370487,
+      "emissionsPerCapita": 0.2177645962279708,
+      "percentage": 0.0001366015787695167,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 234,
+      "country": "SPM",
+      "name": "Saint Pierre and Miquelon",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 8325.215797547604,
+      "emissionsPerCapita": 0,
+      "percentage": 0.00013307322345103206,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 235,
+      "country": "SMR",
+      "name": "San Marino",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 7231.172621171548,
+      "emissionsPerCapita": 0.2130700872523881,
+      "percentage": 0.00011558564647821003,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 236,
+      "country": "IOT",
+      "name": "British Indian Ocean Territory",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 6774.151572413378,
+      "emissionsPerCapita": 0,
+      "percentage": 0.00010828045876630277,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 237,
+      "country": "NRU",
+      "name": "Nauru",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 5861.622768896475,
+      "emissionsPerCapita": 0.5410395762319065,
+      "percentage": 9.36942723743922e-05,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 238,
+      "country": "TUV",
+      "name": "Tuvalu",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 5166.778418547514,
+      "emissionsPerCapita": 0.43815963522282175,
+      "percentage": 8.258763204863483e-05,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 239,
+      "country": "SHN",
+      "name": "Saint Helena",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 4336.437657286335,
+      "emissionsPerCapita": 0,
+      "percentage": 6.931516868541988e-05,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 240,
+      "country": "WLF",
+      "name": "Wallis and Futuna Islands",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 4032.065561692404,
+      "emissionsPerCapita": 0,
+      "percentage": 6.444997637398917e-05,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 241,
+      "country": "MSR",
+      "name": "Montserrat",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 2739.145847765608,
+      "emissionsPerCapita": 0,
+      "percentage": 4.3783485777276055e-05,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 242,
+      "country": "CXR",
+      "name": "Christmas Island",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 2019.0621155235956,
+      "emissionsPerCapita": 0,
+      "percentage": 3.227341015469318e-05,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 243,
+      "country": "PCN",
+      "name": "Pitcairn",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1650.787440806561,
+      "emissionsPerCapita": 0,
+      "percentage": 2.638677618967183e-05,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 244,
+      "country": "NFK",
+      "name": "Norfolk Island",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1562.2543917005912,
+      "emissionsPerCapita": 0,
+      "percentage": 2.497163230475891e-05,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 245,
+      "country": "VAT",
+      "name": "Holy See",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1372.1560838960372,
+      "emissionsPerCapita": 0,
+      "percentage": 2.1933033041110953e-05,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 246,
+      "country": "NIU",
+      "name": "Niue",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 1272.449464101682,
+      "emissionsPerCapita": 0,
+      "percentage": 2.0339286810610858e-05,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 247,
+      "country": "CCK",
+      "name": "Cocos (Keeling) Islands",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 368.8352161272635,
+      "emissionsPerCapita": 0,
+      "percentage": 5.8955938591731604e-06,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 248,
+      "country": "UMI",
+      "name": "United States Minor Outlying Islands",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 233.7432609456929,
+      "emissionsPerCapita": 0,
+      "percentage": 3.736235786604093e-06,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 249,
+      "country": "TKL",
+      "name": "Tokelau",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 213.39423582372112,
+      "emissionsPerCapita": 0,
+      "percentage": 3.4109696994638055e-06,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 250,
+      "country": "ATF",
+      "name": "French Southern Territories",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 50.59947657945174,
+      "emissionsPerCapita": 0,
+      "percentage": 8.08800110063951e-07,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 251,
+      "country": "BVT",
+      "name": "Bouvet Island",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 0,
+      "emissionsPerCapita": 0,
+      "percentage": 0,
+      "emissionsPercentChange": 0
+    },
+    {
+      "rank": 252,
+      "country": "HMD",
+      "name": "Heard Island and McDonald Islands",
+      "gas": "co2e_100yr",
+      "emissionsQuantity": 0,
+      "emissionsPerCapita": 0,
+      "percentage": 0,
+      "emissionsPercentChange": 0
+    }
+  ]
+}

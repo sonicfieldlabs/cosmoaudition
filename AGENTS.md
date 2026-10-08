@@ -13,7 +13,7 @@ This repository holds Cosmoaudition System, a modulation framework and local ins
 Only what the system needs to run, be verified, and be understood:
 
 - source under `apps/` and `packages/`, plus the fixtures in `data/mock/` that make fixture mode reproducible;
-- the vendored MASA release under `vendor/masa/` with its checksums;
+- the reviewed MASA tooling candidate under `vendor/masa-0.2.2/` with checksums and provenance; the historical release remains under `vendor/masa/` outside new build archives;
 - current specifications and operator documentation under `docs/`;
 - scripts and test suites.
 

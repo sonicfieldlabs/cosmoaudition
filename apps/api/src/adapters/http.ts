@@ -1,6 +1,7 @@
 import { BlockList, isIP } from "node:net";
 
 const DEFAULT_MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
+const providerBackoff = new Map<string, number>();
 const providerTails = new Map<string, Promise<unknown>>();
 
 async function cancelResponseBody(response: Response): Promise<void> {
@@ -24,9 +25,9 @@ async function runSerialized<T>(
   }
 }
 
-async function boundedJson(response: Response, maxBytes: number): Promise<unknown> {
+async function boundedJson(response: Response, maxBytes: number, format: "json" | "text" = "json"): Promise<unknown> {
   const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
-  if (contentType && !contentType.includes("json")) {
+  if (format === "json" && contentType && !contentType.includes("json")) {
     await cancelResponseBody(response);
     throw new Error(`Unexpected response content type: ${contentType.split(";")[0]}.`);
   }
@@ -70,7 +71,7 @@ async function boundedJson(response: Response, maxBytes: number): Promise<unknow
     throw new Error("Provider response is not valid UTF-8 JSON.");
   }
   try {
-    return JSON.parse(text) as unknown;
+    return format === "text" ? text : JSON.parse(text) as unknown;
   } catch {
     throw new Error("Provider response is not valid JSON.");
   }
@@ -200,6 +201,7 @@ export async function fetchJson(
     headers?: Record<string, string>;
     maxBytes?: number;
     concurrencyKey?: string;
+    format?: "json" | "text";
   }
 ): Promise<unknown> {
   if (
@@ -216,6 +218,8 @@ export async function fetchJson(
   assertPublicProviderUrl(url);
 
   return runSerialized(options.concurrencyKey, async () => {
+    const provider = new URL(url).hostname;
+    if ((providerBackoff.get(provider) ?? 0) > Date.now()) throw new Error("HTTP 429 provider backoff active");
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), options.timeoutMs);
 
@@ -245,12 +249,17 @@ export async function fetchJson(
         response = await fetch(currentUrl, init);
       }
 
+      if (response.status === 429) {
+        const retry = response.headers.get("retry-after") ?? "60";
+        const seconds = /^\d+$/.test(retry) ? Number(retry) : (Date.parse(retry) - Date.now()) / 1000;
+        providerBackoff.set(provider, Date.now() + Math.min(3600, Math.max(60, Number.isFinite(seconds) ? seconds : 60)) * 1000);
+      }
       if (!response.ok) {
         await cancelResponseBody(response);
         throw new Error(`HTTP ${response.status}`);
       }
 
-      return await boundedJson(response, maxBytes);
+      return await boundedJson(response, maxBytes, options.format);
     } finally {
       clearTimeout(timeout);
     }

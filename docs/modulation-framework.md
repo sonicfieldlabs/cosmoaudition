@@ -15,7 +15,7 @@ Every transport carries the same document, a **ModulationFrame**:
 | `frameId`, `generatedAt` | identity and time of this frame |
 | `acquisitionMode` | `live`, `fixture`, or `archive` — how this observation was obtained |
 | `originMode` | for a replay, the mode it was originally acquired in |
-| `signalCatalog` | `cosmo/signal-catalog/v0.2`, version `0.2.0`, and the `/api/signals` route |
+| `signalCatalog` | `cosmo/signal-catalog/v0.2`, version `0.3.0`, and the `/api/signals` route |
 | `signals[]` | value, unit, normalized value, normalization declaration, confidence, staleness, sphere, epistemic status, temporal character, signal kind, and provenance |
 | `controls[]` | every mapping decision: target, status, reason, raw and amount-scaled normalization, output, range, curve, smoothing, missing-data policy, epistemic note |
 | `absences[]` | every target that produced no value, with its reason |
@@ -92,3 +92,50 @@ Deterministic Standard MIDI File export and opt-in live Web MIDI remain availabl
 ## Boundaries that travel with the frame
 
 A control frame records that a parameter was *scheduled*, never that anything was heard. A frame is an authored relation, not the source's voice. Receiving a frame grants no rights over the underlying provider data — which is why licence notes ride along, and why some of them (non-commercial, share-alike, prior-permission) constrain what a downstream work may do.
+
+## Owner client identity (unreleased)
+
+`GET /api/identity` exposes `cosmoaudition/owner-client/v1` with a process-scoped
+`producerId`. Snapshots and modulation frames include `producer`, an envelope
+containing that ID, an SHA-256 `eventId` over the underlying snapshot, acquisition
+mode, namespaced source references and signal/source bindings. Identical snapshot
+content has an identical digest; a changed acquisition timestamp is a new snapshot.
+Fixture and live source namespaces are distinct. This is source/producer identity,
+not a claim of content truth or current external observation.
+
+Client requests must use an approved loopback authority; browser Origin must be
+allowlisted as well. Host query/fragment/userinfo forms and foreign origins are
+refused before source acquisition. CORS alone is not used as request authorization.
+The framework retains its existing status-bearing controls: applied, held, skipped,
+uncertainty and refused are not interchangeable and absent values never become zero.
+Provider health remains operational health; inspect observation freshness separately.
+
+SSE supplies current frames, not a durable replay service. Pair producer identity
+with frame identity, discard an overtaken request, and reacquire after disconnect
+or process restart. `producerId` changes on restart. Do not interpret Last-Event-ID
+as durable retention or let a cached frame become a fresh observation. The separate
+Listening Stack Web application owns disclosure-filtered public journal epochs and
+replay; this owner transport does not publish private events on its behalf.
+
+## Optional timing and audio-rate candidates
+
+`@cosmoaudition/midi-engine` exports `TransportSchedule` with an explicit
+`cosmo/transport-timing/v1` profile. It uses a monotonic software clock, at most
+256 events, a maximum ten-second admission horizon and an explicit late-drop
+tolerance of at most one second. Dispatch, late drop, failure and cancellation
+receipts state `software-dispatch-only`. A caller's device qualification label is
+not measured hardware evidence. Existing MIDI/OSC adapters are not automatically
+rewired or activated by importing this library.
+
+OSC encoding now refuses nonfinite/overflow values and malformed strings rather
+than replacing values with zero. MIDI queue payloads remain explicitly bounded
+bytes. The caller must select and qualify the exact adapter/device, queue servicing
+clock, disconnect behavior, jitter and receiver before claiming physical timing.
+
+`cv-preview.ts` provides an offline normalized Float32 sample buffer from explicit
+ordered points, at 8–96 kHz for at most one second and 256 points. Missing/refused
+controls cannot emit it; held controls need explicit opt-in. Its receipt declares
+unknown voltage calibration and no physical device output. A control-rate queue
+refuses CV output: real CV requires a separately qualified sample clock, DC-capable
+DAC, voltage/calibration/range and device failure policy. No MIDI, OSC, audio or CV
+device was addressed during local qualification.

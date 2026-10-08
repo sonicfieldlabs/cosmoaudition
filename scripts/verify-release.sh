@@ -36,7 +36,7 @@ web_css=(apps/web/dist/assets/*.css)
 (( ${#web_css[@]} > 0 )) || fail "missing built web CSS asset"
 pass "web assets exist"
 
-(cd vendor/masa && shasum -a 256 -c CHECKSUMS.sha256) \
+(cd vendor/masa-0.2.2 && shasum -a 256 -c CHECKSUMS.sha256) \
   >"$TEMP_DIR/masa-checksums.txt" || {
     cat "$TEMP_DIR/masa-checksums.txt" >&2
     fail "vendored MASA checksum verification failed"
@@ -206,17 +206,18 @@ if (( ${#archives[@]} > 0 )); then
     packages/midi-engine/package.json
     packages/ui-system/package.json
     docs/deployment.md
-    vendor/masa/CHECKSUMS.sha256
-    vendor/masa/README.md
-    vendor/masa/sonicfield-masa-0.2.0.tgz
-    vendor/masa/sonicfield-masa-validator-0.2.0.tgz
+    vendor/masa-0.2.2/CHECKSUMS.sha256
+    vendor/masa-0.2.2/README.md
+    vendor/masa-0.2.2/PROVENANCE.json
+    vendor/masa-0.2.2/sonicfield-masa-0.2.2.tgz
+    vendor/masa-0.2.2/sonicfield-masa-validator-0.2.2.tgz
   )
   for required_entry in "${archive_required_files[@]}"; do
     grep -Fxq "$required_entry" "$TEMP_DIR/release-archive-list.txt" ||
       fail "archive missing required file: $required_entry"
   done
-  if grep -E '^vendor/masa/.*\.tgz$' "$TEMP_DIR/release-archive-list.txt" \
-    | grep -v -E '^vendor/masa/sonicfield-masa(-validator)?-0\.2\.0\.tgz$' \
+  if grep -E '^vendor/masa[^/]*/.*\.tgz$' "$TEMP_DIR/release-archive-list.txt" \
+    | grep -v -E '^vendor/masa-0\.2\.2/sonicfield-masa(-validator)?-0\.2\.2\.tgz$' \
     >"$TEMP_DIR/release-archive-extra-masa.txt"; then
     cat "$TEMP_DIR/release-archive-extra-masa.txt" >&2
     fail "archive contains an unexpected MASA package"
@@ -246,13 +247,13 @@ if (( ${#archives[@]} > 0 )); then
     [[ -s "$archive_root/$required_entry" ]] ||
       fail "extracted required file is missing or empty: $required_entry"
   done
-  (cd "$archive_root/vendor/masa" && shasum -a 256 -c CHECKSUMS.sha256) \
+  (cd "$archive_root/vendor/masa-0.2.2" && shasum -a 256 -c CHECKSUMS.sha256) \
     >"$TEMP_DIR/archive-masa-checksums.txt" || {
       cat "$TEMP_DIR/archive-masa-checksums.txt" >&2
       fail "archived MASA artifacts do not match the archived checksums"
     }
   cat "$TEMP_DIR/archive-masa-checksums.txt"
-  pass "archive carries exactly the two verified MASA 0.2.0 packages"
+  pass "archive carries exactly the two verified MASA 0.2.2 tooling packages (protocol 0.2.0)"
 
   unexpected_archive_entry=""
   while IFS= read -r entry; do

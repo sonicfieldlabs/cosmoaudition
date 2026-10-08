@@ -1,6 +1,6 @@
 {
   "name": "@cosmoaudition/api",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -14,7 +14,7 @@
     "@cosmoaudition/core": "workspace:*",
     "@cosmoaudition/masa": "workspace:*",
     "@hono/node-server": "2.1.0",
-    "hono": "^4.13.1"
+    "hono": "^4.13.5"
   },
   "devDependencies": {
     "tsx": "^4.23.11",
