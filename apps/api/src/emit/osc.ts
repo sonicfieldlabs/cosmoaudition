@@ -13,7 +13,11 @@
 
 import { createSocket, type Socket } from "node:dgram";
 
-export type OscArgument = number | string | boolean | { readonly oscInt: number };
+export type OscArgument =
+  | number
+  | string
+  | boolean
+  | { readonly oscInt: number };
 
 function padTo4(length: number): number {
   return (4 - (length % 4)) % 4;
@@ -47,7 +51,10 @@ function encodeArgument(value: OscArgument): { tag: string; bytes: Buffer } {
   const bytes = Buffer.alloc(4);
   // Non-finite values must never reach a consumer as a number; the caller is
   // expected to route absence through the status address instead.
-  bytes.writeFloatBE(Number.isFinite(value) ? value : 0, 0);
+  if (!Number.isFinite(value) || Math.abs(value) > 3.4028234663852886e38) {
+    throw new RangeError("An OSC float must be finite and fit float32.");
+  }
+  bytes.writeFloatBE(value, 0);
   return { tag: "f", bytes };
 }
 
@@ -65,9 +72,19 @@ export function oscInteger(value: number): OscInteger {
 
 export function encodeOscMessage(
   address: string,
-  args: readonly OscArgument[] = []
+  args: readonly OscArgument[] = [],
 ): Buffer {
-  if (!address.startsWith("/")) {
+  if (
+    !address.startsWith("/") ||
+    address.includes("\0") ||
+    address.length > 512 ||
+    args.length > 64 ||
+    args.some(
+      (value) =>
+        typeof value === "string" &&
+        (value.includes("\0") || value.length > 1024),
+    )
+  ) {
     throw new RangeError("An OSC address must begin with '/'.");
   }
   const encoded = args.map(encodeArgument);
@@ -75,7 +92,7 @@ export function encodeOscMessage(
   return Buffer.concat([
     encodeString(address),
     encodeString(typeTags),
-    ...encoded.map((item) => item.bytes)
+    ...encoded.map((item) => item.bytes),
   ]);
 }
 
@@ -90,8 +107,14 @@ export class OscEmitter {
   #closed = false;
 
   constructor(target: OscTarget) {
-    if (!Number.isInteger(target.port) || target.port < 1 || target.port > 65_535) {
-      throw new RangeError("An OSC target port must be an integer inside 1..65535.");
+    if (
+      !Number.isInteger(target.port) ||
+      target.port < 1 ||
+      target.port > 65_535
+    ) {
+      throw new RangeError(
+        "An OSC target port must be an integer inside 1..65535.",
+      );
     }
     this.#target = target;
     // An IPv6 target needs an IPv6 socket; sending to `::1` from a udp4 socket
@@ -108,7 +131,12 @@ export class OscEmitter {
   send(address: string, args: readonly OscArgument[] = []): void {
     if (this.#closed) return;
     const message = encodeOscMessage(address, args);
-    this.#socket.send(message, this.#target.port, this.#target.host, () => undefined);
+    this.#socket.send(
+      message,
+      this.#target.port,
+      this.#target.host,
+      () => undefined,
+    );
   }
 
   close(): void {

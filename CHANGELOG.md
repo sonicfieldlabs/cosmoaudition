@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.0 — 2026-10-08
+
+- Add local report handling, optional GRIB fixtures, and instrument-clock software controls. Hardware and live external sources remain unqualified.
+- Source release only; no package registry publication or service activation.
+
 ## Unreleased — observation freshness
 
 - Prepare application 0.3.1 with build integrity receipts and immutable MASA 0.2.2 tooling. MASA protocol identifiers and the independent snapshot-adapter revision remain unchanged.

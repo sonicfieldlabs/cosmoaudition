@@ -52,3 +52,7 @@ data/snapshots/*
 /*.sqlite3-*
 /*.db
 /docs/audits/
+# Optional offline GRIB tooling: environments and bytecode are local artifacts.
+.venv/
+__pycache__/
+*.py[cod]
