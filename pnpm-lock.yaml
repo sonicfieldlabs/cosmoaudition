@@ -7,10 +7,10 @@ settings:
 overrides:
   '@types/node': 22.20.1
   postcss: 8.5.26
-  fast-uri: 3.1.7
+  fast-uri: 3.1.8
   nanoid: 3.3.18
-  '@sonicfield/masa@0.2.1': file:vendor/masa-0.2.1/sonicfield-masa-0.2.1.tgz
-  '@sonicfield/masa-validator@0.2.1': file:vendor/masa-0.2.1/sonicfield-masa-validator-0.2.1.tgz
+  '@sonicfield/masa@0.2.2': file:vendor/masa-0.2.2/sonicfield-masa-0.2.2.tgz
+  '@sonicfield/masa-validator@0.2.2': file:vendor/masa-0.2.2/sonicfield-masa-validator-0.2.2.tgz
 
 importers:
 
@@ -99,11 +99,11 @@ importers:
         specifier: workspace:*
         version: link:../core
       '@sonicfield/masa':
-        specifier: file:../../vendor/masa-0.2.1/sonicfield-masa-0.2.1.tgz
-        version: file:vendor/masa-0.2.1/sonicfield-masa-0.2.1.tgz
+        specifier: file:../../vendor/masa-0.2.2/sonicfield-masa-0.2.2.tgz
+        version: file:vendor/masa-0.2.2/sonicfield-masa-0.2.2.tgz
       '@sonicfield/masa-validator':
-        specifier: file:../../vendor/masa-0.2.1/sonicfield-masa-validator-0.2.1.tgz
-        version: file:vendor/masa-0.2.1/sonicfield-masa-validator-0.2.1.tgz
+        specifier: file:../../vendor/masa-0.2.2/sonicfield-masa-validator-0.2.2.tgz
+        version: file:vendor/masa-0.2.2/sonicfield-masa-validator-0.2.2.tgz
     devDependencies:
       vitest:
         specifier: ^4.1.11
@@ -533,13 +533,13 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@sonicfield/masa-validator@file:vendor/masa-0.2.1/sonicfield-masa-validator-0.2.1.tgz':
-    resolution: {integrity: sha512-u/lr0wVAUk8qGNNSF9PJ4KTWD97BPAaszJSyqwnsKGUO6jZW8I7z3mxiiSfFVNDdrGtjSIHQmAv21748hKgFqQ==, tarball: file:vendor/masa-0.2.1/sonicfield-masa-validator-0.2.1.tgz}
-    version: 0.2.1
+  '@sonicfield/masa-validator@file:vendor/masa-0.2.2/sonicfield-masa-validator-0.2.2.tgz':
+    resolution: {integrity: sha512-Xvn0MtLQ8wMiiQman3dMwIc2TehQgJ/i79KjlJS+RnZPiVpqmxBlLpAUXnox+lUomP4Fh21L1DnxGjFdz8pe/w==, tarball: file:vendor/masa-0.2.2/sonicfield-masa-validator-0.2.2.tgz}
+    version: 0.2.2
 
-  '@sonicfield/masa@file:vendor/masa-0.2.1/sonicfield-masa-0.2.1.tgz':
-    resolution: {integrity: sha512-C6NoYEiCVhd0HQLFjy6wuu/ItIr1g/g7w7LrbLD1e3NJTT2bmbNaqn3UugGyfriHmjMOuMJgIwLPwBLSFJJ2Vw==, tarball: file:vendor/masa-0.2.1/sonicfield-masa-0.2.1.tgz}
-    version: 0.2.1
+  '@sonicfield/masa@file:vendor/masa-0.2.2/sonicfield-masa-0.2.2.tgz':
+    resolution: {integrity: sha512-iS+6ewjx+iM32j79R7QK0g6qSpRsFlss16172oS1t8cgrSJTD3iJKi4PqZ+M7e4j5pWADg9qM6Hdvz/WqOiTbg==, tarball: file:vendor/masa-0.2.2/sonicfield-masa-0.2.2.tgz}
+    version: 0.2.2
 
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
@@ -683,8 +683,8 @@ packages:
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
 
-  fast-uri@3.1.7:
-    resolution: {integrity: sha512-dOvZVzjdZdz7phd9v6jCbwxrBW3fK6n8Rc0CtdmM4bumzMnxywBYhuph6J819RRw/ku+rLbelwfMunktuzVVHg==}
+  fast-uri@3.1.8:
+    resolution: {integrity: sha512-GZMtZUTNRpOVIECoXwLNZS5xUGE+mVNbTB8h/7Rwh2TFWcBQiPzTgyZi05BF9UMZKkLJv8XBRJTlU7zg8+ZfMg==}
 
   fdir@6.5.0:
     resolution: {integrity: sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==}
@@ -807,8 +807,8 @@ packages:
   siginfo@2.0.0:
     resolution: {integrity: sha512-ybx0WO1/8bSBLEWXZvEd7gMW3Sn3JFlW3TvX1nREbDLRNQNaeNN8WK0meBwPdAaOI7TtRRRJn/Es1zhrrCHu7g==}
 
-  source-map-js@1.2.1:
-    resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
+  source-map-js@1.2.2:
+    resolution: {integrity: sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==}
     engines: {node: '>=0.10.0'}
 
   stackback@0.0.2:
@@ -1239,13 +1239,13 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.62.4':
     optional: true
 
-  '@sonicfield/masa-validator@file:vendor/masa-0.2.1/sonicfield-masa-validator-0.2.1.tgz':
+  '@sonicfield/masa-validator@file:vendor/masa-0.2.2/sonicfield-masa-validator-0.2.2.tgz':
     dependencies:
-      '@sonicfield/masa': file:vendor/masa-0.2.1/sonicfield-masa-0.2.1.tgz
+      '@sonicfield/masa': file:vendor/masa-0.2.2/sonicfield-masa-0.2.2.tgz
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)
 
-  '@sonicfield/masa@file:vendor/masa-0.2.1/sonicfield-masa-0.2.1.tgz': {}
+  '@sonicfield/masa@file:vendor/masa-0.2.2/sonicfield-masa-0.2.2.tgz': {}
 
   '@standard-schema/spec@1.1.0': {}
 
@@ -1351,7 +1351,7 @@ snapshots:
   ajv@8.20.0:
     dependencies:
       fast-deep-equal: 3.1.3
-      fast-uri: 3.1.7
+      fast-uri: 3.1.8
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
@@ -1422,7 +1422,7 @@ snapshots:
 
   fast-deep-equal@3.1.3: {}
 
-  fast-uri@3.1.7: {}
+  fast-uri@3.1.8: {}
 
   fdir@6.5.0(picomatch@4.0.5):
     optionalDependencies:
@@ -1480,7 +1480,7 @@ snapshots:
     dependencies:
       nanoid: 3.3.18
       picocolors: 1.1.1
-      source-map-js: 1.2.1
+      source-map-js: 1.2.2
 
   react-dom@19.2.8(react@19.2.8):
     dependencies:
@@ -1531,7 +1531,7 @@ snapshots:
 
   siginfo@2.0.0: {}
 
-  source-map-js@1.2.1: {}
+  source-map-js@1.2.2: {}
 
   stackback@0.0.2: {}
 

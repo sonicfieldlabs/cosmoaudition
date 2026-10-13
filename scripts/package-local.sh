@@ -52,11 +52,11 @@ REQUIRED_TRACKED_INPUTS=(
   apps/web/package.json
   apps/web/tsconfig.json
   apps/web/vite.config.ts
-  vendor/masa-0.2.1/CHECKSUMS.sha256
-  vendor/masa-0.2.1/README.md
-  vendor/masa-0.2.1/PROVENANCE.json
-  vendor/masa-0.2.1/sonicfield-masa-0.2.1.tgz
-  vendor/masa-0.2.1/sonicfield-masa-validator-0.2.1.tgz
+  vendor/masa-0.2.2/CHECKSUMS.sha256
+  vendor/masa-0.2.2/README.md
+  vendor/masa-0.2.2/PROVENANCE.json
+  vendor/masa-0.2.2/sonicfield-masa-0.2.2.tgz
+  vendor/masa-0.2.2/sonicfield-masa-validator-0.2.2.tgz
 )
 for required_input in "${REQUIRED_TRACKED_INPUTS[@]}"; do
   [[ -s "$required_input" ]] || fail "missing required release input: $required_input"
@@ -64,9 +64,9 @@ for required_input in "${REQUIRED_TRACKED_INPUTS[@]}"; do
     fail "required release input is not tracked: $required_input"
 done
 
-unexpected_masa_archive="$(find vendor/masa-0.2.1 -maxdepth 1 -type f -name '*.tgz' \
-  ! -name 'sonicfield-masa-0.2.1.tgz' \
-  ! -name 'sonicfield-masa-validator-0.2.1.tgz' -print -quit)"
+unexpected_masa_archive="$(find vendor/masa-0.2.2 -maxdepth 1 -type f -name '*.tgz' \
+  ! -name 'sonicfield-masa-0.2.2.tgz' \
+  ! -name 'sonicfield-masa-validator-0.2.2.tgz' -print -quit)"
 [[ -z "$unexpected_masa_archive" ]] ||
   fail "unexpected vendored MASA archive: $unexpected_masa_archive"
 
@@ -127,18 +127,8 @@ WEB_BUILD="apps/web/dist/index.html"
 [[ -s "$WEB_BUILD" ]] || fail "missing or empty web build: $WEB_BUILD"
 
 if [[ "$SKIP_BUILD" == true ]]; then
-  while IFS= read -r -d '' build_input; do
-    if [[ "$build_input" -nt "$API_BUILD" || "$build_input" -nt "$WEB_BUILD" ]]; then
-      fail "--skip-build cannot package stale output; rebuild after: $build_input"
-    fi
-  done < <(
-    git ls-files -z -- \
-      package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json \
-      apps/api/package.json apps/api/src \
-      apps/web/index.html apps/web/package.json apps/web/public apps/web/src \
-      apps/web/tsconfig.json apps/web/vite.config.ts packages data/mock data/sources.yaml \
-      vendor/masa-0.2.1
-  )
+  node scripts/profile-local-build.mjs --verify-build ||
+    fail "--skip-build requires unchanged, verified build inputs and outputs"
 fi
 
 dist_symlink="$(find apps/api/dist apps/web/dist -type l -print -quit)"
@@ -172,7 +162,7 @@ RELEASE_INPUTS=(
   packages
   scripts
   tests
-  vendor/masa-0.2.1
+  vendor/masa-0.2.2
   data/cache/.gitkeep
   data/mock
   data/snapshots/.gitkeep

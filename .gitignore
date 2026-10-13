@@ -22,6 +22,9 @@ private/
 .DS_Store
 *.log
 *.tsbuildinfo
+/.build-inputs.json
+/.build-integrity.json
+/.build-*.json.*.tmp
 
 data/cache/*
 !data/cache/.gitkeep
@@ -31,3 +34,8 @@ data/snapshots/*
 .env
 .env.*
 !.env.example
+
+# Optional offline GRIB tooling: environments and bytecode are local artifacts.
+.venv/
+__pycache__/
+*.py[cod]

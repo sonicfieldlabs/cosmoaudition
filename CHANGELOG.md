@@ -2,6 +2,7 @@
 
 ## Unreleased — observation freshness
 
+- Prepare application 0.3.1 with build integrity receipts and immutable MASA 0.2.2 tooling. MASA protocol identifiers and the independent snapshot-adapter revision remain unchanged.
 - Evaluate source age independently of successful transport and confidence; refuse expired, future, and archive values at mapping boundaries.
 - Preserve original clocks and carbon settlement intervals; add effective freshness to frames and MASA exports. Fixtures remain explicitly non-current simulation evidence.
 - See [freshness policy](docs/freshness.md) for owner/consumer behavior and compatibility.
