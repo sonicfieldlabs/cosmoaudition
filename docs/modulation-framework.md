@@ -116,3 +116,26 @@ or process restart. `producerId` changes on restart. Do not interpret Last-Event
 as durable retention or let a cached frame become a fresh observation. The separate
 Listening Stack Web application owns disclosure-filtered public journal epochs and
 replay; this owner transport does not publish private events on its behalf.
+
+## Optional timing and audio-rate candidates
+
+`@cosmoaudition/midi-engine` exports `TransportSchedule` with an explicit
+`cosmo/transport-timing/v1` profile. It uses a monotonic software clock, at most
+256 events, a maximum ten-second admission horizon and an explicit late-drop
+tolerance of at most one second. Dispatch, late drop, failure and cancellation
+receipts state `software-dispatch-only`. A caller's device qualification label is
+not measured hardware evidence. Existing MIDI/OSC adapters are not automatically
+rewired or activated by importing this library.
+
+OSC encoding now refuses nonfinite/overflow values and malformed strings rather
+than replacing values with zero. MIDI queue payloads remain explicitly bounded
+bytes. The caller must select and qualify the exact adapter/device, queue servicing
+clock, disconnect behavior, jitter and receiver before claiming physical timing.
+
+`cv-preview.ts` provides an offline normalized Float32 sample buffer from explicit
+ordered points, at 8–96 kHz for at most one second and 256 points. Missing/refused
+controls cannot emit it; held controls need explicit opt-in. Its receipt declares
+unknown voltage calibration and no physical device output. A control-rate queue
+refuses CV output: real CV requires a separately qualified sample clock, DC-capable
+DAC, voltage/calibration/range and device failure policy. No MIDI, OSC, audio or CV
+device was addressed during local qualification.

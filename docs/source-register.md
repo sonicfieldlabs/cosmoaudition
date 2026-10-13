@@ -110,4 +110,42 @@ The generated control field has restrained cosmic, biospheric, and cultural voic
 
 ## Deferred expansions
 
+### Operator-provided observation packets
+
+`cosmo/local-observation/v1` admits a bounded offline `grib-forecast` or
+`account-report` packet. Required fields include source fingerprint, attribution,
+licence note, rights reference, coverage, issue/fetch timestamps with time zone,
+TTL and up to 4,096 uniquely identified points. Account references are opaque
+identifiers, never login secrets or URLs. Future account aggregates are refused;
+forecast validity is separate from issue time. Non-finite values and malformed
+packets are refused. Stale data becomes null with stale status; normalization is
+not invented and independently verified remains false.
+
+The local API's fixed `GET /api/local-observations` reads only the operator's
+`COSMOAUDITION_LOCAL_OBSERVATION` file. Requests cannot choose a path. The reader
+refuses symlinks, nonregular files, changes during a bounded read and packets over
+2 MiB. With no configured file it returns unavailable. There is no account login,
+remote import, provider cache or automatic control mapping.
+
+```sh
+pnpm exec tsx scripts/import-local-observation.mts packet.json 2026-10-08T00:00:20Z
+```
+
+`scripts/import-grib.py` optionally decodes local GRIB using an explicitly
+provisioned isolated Python environment. `scripts/requirements-grib.txt` records
+the exact codec dependency cohort used for generated qualification. The application
+does not install it on browse/startup or download source data. ecCodes/eckit native
+libraries carry Apache-2.0 licences; their exact installed metadata and licence
+file hashes are qualification evidence, independent of the input's rights.
+
+The decoder freezes a regular nonsymlink source of at most 32 MiB, admits at most
+16 messages and 4,096 total grid points before expanding arrays, binds coordinates
+and raw source SHA-256, and preserves issue/forecast validity and missing values.
+The CLI isolates native decoding in a worker with a 15-second deadline and bounded
+output. It requires source ID, attribution, licence, rights, coverage and fetch time.
+Run `python scripts/import-grib.py --help` for the exact arguments. Generated GRIB2
+roundtrip evidence establishes codec/import behavior only. Real weather data,
+source-specific availability, rights, credentials, provider rate limits and account
+reports still require separate qualification.
+
 Candidates for a later, independently reviewed adapter phase include NOAA CO-OPS coastal water level/wind, MET Norway forecast with required identifying headers, Wikimedia EventStreams with one server-side SSE aggregator and immediate personal-field removal, GBIF as slow ecological context, ECB daily statistics, and credentialed Copernicus Marine products. They are not operational merely because they are named here; the new Open-Meteo marine forecast does not replace an in-situ coastal station or a credentialed ocean product.

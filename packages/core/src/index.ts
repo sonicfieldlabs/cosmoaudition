@@ -17,3 +17,4 @@ export const PROJECT_NAME = "Cosmoaudition System";
 export * from "./generation-frame";
 
 export * from "./observation-series";
+export * from "./local-observation";
