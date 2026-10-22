@@ -18,6 +18,6 @@
     "@sonicfield/masa-validator": "file:../../vendor/masa-0.2.2/sonicfield-masa-validator-0.2.2.tgz"
   },
   "devDependencies": {
-    "vitest": "^4.1.11"
+    "vitest": "4.1.12"
   }
 }
