@@ -13,11 +13,11 @@
   "dependencies": {
     "@cosmoaudition/core": "workspace:*",
     "@cosmoaudition/masa": "workspace:*",
-    "@hono/node-server": "2.1.0",
-    "hono": "^4.13.13"
+    "@hono/node-server": "2.1.5",
+    "hono": "^4.13.14"
   },
   "devDependencies": {
-    "tsx": "^4.23.11",
+    "tsx": "^4.23.15",
     "vite": "^7.3.7"
   }
 }
