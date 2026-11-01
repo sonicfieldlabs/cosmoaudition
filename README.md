@@ -66,7 +66,7 @@ No family stands for a whole cosmos, atmosphere, biosphere, culture, or planet. 
 ## Requirements
 
 - Node.js 22.20 or newer
-- pnpm 10.32.1
+- pnpm 10.34.7
 - a browser with Web Audio support
 - optional Web MIDI support for authorized live device output
 
