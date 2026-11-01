@@ -46,3 +46,6 @@ jobs:
 
       - name: Run the complete release gate
         run: pnpm release:check
+
+      - name: Audit all dependency scopes
+        run: pnpm audit --audit-level=low
