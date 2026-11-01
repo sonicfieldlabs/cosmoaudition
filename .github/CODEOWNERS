@@ -7,3 +7,4 @@
 **/uv.lock @emeisazam
 **/wrangler.* @emeisazam
 /scripts/*release* @emeisazam
+**/requirements*.txt @emeisazam
