@@ -24,7 +24,7 @@ afterEach(() => {
   }
 });
 
-describe.sequential("extended source adapter fixtures", () => {
+describe("extended source adapter fixtures", { concurrent: false }, () => {
   it("parses cosmic, biosphere, and human aggregates with explicit epistemic metadata", async () => {
     const snapshot = await collectSnapshot({
       mode: "fixture",
