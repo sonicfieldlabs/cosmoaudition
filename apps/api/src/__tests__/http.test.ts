@@ -7,7 +7,7 @@ afterEach(() => {
   globalThis.fetch = originalFetch;
 });
 
-describe.sequential("bounded provider HTTP", () => {
+describe("bounded provider HTTP", { concurrent: false }, () => {
   it("refuses non-HTTPS and non-public provider targets before fetching", async () => {
     let fetchCount = 0;
     globalThis.fetch = (async () => {

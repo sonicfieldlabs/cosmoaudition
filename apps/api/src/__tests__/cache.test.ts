@@ -25,7 +25,7 @@ afterEach(async () => {
   );
 });
 
-describe.sequential("filesystem cache envelopes", () => {
+describe("filesystem cache envelopes", { concurrent: false }, () => {
   it("keeps coordinate variants isolated and leaves no partial write", async () => {
     const cacheDir = await createCacheDir();
     const source = getSourceDefinition("open_meteo_local")!;
