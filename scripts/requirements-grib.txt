@@ -2,7 +2,7 @@ attrs==26.1.0
 cffi==2.1.1
 eccodes==2.50.0
 eccodeslib==2.50.0.33
-eckitlib==2.5.0.33
+eckitlib==2.5.0.34
 findlibs==0.1.5
 numpy==2.5.4
 pycparser==3.12
