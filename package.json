@@ -27,9 +27,9 @@
     "verify:release": "scripts/verify-release.sh"
   },
   "devDependencies": {
-    "@playwright/test": "^1.64.1",
+    "@playwright/test": "^1.65.0",
     "@types/node": "^22.20.1",
     "typescript": "^5.9.3",
-    "vitest": "5.0.5"
+    "vitest": "5.1.0"
   }
 }
