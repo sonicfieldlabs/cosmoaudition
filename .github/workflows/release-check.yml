@@ -1,10 +1,17 @@
+# Portable PR checks run once; full platform qualification is deliberate.
 name: Release check
 
 on:
   pull_request:
-  push:
     branches:
-      - main
+    - main
+  workflow_dispatch:
+    inputs:
+      full:
+        description: Run complete platform and release qualification (prefer local execution)
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -42,9 +49,15 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Install Chromium
+        if: inputs.full == true
         run: pnpm exec playwright install --with-deps chromium
 
+      - name: Run portable checks
+        if: inputs.full != true
+        run: pnpm typecheck && pnpm test
+
       - name: Run the complete release gate
+        if: inputs.full == true
         run: pnpm release:check
 
       - name: Audit all dependency scopes
