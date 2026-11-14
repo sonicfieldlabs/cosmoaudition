@@ -137,7 +137,7 @@ All variables are optional:
 - No automatic geolocation, analytics, cookies, accounts, or public upload are used.
 - A control or modulation receipt means the parameter was scheduled; it does not claim audition.
 - A live synthesis state is not represented as an audio artifact unless it is recorded.
-- MASA TypeScript tooling 0.2.2 is selected as an unpublished, locally verified validation candidate. It repairs generating-lineage and completed-preservation checks while snapshot records retain the normative MASA 0.2.0 Observation profile. Epistemic status, temporal character, and signal kind remain protocol fields. Runtime dependencies are reviewed package archives, not mutable sibling checkouts. See [`vendor/masa-0.2.2/README.md`](vendor/masa-0.2.2/README.md) for checksums and source provenance. The original public 0.2.0 archives remain unchanged under `vendor/masa/` and are excluded from new local build archives.
+- The pinned MASA TypeScript tooling 0.2.2 is a locally verified validation candidate, not built from a public tag; MASA's released tooling is 0.2.3, and this repository has not moved to it. It repairs generating-lineage and completed-preservation checks while snapshot records retain the normative MASA 0.2.0 Observation profile. Epistemic status, temporal character, and signal kind remain protocol fields. Runtime dependencies are reviewed package archives, not mutable sibling checkouts. See [`vendor/masa-0.2.2/README.md`](vendor/masa-0.2.2/README.md) for checksums and source provenance. The original public 0.2.0 archives remain unchanged under `vendor/masa/` and are excluded from new local build archives.
 
 ## Licensing
 
@@ -154,7 +154,7 @@ their own and are **not** relicensed by it:
 - **Live provider responses** fetched at runtime are governed by the terms of the
   provider they came from. This is why attribution and licence notes travel with every
   emitted signal rather than being stripped at the gateway.
-- **The selected MASA tooling under `vendor/masa-0.2.2/` and historical `vendor/masa/` release** are MIT from their canonical source
+- **The pinned MASA tooling under `vendor/masa-0.2.2/` and historical `vendor/masa/` release** are MIT from their canonical source
   (`sonicfieldlabs/MASA`), and each archive retains that repository's copyright notice. Only the historical set comes from public tag `v0.2.0`; the candidate has the source identity recorded in its provenance receipt.
 
 Reusing the code and operating the system publicly are separate questions. Sources whose
